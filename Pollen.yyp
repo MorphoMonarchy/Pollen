@@ -11,6 +11,7 @@
   "defaultScriptType":1,
   "Folders":[
     {"$GMFolder":"","%Name":"Extensions","folderPath":"folders/Extensions.yy","name":"Extensions","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Pollen Example","folderPath":"folders/Pollen Example.yy","name":"Pollen Example","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Pollen","folderPath":"folders/Pollen.yy","name":"Pollen","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Rooms","folderPath":"folders/Rooms.yy","name":"Rooms","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Vinyl","folderPath":"folders/Vinyl.yy","name":"Vinyl","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -44,6 +45,7 @@
   "resources":[
     {"id":{"name":"Vinyl JSON Format","path":"notes/Vinyl JSON Format/Vinyl JSON Format.yy",},},
     {"id":{"name":"Vinyl Start Guide","path":"notes/Vinyl Start Guide/Vinyl Start Guide.yy",},},
+    {"id":{"name":"obj_example","path":"objects/obj_example/obj_example.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"id":{"name":"__VinylArrayShuffle","path":"scripts/__VinylArrayShuffle/__VinylArrayShuffle.yy",},},
     {"id":{"name":"__VinylBufferReadGML","path":"scripts/__VinylBufferReadGML/__VinylBufferReadGML.yy",},},

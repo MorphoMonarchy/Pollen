@@ -55,15 +55,17 @@ function Pollen() constructor {
                         }
                         
                         if (is_struct(_gml)){
-                            Log("Success!");
-                            // try{
-                            //     VinylSetupImportJSON(_gml[$ "global.VinylConfigSON"] ?? []);
-                            //     __VinylTrace("Successfully loaded config JSON from disk (", date_datetime_string(date_current_datetime()), ")");
-                            // }
-                            // catch(_error){
-                            //     show_debug_message(json_stringify(_error, true));
-                            //     __VinylTrace("Warning! Failed to import JSON");
-                            // }
+                            try {
+                                var _result = _gml[$ "global.pollen_config_vfx"] ?? [];
+                                global.pollen_config_vfx = _result;
+                                Log($"Success! Result = {_result[0]}");
+                                // VinylSetupImportJSON(_gml[$ "global.VinylConfigSON"] ?? []);
+                                // __VinylTrace("Successfully loaded config JSON from disk (", date_datetime_string(date_current_datetime()), ")");
+                            }
+                            catch(_error){
+                                show_debug_message(json_stringify(_error, true));
+                                Warn("Failed to import JSON");
+                            }
                         }
                     }
                 }

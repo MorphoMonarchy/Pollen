@@ -1,0 +1,7 @@
+// 2025-08-12 17:44:51
+#event properties (no comments/etc. here are saved)
+parent_index = -1;
+uses_physics = false;
+#event draw_gui
+
+draw_text(100, 100, $"Pollen struct = {global.pollen_config_vfx}");
