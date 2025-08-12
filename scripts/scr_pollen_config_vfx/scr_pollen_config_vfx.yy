@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_pollen_config_vfx",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_pollen_config_vfx",
+  "parent":{
+    "name":"Pollen",
+    "path":"folders/Pollen.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

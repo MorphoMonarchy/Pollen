@@ -1,0 +1,24 @@
+// 2025-08-12 15:35:27
+//======================================================================================================================
+/*
+                                 ____       _ _             __     _________  __
+                                |  _ \ ___ | | | ___ _ __   \ \   / /  ___\ \/ /
+                                | |_) / _ \| | |/ _ \ '_ \   \ \ / /| |_   \  /
+                                |  __/ (_) | | |  __/ | | |   \ V / |  _|  /  \
+                                |_|   \___/|_|_|\___|_| |_|    \_/  |_|   /_/\_\
+                                
+*/
+//======================================================================================================================
+
+function Pollen() constructor {
+    
+    //There should be no more than one instance of Pollen
+    static __numPollen = 0;
+    __numPollen++;
+    if(__numPollen > 1){DebugError("Error! Only one instance of Pollen should ever be created which should be created automatically at the end of the Pollen() constructor.\n   There's no need to create more than one instance since Pollen only uses static vars.");}
+    
+}
+
+//We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
+var _initPollen = new Pollen(); 
+delete _initPollen;

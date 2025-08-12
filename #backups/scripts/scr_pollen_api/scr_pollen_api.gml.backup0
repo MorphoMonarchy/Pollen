@@ -1,0 +1,82 @@
+// 2025-08-12 16:31:04
+//======================================================================================================================
+/*
+                                 ____       _ _             __     _________  __
+                                |  _ \ ___ | | | ___ _ __   \ \   / /  ___\ \/ /
+                                | |_) / _ \| | |/ _ \ '_ \   \ \ / /| |_   \  /
+                                |  __/ (_) | | |  __/ | | |   \ V / |  _|  /  \
+                                |_|   \___/|_|_|\___|_| |_|    \_/  |_|   /_/\_\
+                                
+*/
+//======================================================================================================================
+
+function Pollen() constructor {
+    
+    //There should be no more than one instance of Pollen
+    static __numPollen = 0;
+    __numPollen++;
+    if(__numPollen > 1){Error("Only one instance of Pollen should ever be created which should be created automatically at the end of the Pollen() constructor.\n   There's no need to create more than one instance since Pollen only uses static vars.");}
+    
+    //Handle live update from boot setup JSON
+    //Set up an update function that executes one every frame forever.
+    time_source_start(time_source_create(time_source_global, 1, time_source_units_frames, function()
+    {
+        static __bootSetupTimer   = 0;
+        // static __bootSetupPath    = VINYL_LIVE_EDIT? filename_dir(GM_project_filename) + "/scripts/__VinylConfigJSON/__VinylConfigJSON.gml" : undefined;
+        // static __bootSetupHash    = undefined;
+        
+        if (POLLEN_LIVE_EDIT && ((os_type == os_windows) || (os_type == os_macosx) || (os_type == os_linux))){
+            --__bootSetupTimer;
+            if (__bootSetupTimer <= 0){
+                __bootSetupTimer = 60;
+                Log("TEST");
+                static __bootSetupTimer   = 0;
+                static __bootSetupPath    = VINYL_LIVE_EDIT? filename_dir(GM_project_filename) + "/scripts/scr_pollen_config_vfx/scr_pollen_config_vfx.gml" : undefined;
+                static __bootSetupHash    = undefined;
+                
+                var _newHash = md5_file(__bootSetupPath);
+                if (_newHash != __bootSetupHash){
+                    if (__bootSetupHash == undefined){__bootSetupHash = _newHash;}
+                    else {
+                        __bootSetupHash = _newHash;
+                        
+                        var _buffer = buffer_load(__bootSetupPath);
+                        
+                        var _gml = undefined;
+                        try {
+                            var _gml = __VinylBufferReadGML(_buffer, 0, buffer_get_size(_buffer));
+                        }
+                        catch(_error) {
+                            show_debug_message(json_stringify(_error, true));
+                            Warn("Failed to read GML");
+                        }
+                        
+                        if (buffer_exists(_buffer)){
+                            buffer_delete(_buffer);
+                        }
+                        
+                        if (is_struct(_gml)){
+                            Log("Success!");
+                            // try{
+                            //     VinylSetupImportJSON(_gml[$ "global.VinylConfigSON"] ?? []);
+                            //     __VinylTrace("Successfully loaded config JSON from disk (", date_datetime_string(date_current_datetime()), ")");
+                            // }
+                            // catch(_error){
+                            //     show_debug_message(json_stringify(_error, true));
+                            //     __VinylTrace("Warning! Failed to import JSON");
+                            // }
+                        }
+                    }
+                }
+            }
+        }
+    }, [], -1));
+    
+    static Log = function(_message){show_debug_message("Pollen -> " + _message);}
+    static Warn = function(_message){show_debug_message("Pollen -> Warning! " + _message);}
+    static Error = function(_message){show_error("Pollen -> Error! " + _message, true);}
+}
+
+//We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
+var _initPollen = new Pollen(); 
+delete _initPollen;
