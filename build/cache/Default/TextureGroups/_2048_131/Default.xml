@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureGroup>
+  <texture scale="1" mipsToGenerate="0" texwidth="256" texheight="512">default_0.bz2</texture>
+  <tpe x="4" y="4" tpage="default_0.bz2">res_pt_shape_explosion.tpe</tpe>
+  <tpe x="4" y="76" tpage="default_0.bz2">res_pt_shape_flare.tpe</tpe>
+  <tpe x="4" y="148" tpage="default_0.bz2">res_pt_shape_smoke.tpe</tpe>
+  <tpe x="4" y="220" tpage="default_0.bz2">res_pt_shape_spark.tpe</tpe>
+  <tpe x="4" y="292" tpage="default_0.bz2">res_pt_shape_circle.tpe</tpe>
+  <tpe x="4" y="362" tpage="default_0.bz2">res_pt_shape_disk.tpe</tpe>
+  <tpe x="4" y="432" tpage="default_0.bz2">res_pt_shape_ring.tpe</tpe>
+  <tpe x="76" y="4" tpage="default_0.bz2">res_pt_shape_square.tpe</tpe>
+  <tpe x="76" y="74" tpage="default_0.bz2">res_pt_shape_snow.tpe</tpe>
+  <tpe x="76" y="146" tpage="default_0.bz2">res_pt_shape_sphere.tpe</tpe>
+  <tpe x="76" y="215" tpage="default_0.bz2">res_pt_shape_star.tpe</tpe>
+  <tpe x="76" y="283" tpage="default_0.bz2">res_pt_shape_cloud.tpe</tpe>
+  <tpe x="74" y="348" tpage="default_0.bz2">res_pt_shape_line.tpe</tpe>
+  <tpe x="74" y="366" tpage="default_0.bz2">res_pt_shape_pixel.tpe</tpe>
+</TextureGroup>

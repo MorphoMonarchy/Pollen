@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"scr_pollen_config_vfx",
+  "%Name":"scr_pollen_config_pfx",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"scr_pollen_config_vfx",
+  "name":"scr_pollen_config_pfx",
   "parent":{
     "name":"Pollen",
     "path":"folders/Pollen.yy",

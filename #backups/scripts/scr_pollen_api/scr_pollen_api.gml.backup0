@@ -1,14 +1,41 @@
-// 2025-08-12 17:46:32
+// 2025-08-13 15:15:24
 //======================================================================================================================
 /*
-                                 ____       _ _             __     _________  __
-                                |  _ \ ___ | | | ___ _ __   \ \   / /  ___\ \/ /
-                                | |_) / _ \| | |/ _ \ '_ \   \ \ / /| |_   \  /
-                                |  __/ (_) | | |  __/ | | |   \ V / |  _|  /  \
-                                |_|   \___/|_|_|\___|_| |_|    \_/  |_|   /_/\_\
+                                 ____       _ _                 _    ____ ___
+                                |  _ \ ___ | | | ___ _ __      / \  |  _ \_ _|
+                                | |_) / _ \| | |/ _ \ '_ \    / _ \ | |_) | |
+                                |  __/ (_) | | |  __/ | | |  / ___ \|  __/| |
+                                |_|   \___/|_|_|\___|_| |_| /_/   \_\_|  |___|
                                 
 */
 //======================================================================================================================
+
+/*                                                                                                          Completed?
+
+    USEFUL TOOLS:
+        ~ Tome (Auto generate doc site via docsify): https://github.com/CataclysmicStudios/Tome
+
+    TODO:                                                                                                       [ ]                                                                                                            
+        
+        ~ Feature list (v1.0):                                                                                  [ ]
+            ~ Setup hot-reload script                                                                           [X]
+            ~ Create default GM-editor particle system                                                          [X]
+            ~ Particle builder API                                                                              [ ]
+            ~ Util functions for bursting and streaming particles                                               [ ]
+            ~ Generate particle systems from hot-reload script                                                  [ ]
+            ~ Hot-reload particle systems                                                                       [ ]
+            ~ Generate particle systems from presets (use GM-editor presets, and add more)                      [ ]
+            ~ Ability for user to config presets                                                                [ ]
+        
+        ~ Potential future features:                                                                            [ ]       
+            ~ A particle editor tool that copies data as either gml or pollen-struct                            [ ]
+            ~ Ability to use paths/curves to modify properties                                                  [ ]
+            ~ Custom emitter shapes/stencils                                                                    [ ]
+            ~ Custom blendmodes for particles                                                                   [ ]
+            ~ Custom particle properties (randomize shape or image index?)                                      [ ]
+            
+            
+*/
 
 function Pollen() constructor {
     
@@ -17,7 +44,11 @@ function Pollen() constructor {
     __numPollen++;
     if(__numPollen > 1){Error("Only one instance of Pollen should ever be created which should be created automatically at the end of the Pollen() constructor.\n   There's no need to create more than one instance since Pollen only uses static vars.");}
     
-    //Handle live update from boot setup JSON
+    
+//======================================================================================================================
+#region ~ UPDATE ~
+//======================================================================================================================
+
     //Set up an update function that executes one every frame forever.
     time_source_start(time_source_create(time_source_global, 1, time_source_units_frames, function()
     {
@@ -31,7 +62,7 @@ function Pollen() constructor {
                 __bootSetupTimer = 60;
                 Log("TEST");
                 static __bootSetupTimer   = 0;
-                static __bootSetupPath    = VINYL_LIVE_EDIT? filename_dir(GM_project_filename) + "/scripts/scr_pollen_config_vfx/scr_pollen_config_vfx.gml" : undefined;
+                static __bootSetupPath    = VINYL_LIVE_EDIT? filename_dir(GM_project_filename) + "/scripts/scr_pollen_config_pfx/scr_pollen_config_pfx.gml" : undefined;
                 static __bootSetupHash    = undefined;
                 
                 var _newHash = md5_file(__bootSetupPath);
@@ -57,9 +88,10 @@ function Pollen() constructor {
                         
                         if (is_struct(_gml)){
                             try {
-                                var _result = _gml[$ "global.pollen_config_vfx"] ?? [];
-                                global.pollen_config_vfx = _result;
-                                Log($"Success! Result = {_result[0]}");
+                                var _result = _gml[$ "global.pollen_config_pfx"] ?? [];
+                                ImportPFX(_result);
+                                global.pollen_config_pfx = _result;
+                                // Log($"Success! Result = {_result[0]}");
                                 // VinylSetupImportJSON(_gml[$ "global.VinylConfigSON"] ?? []);
                                 // __VinylTrace("Successfully loaded config JSON from disk (", date_datetime_string(date_current_datetime()), ")");
                             }
@@ -73,6 +105,50 @@ function Pollen() constructor {
             }
         }
     }, [], -1));
+    
+
+//======================================================================================================================
+#region ~ API ~
+//======================================================================================================================
+
+    static PFX = function() constructor {
+        system = part_system_create();
+        part_system_depth(system, -100);
+        
+        type = part_type_create();
+        part_type_shape(type, pt_shape_sphere);
+        part_type_color1(type, c_white);
+        part_type_blend(type, false);
+        part_type_life(type, 80, 80);
+        part_type_scale(type, 1, 1);
+        part_type_size(type, 1, 1, 0, 0);
+        part_type_speed(type, 5, 5, 0, 0);
+        part_type_gravity(type, 0, 270);
+        part_type_direction(type, 80, 100, 0, 0);
+        part_type_orientation(type, 0, 0, 0, 0, false);
+        
+        emitter = part_emitter_create(system);
+        part_emitter_region(system, emitter, 0, 0, 64, 64, ps_shape_rectangle, ps_distr_linear);
+    }
+
+    static ImportPFX = function(_data){
+        if(!is_array(_data)){Error("global.pollen_config_vfx must be an array!");}
+        var _i = -1;
+        var _len = array_length(_data);
+        repeat(_len){
+            _i++;
+            var _struct = _data[_i];
+            if(struct_exists(_struct, "test")){
+                Log($"Success! Result = {_struct.test}");
+            }
+            else {
+                static __expectedList = "'test',";
+                Error($"Struct could not be parsed. Struct should contain one of the following properties: {__expectedList}");
+            }
+        }
+    }
+    
+    static CreatePFX = function(){return new PFX();}
     
     static Log = function(_message){show_debug_message("Pollen -> " + _message);}
     static Warn = function(_message){show_debug_message("Pollen -> Warning! " + _message);}
