@@ -1,4 +1,4 @@
-// 2025-08-13 13:54:00
+// 2025-08-14 14:53:15
 #event properties (no comments/etc. here are saved)
 parent_index = -1;
 uses_physics = false;
@@ -8,8 +8,8 @@ uses_physics = false;
 pfx = new Pollen.PFX();
 
 // start streaming a few particles per step
-part_emitter_region(pfx.system, pfx.emitter, x - 32, x + 32, y - 32, y + 32, ps_shape_rectangle, ps_distr_linear);
-part_emitter_stream(pfx.system, pfx.emitter, pfx.type, 10);
+part_emitter_region(pfx.system, pfx.emitterList[0], x - 32, x + 32, y - 32, y + 32, ps_shape_rectangle, ps_distr_linear);
+part_emitter_stream(pfx.system, pfx.emitterList[0], pfx.typeList[0], 10);
 
 #event draw_gui
 

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_pollen_parser",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_pollen_parser",
+  "parent":{
+    "name":"Pollen",
+    "path":"folders/Pollen.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

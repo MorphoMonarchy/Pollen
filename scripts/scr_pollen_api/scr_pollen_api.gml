@@ -24,6 +24,7 @@
             ~ Generate particle systems from hot-reload script                                                  [ ]
             ~ Hot-reload particle systems                                                                       [ ]
             ~ Generate particle systems from presets (use GM-editor presets, and add more)                      [ ]
+            ~ Generate particle types/emitters from presets                                                     [ ]
             ~ Ability for user to config presets                                                                [ ]
         
         ~ Potential future features:                                                                            [ ]       
@@ -59,7 +60,7 @@ function Pollen() constructor {
             --__bootSetupTimer;
             if (__bootSetupTimer <= 0){
                 __bootSetupTimer = 60;
-                Log("TEST");
+                self.Log("TEST");
                 static __bootSetupTimer   = 0;
                 static __bootSetupPath    = VINYL_LIVE_EDIT? filename_dir(GM_project_filename) + "/scripts/scr_pollen_config_pfx/scr_pollen_config_pfx.gml" : undefined;
                 static __bootSetupHash    = undefined;
@@ -78,7 +79,7 @@ function Pollen() constructor {
                         }
                         catch(_error) {
                             show_debug_message(json_stringify(_error, true));
-                            Warn("Failed to read GML");
+                            self.Warn("Failed to read GML");
                         }
                         
                         if (buffer_exists(_buffer)){
@@ -88,7 +89,7 @@ function Pollen() constructor {
                         if (is_struct(_gml)){
                             try {
                                 var _result = _gml[$ "global.pollen_config_pfx"] ?? [];
-                                ImportPFX(_result);
+                                self.ImportPFX(_result);
                                 global.pollen_config_pfx = _result;
                                 // Log($"Success! Result = {_result[0]}");
                                 // VinylSetupImportJSON(_gml[$ "global.VinylConfigSON"] ?? []);
@@ -114,35 +115,80 @@ function Pollen() constructor {
         system = part_system_create();
         part_system_depth(system, -100);
         
-        type = part_type_create();
-        part_type_shape(type, pt_shape_sphere);
-        part_type_color1(type, c_white);
-        part_type_blend(type, false);
-        part_type_life(type, 80, 80);
-        part_type_scale(type, 1, 1);
-        part_type_size(type, 1, 1, 0, 0);
-        part_type_speed(type, 5, 5, 0, 0);
-        part_type_gravity(type, 0, 270);
-        part_type_direction(type, 80, 100, 0, 0);
-        part_type_orientation(type, 0, 0, 0, 0, false);
+        typeList = [
+            part_type_create(),
+        ];
         
-        emitter = part_emitter_create(system);
-        part_emitter_region(system, emitter, 0, 0, 64, 64, ps_shape_rectangle, ps_distr_linear);
+        part_type_shape(typeList[0], pt_shape_sphere);
+        part_type_color1(typeList[0], c_white);
+        part_type_blend(typeList[0], false);
+        part_type_life(typeList[0], 80, 80);
+        part_type_scale(typeList[0], 1, 1);
+        part_type_size(typeList[0], 1, 1, 0, 0);
+        part_type_speed(typeList[0], 5, 5, 0, 0);
+        part_type_gravity(typeList[0], 0, 270);
+        part_type_direction(typeList[0], 80, 100, 0, 0);
+        part_type_orientation(typeList[0], 0, 0, 0, 0, false);
+        
+        emitterList = [
+            part_emitter_create(system),
+        ];
+        
+        part_emitter_region(system, emitterList[0], 0, 0, 64, 64, ps_shape_rectangle, ps_distr_linear);
+        
+        //--- TYPE SETTERS ---//
+        
+        static SetTypeShape = function(_index_or_tag, _shape){
+            if(!is_real(_index_or_tag)){return self;}
+            part_type_shape(typeList[_index_or_tag], _shape);
+            return self;
+        }
+        
+        
+        //--- TYPE GETTERS ---//
+        
+        // static GetTypeID = function(_)
     }
-
+    
     static ImportPFX = function(_data){
-        if(!is_array(_data)){Error("global.pollen_config_vfx must be an array!");}
+        if(!is_array(_data)){self.Error("global.pollen_config_vfx must be an array!");}
         var _i = -1;
         var _len = array_length(_data);
         repeat(_len){
             _i++;
             var _struct = _data[_i];
             if(struct_exists(_struct, "test")){
-                Log($"Success! Result = {_struct.test}");
+                self.Log($"Success! Result = {_struct.test}");
+            }
+            else if(struct_exists(_struct, "shape")){
+                with(obj_example.pfx){
+                    var _tag = struct_get(_struct, "shape");
+                    var _shape;
+                    switch(_tag){
+                        case "pixel": _shape = pt_shape_pixel; break;
+                        case "disk": //<--- accept both spellings
+                        case "disc": _shape = pt_shape_disk; break; 
+                        case "square": _shape = pt_shape_square; break;
+                        case "line": _shape = pt_shape_line; break;
+                        case "star": _shape = pt_shape_star; break;
+                        case "circle": _shape = pt_shape_circle; break;
+                        case "ring": _shape = pt_shape_ring; break;
+                        case "sphere": _shape = pt_shape_sphere; break;
+                        case "flare": _shape = pt_shape_flare; break;
+                        case "spark": _shape = pt_shape_spark; break;
+                        case "explosion": _shape = pt_shape_explosion; break;
+                        case "cloud": _shape = pt_shape_cloud; break;
+                        case "smoke": _shape = pt_shape_smoke; break;
+                        case "snow": _shape = pt_shape_snow; break;
+                        default: other.Error("Particle shape not recognized! Check spelling!"); break; 
+                    }
+                    self.SetTypeShape(0, _shape);
+                }
+                self.Log($"Success! Result = {_struct.shape}");
             }
             else {
                 static __expectedList = "'test',";
-                Error($"Struct could not be parsed. Struct should contain one of the following properties: {__expectedList}");
+                self.Error($"Struct could not be parsed. Struct should contain one of the following properties: {__expectedList}");
             }
         }
     }
