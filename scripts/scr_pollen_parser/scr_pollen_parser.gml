@@ -1,3 +1,5 @@
+// Feather ignore all
+
 function __PollenBufferReadGML(_buffer, _offset, _size)
 {
     var _oldOffset = buffer_tell(_buffer);
@@ -513,6 +515,23 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
             c_white:   c_white,
             c_yellow:  c_yellow,
             c_orange:  c_orange,
+            
+            //Part type shapes
+            pt_shape_pixel: pt_shape_pixel,
+            pt_shape_disk: pt_shape_disk,
+            pt_shape_square: pt_shape_square,
+            pt_shape_line: pt_shape_line,
+            pt_shape_star: pt_shape_star,
+            pt_shape_circle: pt_shape_circle,
+            pt_shape_ring: pt_shape_ring,
+            pt_shape_sphere: pt_shape_sphere,
+            pt_shape_flare: pt_shape_flare,
+            pt_shape_spark: pt_shape_spark,
+            pt_shape_explosion: pt_shape_explosion,
+            pt_shape_cloud: pt_shape_cloud,
+            pt_shape_smoke: pt_shape_smoke,
+            pt_shape_snow: pt_shape_snow,
+    
         };
         
         if (!is_string(_asset)) return _asset;

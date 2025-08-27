@@ -1,4 +1,4 @@
-// 2025-08-27 16:18:29
+// 2025-08-27 16:38:42
 #event properties (no comments/etc. here are saved)
 parent_index = -1;
 uses_physics = false;
@@ -9,11 +9,11 @@ show_debug_overlay(true);
 pfx = new Pollen.PFX();
 
 var _type = Pollen.TypeTagGetData("test");
-if(_type == undefined){Pollen.Error("WHOAAAA");}
+Pollen.Log($"{_type}");
 
 // start streaming a few particles per step
 part_emitter_region(pfx.system, pfx.emitterList[0], x - 32, x + 32, y - 32, y + 32, ps_shape_rectangle, ps_distr_linear);
-part_emitter_stream(pfx.system, pfx.emitterList[0], _type, 10);
+part_emitter_stream(pfx.system, pfx.emitterList[0], _type.GetGmlType(), 10);
 
 #event draw_gui
 

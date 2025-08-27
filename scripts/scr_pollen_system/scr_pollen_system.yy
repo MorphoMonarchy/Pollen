@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"scr_pollen_api",
+  "%Name":"scr_pollen_system",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"scr_pollen_api",
+  "name":"scr_pollen_system",
   "parent":{
     "name":"Pollen",
     "path":"folders/Pollen.yy",

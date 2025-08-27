@@ -1,4 +1,3 @@
-// 2025-08-27 16:24:13
 // Feather ignore all
 //======================================================================================================================
 /*
@@ -56,10 +55,10 @@ function Pollen() constructor {
     static __bootSetupTimer = 0;
     static __bootSetupPath = (POLLEN_LIVE_EDIT) ? filename_dir(GM_project_filename) + "/scripts/scr_pollen_config_pfx/scr_pollen_config_pfx.gml" : undefined;
     static __bootSetupHash = undefined;
-    static __initData = false;
     
     time_source_start(time_source_create(time_source_global, 1, time_source_units_frames, function()
     {
+        
         if (POLLEN_LIVE_EDIT && ((os_type == os_windows) || (os_type == os_macosx) || (os_type == os_linux))){
             self.__bootSetupTimer--;
             if (self.__bootSetupTimer <= 0){
@@ -195,21 +194,25 @@ function Pollen() constructor {
     static PFXType = function(_tag) constructor {
         
         //--- SETUP BACKEND ---//
-        if(__typeMap[? _tag] != undefined){Pollen.Error($"Attempting to create pollen part type, but type tag: '{_tag}' already exists!");}
-        
-        __gmlType = part_type_create();
-        __typeMap[? _tag] = __gmlType; 
+        if(Pollen.__typeMap[? _tag] != undefined){Pollen.Error($"Attempting to create pollen part type, but type tag: '{_tag}' already exists!");}
+        Pollen.__typeMap[? _tag] = self; 
         
         //--- SETUP PROPERTIES ---//
+        __gmlType = part_type_create();
         __shape = undefined;
         __sprite = {id: undefined, image: 0}
         
         //--- GML TYPE ---//
-        static GetGmlType = function(){return gmlType;}
+        static GetGmlType = function(){return __gmlType;}
         
         //--- SHAPE ---//
-        static GetShape = function(){return __shape;}
-        static SetShape = function(_shape){__sprite.id = undefined; __shape = _shape; part_type_shape(__gmlType, _shape); return self;}
+        static GetShape = function(){return self.__shape;}
+        static SetShape = function(_shape){
+            self.__sprite.id = undefined; 
+            self.__shape = _shape; 
+            part_type_shape(self.__gmlType, _shape); 
+            return self;
+        }
     }
     
     static TypeSetProperty = function(_part_type_or_tag, _property, _args){
@@ -282,4 +285,5 @@ function Pollen() constructor {
 //We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
 var _initPollen = new Pollen(); 
 delete _initPollen;
+Pollen.ImportPFX(global.pollen_config_pfx);
 Pollen.Log("Ready!");
