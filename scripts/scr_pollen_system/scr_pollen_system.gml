@@ -106,81 +106,6 @@ function Pollen() constructor {
         }
     }, [], -1));
     
-
-//======================================================================================================================
-#region ~ Particle Systems ~
-//======================================================================================================================
-
-    static PFX = function(_system = undefined, _typeList = undefined, _emitterList = undefined) constructor {
-        system = _system ?? part_system_create();
-        part_system_depth(system, -100);
-        
-        typeList = _typeList ?? [
-            part_type_create(),
-        ];
-        
-        if(_typeList == undefined){
-            part_type_shape(typeList[0], pt_shape_sphere);
-            part_type_color1(typeList[0], c_white);
-            part_type_blend(typeList[0], false);
-            part_type_life(typeList[0], 80, 80);
-            part_type_scale(typeList[0], 1, 1);
-            part_type_size(typeList[0], 1, 1, 0, 0);
-            part_type_speed(typeList[0], 5, 5, 0, 0);
-            part_type_gravity(typeList[0], 0, 270);
-            part_type_direction(typeList[0], 80, 100, 0, 0);
-            part_type_orientation(typeList[0], 0, 0, 0, 0, false);
-        }
-        
-        emitterList = _emitterList ?? [
-            part_emitter_create(system),
-        ];
-        
-        if(_emitterList == undefined){
-            part_emitter_region(system, emitterList[0], 0, 0, 64, 64, ps_shape_rectangle, ps_distr_linear);
-        }
-        
-        //--- TYPE SETTERS ---//
-        
-        static SetTypeProperty = function(_index_or_tag, _property, _args){
-            if(!is_real(_index_or_tag)){return self;}
-            var _type = typeList[_index_or_tag];
-            Pollen.TypeSetProperty(_type, _property, _args);
-            return self;
-        }
-        
-        
-        //--- TYPE GETTERS ---//
-        
-        // static GetTypeID = function(_)
-    }
-    
-    static ImportPFX = function(_data){
-        if(!is_array(_data)){self.Error("global.pollen_config_vfx must be an array!");}
-        var _i = -1;
-        var _len = array_length(_data);
-        repeat(_len){
-            _i++;
-            var _struct = _data[_i];
-            if(struct_exists(_struct, "type")){
-                var _tag = struct_get(_struct, "type");
-                var _tagData = self.TypeTagGetData(_tag);
-                if(_tagData == undefined){_tagData = new PFXType(_tag);}
-                var _shape = struct_get(_struct, "shape");
-                if(_shape != undefined){_tagData.SetShape(_shape);}
-                self.Log($"Type: '{_tag}' was reloaded.");
-            }
-            else if (struct_exists(_struct, "emitter")){self.Log($"Emitter: '{struct_get(_struct, "emitter")}' was reloaded");}
-            else if (struct_exists(_struct, "system")){self.Log($"System: '{struct_get(_struct, "system")}' was reloaded.");}
-            else {
-                static __expectedList = "type', 'emitter', 'system'";
-                self.Error($"Struct at global.pollen_config_pfx[{i}] could not be parsed. Struct should contain one of the following properties: {self.__expectedList}");
-            }
-        }
-    }
-    
-    static CreatePFX = function(){return new PFX();}
-    
     
 //======================================================================================================================
 #region ~ Particle Types ~
@@ -191,26 +116,26 @@ function Pollen() constructor {
     static __typeMap = ds_map_create();
     static TypeTagGetData = function(_tag){return __typeMap[? _tag];}
     
-    static PFXType = function(_tag) constructor {
+    static PfxType = function(_tag) constructor {
         
         //--- SETUP BACKEND ---//
         if(Pollen.__typeMap[? _tag] != undefined){Pollen.Error($"Attempting to create pollen part type, but type tag: '{_tag}' already exists!");}
         Pollen.__typeMap[? _tag] = self; 
         
         //--- SETUP PROPERTIES ---//
-        __gmlType = part_type_create();
+        __gmlData = part_type_create();
         __shape = undefined;
         __sprite = {id: undefined, image: 0}
         
         //--- GML TYPE ---//
-        static GetGmlType = function(){return __gmlType;}
+        static GetGmlData = function(){return __gmlData;}
         
         //--- SHAPE ---//
         static GetShape = function(){return self.__shape;}
         static SetShape = function(_shape){
             self.__sprite.id = undefined; 
             self.__shape = _shape; 
-            part_type_shape(self.__gmlType, _shape); 
+            part_type_shape(self.__gmlData, _shape); 
             return self;
         }
     }
@@ -274,6 +199,106 @@ function Pollen() constructor {
     
     
 //======================================================================================================================
+#region ~ Particle Systems ~
+//======================================================================================================================
+
+    static __systemMap = ds_map_create();
+    static SystemTagGetData = function(_tag){return __systemMap[? _tag];}
+
+    static Pfx = function(_tag, _system = undefined, _typeList = undefined, _emitterList = undefined) constructor {
+        
+        //--- SETUP BACKEND ---//
+        if(Pollen.__systemMap[? _tag] != undefined){Pollen.Error($"Attempting to create pollen part system, but system tag: '{_tag}' already exists!");}
+        Pollen.__systemMap[? _tag] = self; 
+        
+        
+        //--- SETUP PROPERTIES ---//
+        __gmlData = _system ?? part_system_create();
+        part_system_depth(__gmlData, -100); //<---will get rid of this eventually
+        
+        __typeList = _typeList ?? [];
+        __emitterList = _emitterList ?? [part_emitter_create(__gmlData)];
+        if(_emitterList == undefined){part_emitter_region(__gmlData, __emitterList[0], 0, 0, 128, 128, ps_shape_rectangle, ps_distr_linear);}
+
+        //--- SETTERS ---//
+        static SetTypeList = function(_list){__typeList = _list;}
+        static SetEmitterList = function(_list){__typeList = _list;}
+        static SetTypeProperty = function(_index_or_tag, _property, _args){
+            if(!is_real(_index_or_tag)){return self;}
+            var _type = __typeList[_index_or_tag];
+            Pollen.TypeSetProperty(_type, _property, _args);
+            return self;
+        }
+        
+        
+        //--- GETTERS ---//
+        static GetGmlData = function(){return __gmlData;}
+        static GetTypeList = function(){return __typeList;}
+        static GetEmitterList = function(){return __emitterList;}
+    }
+    
+    static PfxStream = function(_system_or_tag, _x, _y, _amount = undefined){
+        if(is_string(_system_or_tag)){
+            
+            var _data = self.__systemMap[? _system_or_tag];
+            var _gmlData = _data.GetGmlData();
+            var _emitterList = _data.GetEmitterList();
+            var _typeList = _data.GetTypeList();
+            
+            part_system_position(_gmlData, _x, _y);
+            
+            var _i = -1;
+            var _numEmitters = array_length(_emitterList);
+            repeat(_numEmitters){
+                _i++;
+                var _emitter = _emitterList[_i];
+                var _type = _typeList[_i];
+                if(is_string(_type)){_type = self.TypeTagGetData(_type).GetGmlData();}
+                var _number = _amount ?? 10; //<---will give users the ability to set default values when I add emitter data later
+                part_emitter_stream(_gmlData, _emitter, _type, _number);
+            }
+        }
+        //I'll add support for calling with gml part systems and possibly gml part assets later
+        return;
+    }
+    
+    
+//======================================================================================================================
+#region ~ Import ~
+//======================================================================================================================
+    
+    static ImportPFX = function(_data){
+        if(!is_array(_data)){self.Error("global.pollen_config_vfx must be an array!");}
+        var _i = -1;
+        var _len = array_length(_data);
+        repeat(_len){
+            _i++;
+            var _struct = _data[_i];
+            if(struct_exists(_struct, "type")){
+                var _tag = struct_get(_struct, "type");
+                var _tagData = self.TypeTagGetData(_tag);
+                if(_tagData == undefined){_tagData = new PfxType(_tag);}
+                var _shape = struct_get(_struct, "shape");
+                if(_shape != undefined){_tagData.SetShape(_shape);}
+                self.Log($"Type: '{_tag}' was reloaded.");
+            }
+            else if (struct_exists(_struct, "system")){
+                var _tag = struct_get(_struct, "system");
+                var _tagData = self.SystemTagGetData(_tag);
+                if(_tagData == undefined){_tagData = new Pfx(_tag);}
+                var _typeList = struct_get(_struct, "typeList");
+                if(_typeList != undefined){_tagData.SetTypeList(_typeList);}
+                self.Log($"System: '{struct_get(_struct, "system")}' was reloaded.");
+            }
+            else {
+                static __expectedList = "type', 'system'";
+                self.Error($"Struct at global.pollen_config_pfx[{_i}] could not be parsed. Struct should contain one of the following properties: {self.__expectedList}");
+            }
+        }
+    }
+    
+    
+//======================================================================================================================
 #region ~ Debug ~
 //======================================================================================================================
     
@@ -285,5 +310,5 @@ function Pollen() constructor {
 //We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
 var _initPollen = new Pollen(); 
 delete _initPollen;
-Pollen.ImportPFX(global.pollen_config_pfx);
+Pollen.ImportPFX(global.pollen_config_pfx); //<---Do not rename any files or this might not work since it requires the other scripts to be initialized first!!!
 Pollen.Log("Ready!");

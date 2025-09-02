@@ -29,14 +29,7 @@ global.pollen_config_pfx = [
     
     {
         type : "test",
-        shape : pt_shape_pixel,
-    },
-    
-    
-    //--- DEFINE INDEPENDENT EMITTERS HERE ---//
-    
-    {
-        emitter : "test",
+        shape : pt_shape_snow,
     },
     
     
