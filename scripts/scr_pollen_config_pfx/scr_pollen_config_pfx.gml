@@ -29,7 +29,7 @@ global.pollen_config_pfx = [
     
     {
         type : "test",
-        shape : pt_shape_snow,
+        shape : pt_shape_pixel,
     },
     
     
@@ -37,11 +37,12 @@ global.pollen_config_pfx = [
     
     {
         system : "test",
-        typeList : [
-            "test",
-        ],
         emitterList : [
-            "test",
+            {
+                type: "test",
+                width: 64,
+                height: 64,
+            },
         ],
     },
 ];

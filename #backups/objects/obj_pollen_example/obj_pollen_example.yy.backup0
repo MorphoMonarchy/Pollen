@@ -1,4 +1,4 @@
-// 2025-09-02 13:37:31
+// 2025-09-02 17:44:36
 #event properties (no comments/etc. here are saved)
 parent_index = -1;
 uses_physics = false;
@@ -10,7 +10,7 @@ show_debug_overlay(true);
 var _type = Pollen.TypeTagGetData("test");
 Pollen.Log($"{_type}");
 
-Pollen.PfxStream("test", 500, 200);
+Pollen.PfxStream("test", 500, 300);
 
 #event draw_gui
 
