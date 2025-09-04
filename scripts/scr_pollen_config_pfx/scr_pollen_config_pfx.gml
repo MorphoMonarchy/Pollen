@@ -37,6 +37,8 @@ global.pollen_config_pfx = [
         direction: {min: 0, max: 359, incr: 5, wiggle: 1},
         gravity: {amount: 0.05, direction: 270},
         orientation: {min: 0, max: 359, wiggle: 1, relative: true},
+        color: [ #2beB34, #D422B7, c_white ],
+        alpha: [0.5, 1, 0.35],
     },
     
     

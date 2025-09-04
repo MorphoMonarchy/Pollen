@@ -1,4 +1,4 @@
-// 2025-09-03 19:24:29
+// 2025-09-04 12:54:23
 // Feather ignore all
 //======================================================================================================================
 /*
@@ -126,6 +126,7 @@ function Pollen() constructor {
         Pollen.__typeMap[? _tag] = self; 
         
         //--- GML TYPE ---//
+        __tag = _tag;
         __gmlData = part_type_create();
         static GetGmlData = function(){return __gmlData;}
         
@@ -244,6 +245,72 @@ function Pollen() constructor {
         ){
             self.__orientation = { min: _min, max: _max, incr: _incr, wiggle: _wiggle, relative: _relative };
             part_type_orientation(self.__gmlData, _min, _max, _incr, _wiggle, _relative);
+            return self;
+        }
+        
+        //--- COLOR (STANDARD) ---//
+        __color = c_white;
+        static GetColor = function(){return self.__color;}
+        static SetColor = function(_color_or_array){
+            if(!is_array(_color_or_array)){
+                self.__color = _color_or_array;
+                part_type_color1(self.__gmlData, _color_or_array);
+                return self;
+            }
+            var _numColors = array_length(_color_or_array);
+            if(_numColors == 0){
+                Pollen.Warn($"Attempting to set color of type: '{self.__tag}' using an empty array! Bailing!");
+            }
+            else if(_numColors == 1){
+                __color = _color_or_array[0];
+                part_type_color1(self.__gmlData, _color_or_array[0]);
+            }
+            else if(_numColors == 2){
+                __color = _color_or_array;
+                part_type_color2(self.__gmlData, _color_or_array[0], _color_or_array[1]);
+            }
+            else if(_numColors == 3){
+                __color = _color_or_array;
+                part_type_color3(self.__gmlData, _color_or_array[0], _color_or_array[1], _color_or_array[2]);
+            }
+            else {
+                Pollen.Warn($"Attempting to set color of type: '{self.__tag}' using an array larger than 3. Defaulting to first 3 values!");
+                __color = [_color_or_array[0], _color_or_array[1], _color_or_array[2]];
+                part_type_color3(self.__gmlData, _color_or_array[0], _color_or_array[1], _color_or_array[2]);
+            }
+            return self;
+        }
+        
+        //--- ALPHA ---//
+        __alpha = c_white;
+        static GetAlpha = function(){return self.__alpha;}
+        static SetAlpha = function(_alpha_or_array){
+            if(!is_array(_alpha_or_array)){
+                self.__alpha = _alpha_or_array;
+                part_type_alpha1(self.__gmlData, _alpha_or_array);
+                return self;
+            }
+            var _numalphas = array_length(_alpha_or_array);
+            if(_numalphas == 0){
+                Pollen.Warn($"Attempting to set alpha of type: '{self.__tag}' using an empty array! Bailing!");
+            }
+            else if(_numalphas == 1){
+                __alpha = _alpha_or_array[0];
+                part_type_alpha1(self.__gmlData, _alpha_or_array[0]);
+            }
+            else if(_numalphas == 2){
+                __alpha = _alpha_or_array;
+                part_type_alpha2(self.__gmlData, _alpha_or_array[0], _alpha_or_array[1]);
+            }
+            else if(_numalphas == 3){
+                __alpha = _alpha_or_array;
+                part_type_alpha3(self.__gmlData, _alpha_or_array[0], _alpha_or_array[1], _alpha_or_array[2]);
+            }
+            else {
+                Pollen.Warn($"Attempting to set alpha of type: '{self.__tag}' using an array larger than 3. Defaulting to first 3 values!");
+                __alpha = [_alpha_or_array[0], _alpha_or_array[1], _alpha_or_array[2]];
+                part_type_alpha3(self.__gmlData, _alpha_or_array[0], _alpha_or_array[1], _alpha_or_array[2]);
+            }
             return self;
         }
     }
@@ -610,6 +677,14 @@ function Pollen() constructor {
             var _gdir = struct_get(_gravity, "direction") ?? _defGrav.direction;
             _type_data.SetGravity(_gamt, _gdir);
         }
+        
+        //--- COLOR (STANDARD ---//
+        var _color = struct_get(_import_data, "color");
+        if(_color != undefined){_type_data.SetColor(_color);}
+        
+        //--- ALPHA ---//
+        var _alpha = struct_get(_import_data, "alpha");
+        if(_alpha != undefined){_type_data.SetAlpha(_alpha);}
     }
     
     
