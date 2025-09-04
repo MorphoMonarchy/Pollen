@@ -1,4 +1,4 @@
-// 2025-09-02 17:45:26
+// 2025-09-03 19:24:29
 // Feather ignore all
 //======================================================================================================================
 /*
@@ -23,10 +23,11 @@
             ~ Create default GM-editor particle system                                                          [X]
             ~ Particle builder API                                                                              [ ]
             ~ Util functions for bursting and streaming particles                                               [ ]
-            ~ Generate particle systems from hot-reload script                                                  [ ]
+            ~ Generate particle types from hot-reload script                                                    [X]
+            ~ Generate particle systems from hot-reload script                                                  [X]
             ~ Hot-reload particle systems                                                                       [ ]
             ~ Generate particle systems from presets (use GM-editor presets, and add more)                      [ ]
-            ~ Generate particle types/emitters from presets                                                     [ ]
+            ~ Generate particle types from presets                                                              [ ]
             ~ Ability for user to config presets (only for types and systems                                    [ ]
             ~ Ensure easy cleanup of data (add .Destroy methods and check for mem-leaks)                        [ ]
         
@@ -91,7 +92,7 @@ function Pollen() constructor {
                         if (is_struct(_gml)){
                             try {
                                 var _result = _gml[$ "global.pollen_config_pfx"] ?? [];
-                                self.ImportPFX(_result);
+                                self.ImportPfx(_result);
                                 global.pollen_config_pfx = _result;
                                 // Log($"Success! Result = {_result[0]}");
                                 // VinylSetupImportJSON(_gml[$ "global.VinylConfigSON"] ?? []);
@@ -124,15 +125,12 @@ function Pollen() constructor {
         if(Pollen.__typeMap[? _tag] != undefined){Pollen.Error($"Attempting to create pollen part type, but type tag: '{_tag}' already exists!");}
         Pollen.__typeMap[? _tag] = self; 
         
-        //--- SETUP PROPERTIES ---//
-        __gmlData = part_type_create();
-        __shape = undefined;
-        __sprite = {id: undefined, image: 0}
-        
         //--- GML TYPE ---//
+        __gmlData = part_type_create();
         static GetGmlData = function(){return __gmlData;}
         
         //--- SHAPE ---//
+        __shape = undefined;
         static GetShape = function(){return self.__shape;}
         static SetShape = function(_shape){
             self.__sprite.id = undefined; 
@@ -140,45 +138,153 @@ function Pollen() constructor {
             part_type_shape(self.__gmlData, _shape); 
             return self;
         }
+        
+        //--- SPRITE ---//
+        __sprite = {id: undefined, subImg: 0, animate: false, stretch: false, randomImg: false}
+        static GetSpriteData = function(){return self.__sprite;}
+        static SetSprite = function(_sprite, _subImg = 0, _animate = false, _stretch = false, _randomImg = false){
+            self.__shape = undefined; 
+            self.__sprite = {id: _sprite, subImg: _subImg, animate: _animate, stretch: _stretch, randomImg: _randomImg}; 
+            part_type_sprite(self.__gmlData, _sprite, _animate, _stretch, _randomImg); 
+            part_type_subimage(self.__gmlData, _subImg);
+            return self;
+        }
+        
+        //--- SIZE ---// 
+        __size = {min: 0, max: 0, incr: 0, wiggle: 0}
+        __sizeX = undefined; //<--- I hate this but oh well...
+        __sizeY = undefined;
+        static GetSize = function(){return self.__size;}
+        static SetSize = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
+            if(__size != undefined){_min ??= __size.min; _max ??= __size.max; _incr ??= __size.incr; _wiggle ??= __size.wiggle;}
+            else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
+            self.__size = {min: _min, max: _max, incr: _incr, wiggle: _wiggle}
+            self.__sizeX = undefined;
+            self.__sizeY = undefined;
+            part_type_size(self.__gmlData, _min, _max, _incr, _wiggle); 
+            return self;
+        }
+        static GetSizeX = function(){return self.__sizeX;}
+        static SetSizeX = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
+            if(__sizeX != undefined){_min ??= __sizeX.min; _max ??= __sizeX.max; _incr ??= __sizeX.incr; _wiggle ??= __sizeX.wiggle;}
+            else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
+            self.__sizeX = undefined;
+            self.__sizeX = {min: _min, max: _max, incr: _incr, wiggle: _wiggle};
+            part_type_size_x(self.__gmlData, _min, _max, _incr, _wiggle); 
+            return self;
+        }
+        static GetSizeY = function(){return self.__sizeY;}
+        static SetSizeY = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
+            if(__sizeY != undefined){_min ??= __sizeY.min; _max ??= __sizeY.max; _incr ??= __sizeY.incr; _wiggle ??= __sizeY.wiggle;}
+            else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
+            self.__size = undefined;
+            self.__sizeY = {min: _min, max: _max, incr: _incr, wiggle: _wiggle};
+            part_type_size_y(self.__gmlData, _min, _max, _incr, _wiggle); 
+            return self;
+        }
+        
+        //--- SCALE ---//
+        __scale = {x: 1, y: 1};
+        static GetScale = function(){return self.__scale;}
+        static SetScale = function(_x = __scale.x, _y = __scale.y){
+            self.__scale = {x: _x, y: _y};
+            part_type_scale(self.__gmlData, _x, _y); 
+            return self;
+        }
+        
+        //--- SPEED ---//
+        __speed = { min: 1, max: 1, incr: 0, wiggle: 0 };
+        static GetSpeed = function(){ return self.__speed; }
+        static SetSpeed = function(
+            _min    = __speed.min,
+            _max    = __speed.max,
+            _incr   = __speed.incr,
+            _wiggle = __speed.wiggle
+        ){
+            self.__speed = { min: _min, max: _max, incr: _incr, wiggle: _wiggle };
+            part_type_speed(self.__gmlData, _min, _max, _incr, _wiggle);
+            return self;
+        }
+        
+        //--- DIRECTION ---//
+        __direction = { min: 0, max: 0, incr: 0, wiggle: 0 };
+        static GetDirection = function(){ return self.__direction; }
+        static SetDirection = function(
+            _min    = __direction.min,
+            _max    = __direction.max,
+            _incr   = __direction.incr,
+            _wiggle = __direction.wiggle
+        ){
+            self.__direction = { min: _min, max: _max, incr: _incr, wiggle: _wiggle };
+            part_type_direction(self.__gmlData, _min, _max, _incr, _wiggle);
+            return self;
+        }
+        
+        //--- GRAVITY ---//
+        __gravity = { amount: 0, direction: 270 };
+        static GetGravity = function(){ return self.__gravity; }
+        static SetGravity = function(
+            _amount    = __gravity.amount,
+            _direction = __gravity.direction
+        ){
+            self.__gravity = { amount: _amount, direction: _direction };
+            part_type_gravity(self.__gmlData, _amount, _direction);
+            return self;
+        }
+        
+        //--- ORIENTATION ---//
+        __orientation = { min: 0, max: 0, incr: 0, wiggle: 0, relative: false };
+        static GetOrientation = function(){ return self.__orientation; }
+        static SetOrientation = function(
+            _min      = __orientation.min,
+            _max      = __orientation.max,
+            _incr     = __orientation.incr,
+            _wiggle   = __orientation.wiggle,
+            _relative = __orientation.relative
+        ){
+            self.__orientation = { min: _min, max: _max, incr: _incr, wiggle: _wiggle, relative: _relative };
+            part_type_orientation(self.__gmlData, _min, _max, _incr, _wiggle, _relative);
+            return self;
+        }
     }
     
-    static TypeSetProperty = function(_part_type_or_tag, _property, _args){
-        if(is_string(_part_type_or_tag)){
-            var _data = TypeTagGetData(_part_type_or_tag);
-            if(_data == undefined){self.Error("TypeSetProperty: type tag not recognized!");}
-            switch(_property){
-                case pollen_type_property.shape: _data.SetShape(_args[0]); break;
-                case pollen_type_property.sprite: break;
-                case pollen_type_property.size: break;
-                case pollen_type_property.scale: break;
-                case pollen_type_property.speed: break;
-                case pollen_type_property.direction: break;
-                case pollen_type_property.gravity: break;
-                case pollen_type_property.orientation: break;
-                case pollen_type_property.color: break;
-                case pollen_type_property.blend: break;
-                case pollen_type_property.life: break;
-                case pollen_type_property.step: break;
-                case pollen_type_property.death: break;
-            }
-            return;
-        }
-        switch(_property){
-            case pollen_type_property.shape: part_type_shape(_part_type_or_tag, _args[0]); break;
-            case pollen_type_property.sprite: break;
-            case pollen_type_property.size: break;
-            case pollen_type_property.scale: break;
-            case pollen_type_property.speed: break;
-            case pollen_type_property.direction: break;
-            case pollen_type_property.gravity: break;
-            case pollen_type_property.orientation: break;
-            case pollen_type_property.color: break;
-            case pollen_type_property.blend: break;
-            case pollen_type_property.life: break;
-            case pollen_type_property.step: break;
-            case pollen_type_property.death: break;
-        }
-    }
+    // static TypeSetProperty = function(_part_type_or_tag, _property, _args){
+    //     if(is_string(_part_type_or_tag)){
+    //         var _data = TypeTagGetData(_part_type_or_tag);
+    //         if(_data == undefined){self.Error("TypeSetProperty: type tag not recognized!");}
+    //         switch(_property){
+    //             case pollen_type_property.shape: _data.SetShape(_args[0]); break;
+    //             case pollen_type_property.sprite: _data.SetSprite(_args[0], _args[1], _args[2], _args[3], _args[4]);
+    //             case pollen_type_property.size: break;
+    //             case pollen_type_property.scale: break;
+    //             case pollen_type_property.speed: break;
+    //             case pollen_type_property.direction: break;
+    //             case pollen_type_property.gravity: break;
+    //             case pollen_type_property.orientation: break;
+    //             case pollen_type_property.color: break;
+    //             case pollen_type_property.blend: break;
+    //             case pollen_type_property.life: break;
+    //             case pollen_type_property.step: break;
+    //             case pollen_type_property.death: break;
+    //         }
+    //         return;
+    //     }
+    //     switch(_property){
+    //         case pollen_type_property.shape: part_type_shape(_part_type_or_tag, _args[0]); break;
+    //         case pollen_type_property.sprite: break;
+    //         case pollen_type_property.size: break;
+    //         case pollen_type_property.scale: break;
+    //         case pollen_type_property.speed: break;
+    //         case pollen_type_property.direction: break;
+    //         case pollen_type_property.gravity: break;
+    //         case pollen_type_property.orientation: break;
+    //         case pollen_type_property.color: break;
+    //         case pollen_type_property.blend: break;
+    //         case pollen_type_property.life: break;
+    //         case pollen_type_property.step: break;
+    //         case pollen_type_property.death: break;
+    //     }
+    // }
     
     // static __TypeSetPropertyTestArgs = function(_part_type_or_tag, _property, _args){
     //     if(is_string(_part_type_or_tag)){return;}
@@ -346,7 +452,7 @@ function Pollen() constructor {
 #region ~ Import ~
 //======================================================================================================================
     
-    static ImportPFX = function(_data){
+    static ImportPfx = function(_data){
         if(!is_array(_data)){self.Error("global.pollen_config_vfx must be an array!");}
         var _i = -1;
         var _len = array_length(_data);
@@ -357,8 +463,7 @@ function Pollen() constructor {
                 var _tag = struct_get(_struct, "type");
                 var _tagData = self.TypeTagGetData(_tag);
                 if(_tagData == undefined){_tagData = new PfxType(_tag);}
-                var _shape = struct_get(_struct, "shape");
-                if(_shape != undefined){_tagData.SetShape(_shape);}
+                self.ImportPfxType(_struct, _tagData);
                 self.Log($"Type: '{_tag}' was reloaded.");
             }
             else if (struct_exists(_struct, "system")){
@@ -396,6 +501,117 @@ function Pollen() constructor {
         }
     }
     
+    //NOTE: Refactor this to use struct get names instead so we can test for mispellings and what not!!!
+    static ImportPfxType = function(_import_data, _type_data){
+        
+        //--- SHAPE ---//
+        var _shape = struct_get(_import_data, "shape");
+        if(_shape != undefined){_type_data.SetShape(_shape);}
+    
+        //--- SPRITE ---//
+        var _sprite = struct_get(_import_data, "sprite");
+        if(_sprite != undefined){
+            var _id = struct_get(_sprite, "id");
+            if(_id == undefined){
+                Pollen.Error($"Sprite struct defined in '{_import_data.type}' must contain 'id' property!");
+            }
+            var _default   = _type_data.GetSpriteData();
+            var _subImg    = struct_get(_sprite, "subImg")    ?? _default.subImg;
+            var _animate   = struct_get(_sprite, "animate")   ?? _default.animate;
+            var _stretch   = struct_get(_sprite, "stretch")   ?? _default.stretch;
+            var _randomImg = struct_get(_sprite, "randomImg") ?? _default.randomImg;
+            _type_data.SetSprite(_id, _subImg, _animate, _stretch, _randomImg);
+        }
+    
+        //--- SIZE (uniform) ---//
+        var _size = struct_get(_import_data, "size");
+        if(_size != undefined){
+            var _def = _type_data.GetSize();
+            if (_def == undefined) { _def = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
+            var _min    = struct_get(_size, "min")    ?? _def.min;
+            var _max    = struct_get(_size, "max")    ?? _def.max;
+            var _incr   = struct_get(_size, "incr")   ?? _def.incr;
+            var _wiggle = struct_get(_size, "wiggle") ?? _def.wiggle;
+            _type_data.SetSize(_min, _max, _incr, _wiggle);
+        }
+    
+        //--- SIZE X (axis override) ---//
+        var _sizeX = struct_get(_import_data, "sizeX");
+        if(_sizeX != undefined){
+            var _defX = _type_data.GetSizeX();
+            if (_defX == undefined) { _defX = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
+            var _minX    = struct_get(_sizeX, "min")    ?? _defX.min;
+            var _maxX    = struct_get(_sizeX, "max")    ?? _defX.max;
+            var _incrX   = struct_get(_sizeX, "incr")   ?? _defX.incr;
+            var _wiggleX = struct_get(_sizeX, "wiggle") ?? _defX.wiggle;
+            _type_data.SetSizeX(_minX, _maxX, _incrX, _wiggleX);
+        }
+    
+        //--- SIZE Y (axis override) ---//
+        var _sizeY = struct_get(_import_data, "sizeY");
+        if(_sizeY != undefined){
+            var _defY = _type_data.GetSizeY();
+            if (_defY == undefined) { _defY = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
+            var _minY    = struct_get(_sizeY, "min")    ?? _defY.min;
+            var _maxY    = struct_get(_sizeY, "max")    ?? _defY.max;
+            var _incrY   = struct_get(_sizeY, "incr")   ?? _defY.incr;
+            var _wiggleY = struct_get(_sizeY, "wiggle") ?? _defY.wiggle;
+            _type_data.SetSizeY(_minY, _maxY, _incrY, _wiggleY);
+        }
+    
+        //--- SCALE ---//
+        var _scale = struct_get(_import_data, "scale");
+        if(_scale != undefined){
+            var _defScale = _type_data.GetScale();
+            var _sx = struct_get(_scale, "x") ?? _defScale.x;
+            var _sy = struct_get(_scale, "y") ?? _defScale.y;
+            _type_data.SetScale(_sx, _sy);
+        }
+    
+        //--- SPEED ---//
+        var _speed = struct_get(_import_data, "speed");
+        if(_speed != undefined){
+            var _defSpeed = _type_data.GetSpeed();
+            var _smin    = struct_get(_speed, "min")    ?? _defSpeed.min;
+            var _smax    = struct_get(_speed, "max")    ?? _defSpeed.max;
+            var _sincr   = struct_get(_speed, "incr")   ?? _defSpeed.incr;
+            var _swiggle = struct_get(_speed, "wiggle") ?? _defSpeed.wiggle;
+            _type_data.SetSpeed(_smin, _smax, _sincr, _swiggle);
+        }
+    
+        //--- DIRECTION ---//
+        var _direction = struct_get(_import_data, "direction");
+        if(_direction != undefined){
+            var _defDir = _type_data.GetDirection();
+            var _dmin    = struct_get(_direction, "min")    ?? _defDir.min;
+            var _dmax    = struct_get(_direction, "max")    ?? _defDir.max;
+            var _dincr   = struct_get(_direction, "incr")   ?? _defDir.incr;
+            var _dwiggle = struct_get(_direction, "wiggle") ?? _defDir.wiggle;
+            _type_data.SetDirection(_dmin, _dmax, _dincr, _dwiggle);
+        }
+        
+        //--- ORIENTATION ---//
+        var _orientation = struct_get(_import_data, "orientation");
+        if(_orientation != undefined){
+            var _defOri = _type_data.GetOrientation();
+            var _omin  = struct_get(_orientation, "min")      ?? _defOri.min;
+            var _omax  = struct_get(_orientation, "max")      ?? _defOri.max;
+            var _oinc  = struct_get(_orientation, "incr")     ?? _defOri.incr;
+            var _owig  = struct_get(_orientation, "wiggle")   ?? _defOri.wiggle;
+            var _orel  = struct_get(_orientation, "relative") ?? _defOri.relative;
+            _type_data.SetOrientation(_omin, _omax, _oinc, _owig, _orel);
+        }
+    
+        //--- GRAVITY ---//
+        var _gravity = struct_get(_import_data, "gravity");
+        if(_gravity != undefined){
+            var _defGrav = _type_data.GetGravity();
+            var _gamt = struct_get(_gravity, "amount")    ?? _defGrav.amount;
+            var _gdir = struct_get(_gravity, "direction") ?? _defGrav.direction;
+            _type_data.SetGravity(_gamt, _gdir);
+        }
+    }
+    
     
 //======================================================================================================================
 #region ~ Debug ~
@@ -409,5 +625,5 @@ function Pollen() constructor {
 //We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
 var _initPollen = new Pollen(); 
 delete _initPollen;
-Pollen.ImportPFX(global.pollen_config_pfx); //<---Do not rename any files or this might not work since it requires the other scripts to be initialized first!!!
+Pollen.ImportPfx(global.pollen_config_pfx); //<---Do not rename any files or this might not work since it requires the other scripts to be initialized first!!!
 Pollen.Log("Ready!");

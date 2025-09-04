@@ -165,6 +165,7 @@
     {"id":{"name":"VinylStopAll","path":"scripts/VinylStopAll/VinylStopAll.yy",},},
     {"id":{"name":"VinylWillStop","path":"scripts/VinylWillStop/VinylWillStop.yy",},},
     {"id":{"name":"VinylFallbackSound","path":"sounds/VinylFallbackSound/VinylFallbackSound.yy",},},
+    {"id":{"name":"spr_pollen_test","path":"sprites/spr_pollen_test/spr_pollen_test.yy",},},
   ],
   "resourceType":"GMProject",
   "resourceVersion":"2.0",

@@ -29,7 +29,14 @@ global.pollen_config_pfx = [
     
     {
         type : "test",
-        shape : pt_shape_pixel,
+        shape: pt_shape_line,
+        // sprite : {id: spr_pollen_test},
+        speed: {min: 2, max: 10, incr: -0.05, wiggle: 0.1},
+        size: {min: 1, max: 3, wiggle: 0.1, incr: -0.01},
+        scale: {x: 0.2, y: 0.2},
+        direction: {min: 0, max: 359, incr: 5, wiggle: 1},
+        gravity: {amount: 0.05, direction: 270},
+        orientation: {min: 0, max: 359, wiggle: 1, relative: true},
     },
     
     
