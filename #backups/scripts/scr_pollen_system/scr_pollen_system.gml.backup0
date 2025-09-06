@@ -1,4 +1,4 @@
-// 2025-09-04 12:54:23
+// 2025-09-06 13:08:12
 // Feather ignore all
 //======================================================================================================================
 /*
@@ -16,6 +16,7 @@
     USEFUL TOOLS:
         ~ Tome (Auto generate doc site via docsify): https://github.com/CataclysmicStudios/Tome
 
+
     TODO:                                                                                                       [ ]                                                                                                            
         
         ~ Feature list (v1.0):                                                                                  [ ]
@@ -24,19 +25,30 @@
             ~ Particle builder API                                                                              [ ]
             ~ Util functions for bursting and streaming particles                                               [ ]
             ~ Generate particle types from hot-reload script                                                    [X]
+            ~ Ability to adjust any part type property from hot-reload script                                   [ ]
             ~ Generate particle systems from hot-reload script                                                  [X]
-            ~ Hot-reload particle systems                                                                       [ ]
-            ~ Generate particle systems from presets (use GM-editor presets, and add more)                      [ ]
+            ~ Ability to adjust any part system/emitter property from hot-reload script                         [ ]
             ~ Generate particle types from presets                                                              [ ]
-            ~ Ability for user to config presets (only for types and systems                                    [ ]
+            ~ Generate particle systems from presets (use GM-editor presets, and add more)                      [ ]
+            ~ Ability for user to config presets                                                                [ ]
             ~ Ensure easy cleanup of data (add .Destroy methods and check for mem-leaks)                        [ ]
+            ~ Add error checks and basic debug tools                                                            [ ]
+            ~ Add additional util functions                                                                     [ ]
         
-        ~ Potential future features:                                                                            [ ]       
-            ~ A particle editor tool that copies data as either gml or pollen-struct                            [ ]
-            ~ Ability to use paths/curves to modify properties                                                  [ ]
-            ~ Custom emitter shapes/stencils                                                                    [ ]
-            ~ Custom blendmodes for particles                                                                   [ ]
-            ~ Custom particle properties (randomize shape or image index?)                                      [ ]
+        
+    POTENTIAL FUTURE FEATURES:    
+    
+        ~ A particle editor tool that copies data as either gml or pollen-struct                            
+        ~ Ability to use paths/curves to modify properties                                                  
+        ~ Custom emitters:                                                                             
+            ~ Utilize GPU for optimization and so shaders can be applied                
+            ~ Customize shape of emitter using stencils
+            ~ Emit particles along a path or using animation curves
+            ~ Displacement maps to effect particle properties
+            ~ Ability to cache emitter states for improved performance
+            ~ Apply collision & forces to particles for more in-game interactions
+            ~ Custom blendmodes for particles (metaball rendering for splatter fx)                                                          
+            ~ Custom particle properties (blend shapes so a star can morph into a square for example?)                                  
             
             
 */
@@ -171,7 +183,7 @@ function Pollen() constructor {
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
             self.__sizeX = undefined;
             self.__sizeX = {min: _min, max: _max, incr: _incr, wiggle: _wiggle};
-            part_type_size_x(self.__gmlData, _min, _max, _incr, _wiggle); 
+            part_type_size_offsetX(self.__gmlData, _min, _max, _incr, _wiggle); 
             return self;
         }
         static GetSizeY = function(){return self.__sizeY;}
@@ -248,6 +260,44 @@ function Pollen() constructor {
             return self;
         }
         
+        //--- COLOR MIX ---//
+        __colorMix = undefined;
+        static GetColorMix = function(){return self.__colorMix;}
+        static SetColorMix = function(_colors_or_array){
+            var _array = _colors_or_array;
+            if(argument_count > 1){_array = [argument0, argument1];}
+            self.__colorMix = _array;
+            self.__colorRgb = undefined;
+            self.__colorHsv = undefined;
+            self.__color = undefined;
+            part_type_color_mix(self.__gmlData, _array[0], _array[1]);
+            return self;
+        }
+        
+        //--- COLOR RGB ---//
+        __colorRgb = undefined;
+        static GetColorRgb = function(){return self.__colorRgb;}
+        static SetColorRgb = function(_rmin, _rmax, _gmin, _gmax, _bmin, _bmax){
+            self.__colorMix = undefined;
+            self.__colorRgb = {rmin: _rmin, rmax: _rmax, gmin: _gmin, gmax: _gmax, bmin: _bmin, bmax: _bmax};
+            self.__colorHsv = undefined;
+            self.__color = undefined;
+            part_type_color_rgb(self.__gmlData, _rmin, _rmax, _gmin, _gmax, _bmin, _bmax);
+            return self;
+        }
+        
+        //--- COLOR HSV ---//
+        __colorHsv = undefined;
+        static GetColorHsv = function(){return self.__colorHsv;}
+        static SetColorHsv = function(_hmin, _hmax, _smin, _smax, _vmin, _vmax){
+            self.__colorMix = undefined;
+            self.__colorRgb = undefined;
+            self.__colorHsv = {hmin: _hmin, hmax: _hmax, smin: _smin, smax: _smax, vmin: _vmin, vmax: _vmax};
+            self.__color = undefined;
+            part_type_color_hsv(self.__gmlData, _hmin, _hmax, _smin, _smax, _vmin, _vmax);
+            return self;
+        }
+        
         //--- COLOR (STANDARD) ---//
         __color = c_white;
         static GetColor = function(){return self.__color;}
@@ -255,11 +305,15 @@ function Pollen() constructor {
             if(!is_array(_color_or_array)){
                 self.__color = _color_or_array;
                 part_type_color1(self.__gmlData, _color_or_array);
+                self.__colorMix = undefined;
+                self.__colorRgb = undefined;
+                self.__colorHsv = undefined;
                 return self;
             }
             var _numColors = array_length(_color_or_array);
             if(_numColors == 0){
                 Pollen.Warn($"Attempting to set color of type: '{self.__tag}' using an empty array! Bailing!");
+                return self;
             }
             else if(_numColors == 1){
                 __color = _color_or_array[0];
@@ -278,6 +332,9 @@ function Pollen() constructor {
                 __color = [_color_or_array[0], _color_or_array[1], _color_or_array[2]];
                 part_type_color3(self.__gmlData, _color_or_array[0], _color_or_array[1], _color_or_array[2]);
             }
+            __colorMix = undefined;
+            __colorRgb = undefined;
+            __colorHsv = undefined;
             return self;
         }
         
@@ -313,6 +370,53 @@ function Pollen() constructor {
             }
             return self;
         }
+        
+        //--- BLEND ---//
+        __blend = undefined;
+        static GetBlend = function(){return self.__blend;}
+        static SetBlend = function(_blend){
+            self.__blend = _blend; 
+            part_type_blend(self.__gmlData, _blend); 
+            return self;
+        }
+        
+        //--- LIFE ---//
+        __life = { min: 100, max: 100};
+        static GetLife = function(){ return self.__life; }
+        static SetLife = function(_min = __life.min, _max = __life.max){
+            self.__life = { min: _min, max: _max };
+            part_type_life(self.__gmlData, _min, _max);
+            return self;
+        }
+        
+        //--- SUB-PARTICLE STEP ---//
+        __step = { number: 100, type: 100};
+        static GetStep = function(){ return self.__step; }
+        static SetStep = function(_number = __step.number, _type = __step.type){
+            self.__step = { number: _number, type: _type };
+            if(is_string(_type)){
+                var _mapData = Pollen.__typeMap[? _type];
+                if(_mapData == undefined){Pollen.Error($"Particle type '{_type}' is not defined in particle map!");}
+                _type = _mapData.GetGmlData();
+            }
+            part_type_step(self.__gmlData, _number, _type);
+            return self;
+        }
+        
+        //--- SUB-PARTICLE DEATH ---//
+        __death = { number: 100, type: 100};
+        static GetDeath = function(){ return self.__death; }
+        static SetDeath = function(_number = __death.number, _type = __death.type){
+            self.__death = { number: _number, type: _type };
+            if(is_string(_type)){
+                var _mapData = Pollen.__typeMap[? _type];
+                if(_mapData == undefined){Pollen.Error($"Particle type '{_type}' is not defined in particle map!");}
+                _type = _mapData.GetGmlData();
+            }
+            part_type_death(self.__gmlData, _number, _type);
+            return self;
+        }
+        
     }
     
     // static TypeSetProperty = function(_part_type_or_tag, _property, _args){
@@ -381,7 +485,7 @@ function Pollen() constructor {
     // static EmitterTagGetData = function(_tag){return __emitterMap[? _tag];}
     
     //NOTE: Emitters must be tied to systems which is why I'm defining the data inside Pfx instead of Pollen
-    static PfxEmitter = function(_type, _system) constructor {
+    static PfxEmitter = function(_system) constructor {
         
         //--- SETUP BACKEND ---//
         // if(Pollen.__emitterMap[? _tag] != undefined){Pollen.Error($"Attempting to create pollen part emitter, but emitter tag: '{_tag}' already exists!");}
@@ -390,10 +494,10 @@ function Pollen() constructor {
         //--- SETUP PROPERTIES ---//
         __gmlData = part_emitter_create(_system.GetGmlData());
         __system = _system;
-        __type = _type;
+        __type = undefined;
         __shape = ps_shape_ellipse;
         __distr = ps_distr_linear;
-        __number = 10;
+        __number = 1;
         __offsetX = 0;
         __offsetY = 0;
         __width = 0;
@@ -408,18 +512,33 @@ function Pollen() constructor {
         }
         static SetWidth = function(_width){SetSize(_width, __height); return self;}
         static SetHeight = function(_height){SetSize(__width, _height); return self;}
+        
         static SetNumber = function(_number){__number = _number; __system.RefreshStream(); return self;}
         static SetType = function(_type){__type = _type; __system.RefreshStream(); return self;}
+        static SetShape = function(_shape){__shape = _shape; __system.RefreshStream(); return self;}
+        static SetDistr = function(_distr){__distr = _distr; __system.RefreshStream(); return self;}
+        
+        static SetOffset = function(_offsetX, _offsetY){
+            __offsetX = _offsetX;
+            __offsetY = _offsetY;
+            __system.RefreshStream();
+            return self;
+        }
+        static SetOffsetX = function(_offsetX){SetSize(_offsetX, __offsetY); return self;}
+        static SetOffsetY = function(_offsetY){SetSize(__offsetX, _offsetY); return self;}
         
         //--- GETTERS ---//
+        static GetGmlData = function(){return __gmlData;}
         static GetType = function(){return __type;}
         static GetNumber = function(){return __number;}
         static GetShape = function(){return __shape;}
         static GetDistr = function(){return __distr;}
-        static GetGmlData = function(){return __gmlData;}
         static GetWidth = function(){return __width;}
         static GetHeight = function(){return __height;}
         static GetSize = function(){return {w: __width, h: __height}}
+        static GetOffsetX = function(){return __offsetX;}
+        static GetOffsetY = function(){return __offsetY;}
+        static GetOffset = function(){return {x: __offsetX, y: __offsetY}}
     }
    
     
@@ -500,13 +619,16 @@ function Pollen() constructor {
                 
                 var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
                 var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
+                var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
+                var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
+                var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
                 var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
                 
                 var _type = _emitter.GetType();
                 if(is_string(_type)){_type = self.TypeTagGetData(_type);}
                 var _typeGml = _type.GetGmlData();
                 
-                part_emitter_region(_gmlData, _emitterGml, _x - _halfW, _x + _halfW, _y - _halfH, _y + _halfH, _shape, _distr);
+                part_emitter_region(_gmlData, _emitterGml, _left, _right, _top, _bottom, _shape, _distr);
                 part_emitter_stream(_gmlData, _emitterGml, _typeGml, _number);
             }
         }
@@ -545,17 +667,24 @@ function Pollen() constructor {
                     repeat(_numNewList){
                         _i++;
                         var _props = _emitterList[_i];
-                        if(_numOldList >= _i + 1){
-                            var _emitter = _tagData.GetEmitterList()[_i];
-                            var _type = struct_get(_props, "type") ?? _emitter.GetType();
-                            var _width = struct_get(_props, "width") ?? _emitter.GetWidth();
-                            var _height = struct_get(_props, "height") ?? _emitter.GetHeight();
-                            _emitter.SetType(_type).SetSize(_width, _height);
-                            continue;
-                        }
-                        var _emitter = new PfxEmitter(_props.type, _tagData)
-                            .SetSize(_props.width, _props.height);
-                        array_push(_tagData.GetEmitterList(), _emitter);
+                        var _emitter;
+                        if(_numOldList >= _i + 1){_emitter = _tagData.GetEmitterList()[_i]}
+                        else {_emitter = new PfxEmitter(_tagData); array_push(_tagData.GetEmitterList(), _emitter);}
+                        var _type = struct_get(_props, "type") ?? _emitter.GetType();
+                        var _width = struct_get(_props, "width") ?? _emitter.GetWidth();
+                        var _height = struct_get(_props, "height") ?? _emitter.GetHeight();
+                        var _number = struct_get(_props, "number") ?? _emitter.GetNumber();
+                        var _shape = struct_get(_props, "shape") ?? _emitter.GetShape();
+                        var _distr = struct_get(_props, "distr") ?? _emitter.GetDistr();
+                        var _offsetX = struct_get(_props, "offsetX") ?? _emitter.GetOffsetX();
+                        var _offsetY = struct_get(_props, "offsetY") ?? _emitter.GetOffsetY();
+                        _emitter
+                            .SetType(_type)
+                            .SetNumber(_number)
+                            .SetShape(_shape)
+                            .SetDistr(_distr)
+                            .SetSize(_width, _height)
+                            .SetOffset(_offsetX, _offsetY);
                     }
                     _tagData.RefreshStream();
                 }
@@ -678,13 +807,92 @@ function Pollen() constructor {
             _type_data.SetGravity(_gamt, _gdir);
         }
         
-        //--- COLOR (STANDARD ---//
+        //--- COLOR MIX ---//
+        var _colorMix = struct_get(_import_data, "colorMix");
+        if(_colorMix != undefined){_type_data.SetColorMix(_colorMix);}
+        
+        //--- COLOR RGB ---//
+        var _colorRgb = struct_get(_import_data, "colorRgb");
+        if(_colorRgb != undefined){
+            
+            var _rmin = struct_get(_colorRgb, "rmin");
+            var _rmax = struct_get(_colorRgb, "rmax");
+            _rmin ??= _rmax; _rmax ??= _rmin; //<---if only one of the values exist, the other value defaults to that
+            if(_rmin == undefined && _rmax == undefined){self.Error("colorRgb needs at least one of the two values 'rmin' or 'rmax' defined.");}
+            
+            var _gmin = struct_get(_colorRgb, "gmin");
+            var _gmax = struct_get(_colorRgb, "gmax");
+            _gmin ??= _gmax; _gmax ??= _gmin;
+            if(_gmin == undefined && _gmax == undefined){self.Error("colorRgb needs at least one of the two values 'gmin' or 'gmax' defined.");}
+            
+            var _bmin = struct_get(_colorRgb, "bmin");
+            var _bmax = struct_get(_colorRgb, "bmax");
+            _bmin ??= _bmax; _bmax ??= _bmin;
+            if(_bmin == undefined && _bmax == undefined){self.Error("colorRgb needs at least one of the two values 'bmin' or 'bmax' defined.");}
+            
+            _type_data.SetColorRgb(_rmin, _rmax, _gmin, _gmax, _bmin, _bmax);
+        }
+        
+        //--- COLOR HSV ---//
+        var _colorHsv = struct_get(_import_data, "colorHsv");
+        if(_colorHsv != undefined){
+            
+            var _hmin = struct_get(_colorHsv, "hmin");
+            var _hmax = struct_get(_colorHsv, "hmax");
+            _hmin ??= _hmax; _hmax ??= _hmin; //<---if only one of the values exist, the other value defaults to that
+            if(_hmin == undefined && _hmax == undefined){self.Error("colorHsv needs at least one of the two values 'hmin' or 'hmax' defined.");}
+            
+            var _smin = struct_get(_colorHsv, "smin");
+            var _smax = struct_get(_colorHsv, "smax");
+            _smin ??= _smax; _smax ??= _smin;
+            if(_smin == undefined && _smax == undefined){self.Error("colorHsv needs at least one of the two values 'smin' or 'smax' defined.");}
+            
+            var _vmin = struct_get(_colorHsv, "vmin");
+            var _vmax = struct_get(_colorHsv, "vmax");
+            _vmin ??= _vmax; _vmax ??= _vmin;
+            if(_vmin == undefined && _vmax == undefined){self.Error("colorHsv needs at least one of the two values 'vmin' or 'vmax' defined.");}
+            
+            _type_data.SetColorHsv(_hmin, _hmax, _smin, _smax, _vmin, _vmax);
+        }
+        
+        //--- COLOR (STANDARD) ---//
         var _color = struct_get(_import_data, "color");
         if(_color != undefined){_type_data.SetColor(_color);}
         
         //--- ALPHA ---//
         var _alpha = struct_get(_import_data, "alpha");
         if(_alpha != undefined){_type_data.SetAlpha(_alpha);}
+        
+        //--- BLEND ---//
+        var _blend = struct_get(_import_data, "blend");
+        if(_blend != undefined){_type_data.SetBlend(_blend);}
+        
+        //--- LIFE ---//
+        var _life = struct_get(_import_data, "life");
+        if(_life != undefined){
+            var _defLife = _type_data.GetLife();
+            var _min = struct_get(_life, "min") ?? _defLife.min;
+            var _max = struct_get(_life, "max") ?? _defLife.max;
+            _type_data.SetLife(_min, _max);
+        }
+        
+        //--- SUB-PARTICLE STEP ---//
+        var _step = struct_get(_import_data, "step");
+        if(_step != undefined){
+            var _defStep = _type_data.GetLife();
+            var _number = struct_get(_step, "number") ?? _defStep.number;
+            var _type = struct_get(_step, "type") ?? _defStep.type;
+            _type_data.SetStep(_number, _type);
+        }
+        
+        //--- SUB-PARTICLE DEATH ---//
+        var _death = struct_get(_import_data, "death");
+        if(_death != undefined){
+            var _defDeath = _type_data.GetLife();
+            var _number = struct_get(_death, "number") ?? _defDeath.number;
+            var _type = struct_get(_death, "type") ?? _defDeath.type;
+            _type_data.SetDeath(_number, _type);
+        }
     }
     
     

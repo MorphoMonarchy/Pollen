@@ -528,7 +528,7 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
             c_yellow:  c_yellow,
             c_orange:  c_orange,
             
-            //Part type shapes
+            //Particle constants
             pt_shape_pixel: pt_shape_pixel,
             pt_shape_disk: pt_shape_disk,
             pt_shape_square: pt_shape_square,
@@ -543,6 +543,15 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
             pt_shape_cloud: pt_shape_cloud,
             pt_shape_smoke: pt_shape_smoke,
             pt_shape_snow: pt_shape_snow,
+            
+            ps_shape_diamond: ps_shape_diamond,
+            ps_shape_ellipse: ps_shape_ellipse,
+            ps_shape_rectangle: ps_shape_rectangle,
+            ps_shape_line: ps_shape_line,
+            
+            ps_distr_gaussian: ps_distr_gaussian,
+            ps_distr_invgaussian: ps_distr_invgaussian,
+            ps_distr_linear: ps_distr_linear,
     
         };
         

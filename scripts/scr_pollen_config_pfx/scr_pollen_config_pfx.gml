@@ -27,6 +27,8 @@ global.pollen_config_pfx = [
     
     //--- DEFINE INDEPENDENT TYPES HERE ---//
     
+    {type: "test1"}, 
+    
     {
         type : "test",
         shape: pt_shape_line,
@@ -37,8 +39,15 @@ global.pollen_config_pfx = [
         direction: {min: 0, max: 359, incr: 5, wiggle: 1},
         gravity: {amount: 0.05, direction: 270},
         orientation: {min: 0, max: 359, wiggle: 1, relative: true},
-        color: [ #2beB34, #D422B7, c_white ],
+        // color: [ #2beB34, #D422B7, c_orange ],
+        // colorMix: [c_red, c_blue],
+        // colorRgb: {rmin: 0, rmax: 255, gmin: 0, gmax: 255,  bmin: 0, bmax: 255},
+        colorHsv: {hmin: 0, hmax: 255, smin: 0, smax: 255,  vmin: 0, vmax: 255},
         alpha: [0.5, 1, 0.35],
+        blend: true,
+        life: {min: 0, max: 100},
+        // step: {number: 0, type: "test1"} //<--- Should I parse structs first to add types to typeMap before setting properties so that way users can do this without having to worry about defining particles in order?
+        death: {number: 1, type: "test1"}
     },
     
     
@@ -51,6 +60,18 @@ global.pollen_config_pfx = [
                 type: "test",
                 width: 64,
                 height: 64,
+                number: 10,
+                // shape: ps_shape_diamond,
+            },
+            {
+                type: "test1",
+                width: 64,
+                height: 64,
+                number: 10,
+                shape: ps_shape_diamond,
+                distr: ps_distr_invgaussian,
+                offsetX: -50,
+                offsetY: -50,
             },
         ],
     },
