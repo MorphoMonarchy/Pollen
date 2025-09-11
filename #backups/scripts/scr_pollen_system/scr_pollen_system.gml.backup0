@@ -1,5 +1,7 @@
-// 2025-09-06 13:08:12
+// 2025-09-11 14:07:16
 // Feather ignore all
+//======================================================================================================================
+#region ~ INDEX ~
 //======================================================================================================================
 /*
                                  ____       _ _                 _    ____ ___
@@ -34,6 +36,10 @@
             ~ Ensure easy cleanup of data (add .Destroy methods and check for mem-leaks)                        [ ]
             ~ Add error checks and basic debug tools                                                            [ ]
             ~ Add additional util functions                                                                     [ ]
+            
+        ~ Testing & polish:                                                                                     [ ]
+            ~ Check builder functions to make sure all of them return self                                      [ ]
+            ~ Add tests to ensure JSON data is valid                                                            [ ]
         
         
     POTENTIAL FUTURE FEATURES:    
@@ -60,7 +66,8 @@ function Pollen() constructor {
     self.__numPollen++;
     if(self.__numPollen > 1){self.Error("Only one instance of Pollen should ever be created which should be created automatically at the end of the Pollen() constructor.\n   There's no need to create more than one instance since Pollen only uses static vars.");}
     
-    
+
+#endregion    
 //======================================================================================================================
 #region ~ UPDATE ~
 //======================================================================================================================
@@ -121,7 +128,8 @@ function Pollen() constructor {
         }
     }, [], -1));
     
-    
+ 
+#endregion   
 //======================================================================================================================
 #region ~ TYPES ~
 //======================================================================================================================
@@ -476,7 +484,8 @@ function Pollen() constructor {
     //     }
     // }
 
-   
+
+#endregion
 //======================================================================================================================
 #region ~ EMITTERS ~
 //======================================================================================================================
@@ -541,7 +550,8 @@ function Pollen() constructor {
         static GetOffset = function(){return {x: __offsetX, y: __offsetY}}
     }
    
-    
+  
+#endregion 
 //======================================================================================================================
 #region ~ SYSTEMS ~
 //======================================================================================================================
@@ -559,18 +569,37 @@ function Pollen() constructor {
         //--- SETUP PROPERTIES ---//
         __tag = _tag;
         __gmlData = _system ?? part_system_create();
-        part_system_depth(__gmlData, -100); //<---will get rid of this eventually
-        
         __position = {x: 0, y: 0}
+        __depth = 0;
+        __layer = undefined;
         __typeList = _typeList ?? [];
         __emitterList = _emitterList ?? [];
         __isStreaming = false;
         __streamNumber = undefined;
         
+        part_system_depth(__gmlData, __depth);
+        
         //--- SETTERS ---//
-        static SetPosition = function(_x, _y){__position = {x: _x, y: _y};}
+        static SetPosition = function(_x, _y){__position = {x: _x, y: _y}; return self;}
         static SetTypeList = function(_list){__typeList = _list; return self;}
         static SetEmitterList = function(_list){__typeList = _list; return self;}
+        
+        static SetDepth = function(_depth){
+            __depth = _depth; 
+            __layer = undefined;
+            part_system_depth(__gmlData, _depth); 
+            RefreshStream(); 
+            return self;
+        }
+        static SetLayer = function(_layer){
+            var _id = layer_get_id(_layer);
+            if(_id == -1){Pollen.Error("layer: '{_layer}' does not exist in current room!");}
+            __layer = _layer;
+            __depth = layer_get_depth(_id);
+            part_system_layer(__gmlData, _id);
+            return self;
+        }
+        
         static SetTypeProperty = function(_index_or_tag, _property, _args){
             if(!is_real(_index_or_tag)){return self;}
             var _type = __typeList[_index_or_tag];
@@ -581,6 +610,8 @@ function Pollen() constructor {
         //--- GETTERS ---//
         static GetTag = function(){return __tag;}
         static GetGmlData = function(){return __gmlData;}
+        static GetDepth = function(){return __depth;}
+        static GetLayer = function(){return __layer;}
         static GetTypeList = function(){return __typeList;}
         static GetEmitterList = function(){return __emitterList;}
         
@@ -636,7 +667,8 @@ function Pollen() constructor {
         return;
     }
     
-    
+
+#endregion   
 //======================================================================================================================
 #region ~ Import ~
 //======================================================================================================================
@@ -659,6 +691,10 @@ function Pollen() constructor {
                 var _tag = struct_get(_struct, "system");
                 var _tagData = self.SystemTagGetData(_tag);
                 if(_tagData == undefined){_tagData = new Pfx(_tag);}
+                var _depth = struct_get(_struct, "depth");
+                if(_depth != undefined){_tagData.SetDepth(_depth);}
+                var _layer = struct_get(_struct, "layer");
+                if(_layer != undefined){_tagData.SetLayer(_layer);}
                 var _emitterList = struct_get(_struct, "emitterList");
                 if(_emitterList != undefined){
                     var _numOldList = array_length(_tagData.GetEmitterList());
@@ -895,18 +931,29 @@ function Pollen() constructor {
         }
     }
     
-    
+
+#endregion    
 //======================================================================================================================
-#region ~ Debug ~
+#region ~ DEBUG ~
 //======================================================================================================================
     
     static Log = function(_message){show_debug_message("Pollen -> " + _message);}
     static Warn = function(_message){show_debug_message("Pollen -> Warning! " + _message);}
     static Error = function(_message){show_error("Pollen -> Error! " + _message, true);}
-}
+
+
+#endregion    
+//======================================================================================================================
+#region ~ SETUP ~
+//======================================================================================================================
+
+} //<---DON'T DELETE THIS!!!
 
 //We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
 var _initPollen = new Pollen(); 
 delete _initPollen;
 Pollen.ImportPfx(global.pollen_config_pfx); //<---Do not rename any files or this might not work since it requires the other scripts to be initialized first!!!
 Pollen.Log("Ready!");
+
+
+//======================================================================================================================

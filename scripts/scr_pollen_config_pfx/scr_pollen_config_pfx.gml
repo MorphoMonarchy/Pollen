@@ -44,7 +44,7 @@ global.pollen_config_pfx = [
         // colorRgb: {rmin: 0, rmax: 255, gmin: 0, gmax: 255,  bmin: 0, bmax: 255},
         colorHsv: {hmin: 0, hmax: 255, smin: 0, smax: 255,  vmin: 0, vmax: 255},
         alpha: [0.5, 1, 0.35],
-        blend: true,
+        blend: false,
         life: {min: 0, max: 100},
         // step: {number: 0, type: "test1"} //<--- Should I parse structs first to add types to typeMap before setting properties so that way users can do this without having to worry about defining particles in order?
         death: {number: 1, type: "test1"}
@@ -55,6 +55,8 @@ global.pollen_config_pfx = [
     
     {
         system : "test",
+        depth: 100,
+        // layer: "Asset",
         emitterList : [
             {
                 type: "test",

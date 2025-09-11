@@ -45,7 +45,7 @@
     {"id":{"name":"Vinyl Start Guide","path":"notes/Vinyl Start Guide/Vinyl Start Guide.yy",},},
     {"id":{"name":"obj_pollen_example","path":"objects/obj_pollen_example/obj_pollen_example.yy",},},
     {"id":{"name":"ParticleSystem1","path":"particles/ParticleSystem1/ParticleSystem1.yy",},},
-    {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"id":{"name":"rm_pollen_example","path":"rooms/rm_pollen_example/rm_pollen_example.yy",},},
     {"id":{"name":"__VinylArrayShuffle","path":"scripts/__VinylArrayShuffle/__VinylArrayShuffle.yy",},},
     {"id":{"name":"__VinylBufferReadGML","path":"scripts/__VinylBufferReadGML/__VinylBufferReadGML.yy",},},
     {"id":{"name":"__VinylBufferWriteGML","path":"scripts/__VinylBufferWriteGML/__VinylBufferWriteGML.yy",},},
@@ -170,7 +170,7 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"roomId":{"name":"rm_pollen_example","path":"rooms/rm_pollen_example/rm_pollen_example.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[
