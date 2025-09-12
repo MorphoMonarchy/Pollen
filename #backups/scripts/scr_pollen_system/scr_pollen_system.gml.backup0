@@ -1,4 +1,4 @@
-// 2025-09-11 14:07:16
+// 2025-09-12 17:37:37
 // Feather ignore all
 //======================================================================================================================
 #region ~ INDEX ~
@@ -572,6 +572,8 @@ function Pollen() constructor {
         __position = {x: 0, y: 0}
         __depth = 0;
         __layer = undefined;
+        __color = c_white;
+        __alpha = 1;
         __typeList = _typeList ?? [];
         __emitterList = _emitterList ?? [];
         __isStreaming = false;
@@ -583,12 +585,24 @@ function Pollen() constructor {
         static SetPosition = function(_x, _y){__position = {x: _x, y: _y}; return self;}
         static SetTypeList = function(_list){__typeList = _list; return self;}
         static SetEmitterList = function(_list){__typeList = _list; return self;}
+        static SetColor = function(_color){
+            __color = _color; 
+            part_system_color(__gmlData, _color, __alpha); 
+            self.RefreshStream();
+            return self;
+        }
+        static SetAlpha = function(_alpha){
+            __alpha = _alpha; 
+            part_system_color(__gmlData, __color, _alpha); 
+            self.RefreshStream();
+            return self;
+        }
         
         static SetDepth = function(_depth){
             __depth = _depth; 
             __layer = undefined;
             part_system_depth(__gmlData, _depth); 
-            RefreshStream(); 
+            self.RefreshStream(); 
             return self;
         }
         static SetLayer = function(_layer){
@@ -612,6 +626,8 @@ function Pollen() constructor {
         static GetGmlData = function(){return __gmlData;}
         static GetDepth = function(){return __depth;}
         static GetLayer = function(){return __layer;}
+        static GetColor = function(){return __color;}
+        static GetAlpha = function(){return __alpha;}
         static GetTypeList = function(){return __typeList;}
         static GetEmitterList = function(){return __emitterList;}
         
@@ -670,7 +686,7 @@ function Pollen() constructor {
 
 #endregion   
 //======================================================================================================================
-#region ~ Import ~
+#region ~ IMPORT ~
 //======================================================================================================================
     
     static ImportPfx = function(_data){
@@ -695,6 +711,10 @@ function Pollen() constructor {
                 if(_depth != undefined){_tagData.SetDepth(_depth);}
                 var _layer = struct_get(_struct, "layer");
                 if(_layer != undefined){_tagData.SetLayer(_layer);}
+                var _color = struct_get(_struct, "color");
+                if(_color != undefined){_tagData.SetColor(_color);}
+                var _alpha = struct_get(_struct, "alpha");
+                if(_alpha != undefined){_tagData.SetAlpha(_alpha);}
                 var _emitterList = struct_get(_struct, "emitterList");
                 if(_emitterList != undefined){
                     var _numOldList = array_length(_tagData.GetEmitterList());

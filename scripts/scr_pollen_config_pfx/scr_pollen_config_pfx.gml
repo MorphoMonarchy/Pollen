@@ -57,6 +57,8 @@ global.pollen_config_pfx = [
         system : "test",
         depth: 100,
         // layer: "Asset",
+        // color: c_white,
+        // alpha: 1,
         emitterList : [
             {
                 type: "test",
