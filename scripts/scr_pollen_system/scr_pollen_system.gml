@@ -23,12 +23,12 @@
         ~ Feature list (v1.0):                                                                                  [ ]
             ~ Setup hot-reload script                                                                           [X]
             ~ Create default GM-editor particle system                                                          [X]
-            ~ Particle builder API                                                                              [ ]
+            ~ Particle builder API                                                                              [X]
             ~ Util functions for bursting and streaming particles                                               [ ]
             ~ Generate particle types from hot-reload script                                                    [X]
             ~ Ability to adjust any part type property from hot-reload script                                   [X]
             ~ Generate particle systems from hot-reload script                                                  [X]
-            ~ Ability to adjust any part system/emitter property from hot-reload script                         [ ]
+            ~ Ability to adjust any part system/emitter property from hot-reload script                         [X]
             ~ Generate particle types from presets                                                              [ ]
             ~ Generate particle systems from presets (use GM-editor presets, and add more)                      [ ]
             ~ Ability for user to config presets                                                                [ ]
@@ -43,6 +43,12 @@
                 -> e.g. can do "size: {w: 64, h: 64}" OR "width: 64, height: 64"
             ~ Make functional on Gamemaker LTS version                                                          [ ]
             ~ Code cleanup and documentation                                                                    [ ]
+            
+    DOCUMENTATION:
+    
+        ~ Alternate libraries:
+            ~ https://github.com/GamemakerCasts/particles - A lightweight particle wrapper for GM
+            ~ https://delfos1.itch.io/pulse - A custom particle emitter library that extends GM's capabilities
         
         
     POTENTIAL FUTURE FEATURES:    
@@ -488,7 +494,7 @@ function Pollen() constructor {
     // }
 
 
-#endregion
+#endregion 
 //======================================================================================================================
 #region ~ EMITTERS ~
 //======================================================================================================================
@@ -696,7 +702,16 @@ function Pollen() constructor {
             repeat(_numEmitter){
                 _i++;
                 var _emitter = __emitterList[_i];
-                part_emitter_clear(__gmlData, _emitter.GetGmlData());
+                var _emitterGml = _emitter.GetGmlData();
+                part_emitter_clear(__gmlData, _emitterGml);
+                
+                //These have to be reset every refresh as well
+                var _emitterDelay = _emitter.GetDelay();
+                var _emitterInterval = _emitter.GetInterval();
+                var _emitterRelative = _emitter.GetRelative();
+                part_emitter_delay(__gmlData, _emitterGml, _emitterDelay.min, _emitterDelay.max, _emitterDelay.unit);
+                part_emitter_interval(__gmlData, _emitterGml, _emitterInterval.min, _emitterInterval.max, _emitterInterval.unit);
+                part_emitter_relative(__gmlData, _emitterGml, _emitterRelative);
             }
             Pollen.PfxStream(__tag);
         }
@@ -803,6 +818,7 @@ function Pollen() constructor {
                         var _interval = struct_get(_props, "interval") ?? _emitter.GetInterval();
                         var _offsetX = struct_get(_props, "offsetX") ?? _emitter.GetOffsetX();
                         var _offsetY = struct_get(_props, "offsetY") ?? _emitter.GetOffsetY();
+                        self.Log($"Import PFX: _interval = {_interval}");
                         _emitter
                             .SetType(_type)
                             .SetRelative(_relative) //<---NOTE: This must be before .SetNumber or changes won't be reflected properly
