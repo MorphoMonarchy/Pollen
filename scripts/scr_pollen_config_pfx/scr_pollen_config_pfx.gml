@@ -27,12 +27,12 @@ global.pollen_config_pfx = [
     
     //--- DEFINE INDEPENDENT TYPES HERE ---//
     
-    {type: "test1"}, 
+    {type: "type_example_min"}, 
     
     {
-        type : "test",
-        shape: pt_shape_line,
-        // sprite : {id: spr_pollen_test},
+        type : "type_example_full",
+        // shape: pt_shape_line,
+        sprite : {id: spr_pollen_test},
         speed: {min: 2, max: 10, incr: -0.05, wiggle: 0.1},
         size: {min: 1, max: 3, wiggle: 0.1, incr: -0.01},
         scale: {x: 0.2, y: 0.2},
@@ -46,31 +46,37 @@ global.pollen_config_pfx = [
         alpha: [0.5, 1, 0.35],
         blend: false,
         life: {min: 0, max: 100},
-        // step: {number: 0, type: "test1"} //<--- Should I parse structs first to add types to typeMap before setting properties so that way users can do this without having to worry about defining particles in order?
-        death: {number: 1, type: "test1"}
+        // step: {number: 0, type: type_example_min"} //<--- Should I parse structs first to add types to typeMap before setting properties so that way users can do this without having to worry about defining particles in order?
+        death: {number: 1, type: "type_example_min"}
     },
     
     
     //--- DEFINE SYSTEMS HERE ---//
     
     {
-        system : "test",
+        system : "system_example",
         depth: 100,
+        position: {x: 600, y: 300},
         // layer: "Asset",
-        // color: c_white,
+        globalSpace: true,
+        // drawOrder: false,
+        // angle: 45,
+        color: c_white,
         // alpha: 1,
         emitterList : [
             {
-                type: "test",
+                type: "type_example_full",
                 width: 64,
                 height: 64,
                 number: 10,
-                // shape: ps_shape_diamond,
             },
             {
-                type: "test1",
+                type: "type_example_min",
                 width: 64,
                 height: 64,
+                relative: true,
+                delay: {min: 200, max: 200, unit: time_source_units_frames},
+                // interval: {min: 200, max: 200, unit: time_source_units_frames},
                 number: 20,
                 shape: ps_shape_diamond,
                 distr: ps_distr_invgaussian,

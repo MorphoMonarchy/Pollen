@@ -552,6 +552,10 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
             ps_distr_gaussian: ps_distr_gaussian,
             ps_distr_invgaussian: ps_distr_invgaussian,
             ps_distr_linear: ps_distr_linear,
+            
+            //Time
+            time_source_units_frames: time_source_units_frames,
+            time_source_units_seconds: time_source_units_seconds,
     
         };
         

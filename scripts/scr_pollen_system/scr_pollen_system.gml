@@ -3,12 +3,12 @@
 #region ~ INDEX ~
 //======================================================================================================================
 /*
-                                 ____       _ _                 _    ____ ___
-                                |  _ \ ___ | | | ___ _ __      / \  |  _ \_ _|
-                                | |_) / _ \| | |/ _ \ '_ \    / _ \ | |_) | |
-                                |  __/ (_) | | |  __/ | | |  / ___ \|  __/| |
-                                |_|   \___/|_|_|\___|_| |_| /_/   \_\_|  |___|
-                                
+                             ____       _ _              ____            _
+                            |  _ \ ___ | | | ___ _ __   / ___| _   _ ___| |_ ___ _ __ ___
+                            | |_) / _ \| | |/ _ \ '_ \  \___ \| | | / __| __/ _ \ '_ ` _ \
+                            |  __/ (_) | | |  __/ | | |  ___) | |_| \__ \ ||  __/ | | | | |
+                            |_|   \___/|_|_|\___|_| |_| |____/ \__, |___/\__\___|_| |_| |_|
+                                                               |___/
 */
 //======================================================================================================================
 
@@ -26,7 +26,7 @@
             ~ Particle builder API                                                                              [ ]
             ~ Util functions for bursting and streaming particles                                               [ ]
             ~ Generate particle types from hot-reload script                                                    [X]
-            ~ Ability to adjust any part type property from hot-reload script                                   [ ]
+            ~ Ability to adjust any part type property from hot-reload script                                   [X]
             ~ Generate particle systems from hot-reload script                                                  [X]
             ~ Ability to adjust any part system/emitter property from hot-reload script                         [ ]
             ~ Generate particle types from presets                                                              [ ]
@@ -39,6 +39,10 @@
         ~ Testing & polish:                                                                                     [ ]
             ~ Check builder functions to make sure all of them return self                                      [ ]
             ~ Add tests to ensure JSON data is valid                                                            [ ]
+            ~ Add options to use structs or split-up variables for position, offset, size, etc                  [ ]
+                -> e.g. can do "size: {w: 64, h: 64}" OR "width: 64, height: 64"
+            ~ Make functional on Gamemaker LTS version                                                          [ ]
+            ~ Code cleanup and documentation                                                                    [ ]
         
         
     POTENTIAL FUTURE FEATURES:    
@@ -505,6 +509,9 @@ function Pollen() constructor {
         __type = undefined;
         __shape = ps_shape_ellipse;
         __distr = ps_distr_linear;
+        __delay = {min: 0, max: 0, unit: time_source_units_frames};
+        __interval = {min: 0, max: 0, unit: time_source_units_frames};
+        __relative = false;
         __number = 1;
         __offsetX = 0;
         __offsetY = 0;
@@ -526,6 +533,26 @@ function Pollen() constructor {
         static SetShape = function(_shape){__shape = _shape; __system.RefreshStream(); return self;}
         static SetDistr = function(_distr){__distr = _distr; __system.RefreshStream(); return self;}
         
+        static SetRelative = function(_enabled){
+            __relative = _enabled; 
+            part_emitter_relative(__system.GetGmlData(), __gmlData, _enabled);
+            __system.RefreshStream(); 
+            return self;
+        }
+        
+        static SetDelay = function(_delay){
+            __delay = _delay; 
+            part_emitter_delay(__system.GetGmlData(), __gmlData, _delay.min, _delay.max, _delay.unit);
+            __system.RefreshStream(); 
+            return self;
+        }
+        static SetInterval = function(_interval){
+            __interval = _interval; 
+            part_emitter_interval(__system.GetGmlData(), __gmlData, _interval.min, _interval.max, _interval.unit);
+            __system.RefreshStream(); 
+            return self;
+        }
+        
         static SetOffset = function(_offsetX, _offsetY){
             __offsetX = _offsetX;
             __offsetY = _offsetY;
@@ -538,9 +565,12 @@ function Pollen() constructor {
         //--- GETTERS ---//
         static GetGmlData = function(){return __gmlData;}
         static GetType = function(){return __type;}
+        static GetRelative = function(){return __relative;}
         static GetNumber = function(){return __number;}
         static GetShape = function(){return __shape;}
         static GetDistr = function(){return __distr;}
+        static GetDelay = function(){return __delay;}
+        static GetInterval = function(){return __interval;}
         static GetWidth = function(){return __width;}
         static GetHeight = function(){return __height;}
         static GetSize = function(){return {w: __width, h: __height}}
@@ -569,6 +599,9 @@ function Pollen() constructor {
         __tag = _tag;
         __gmlData = _system ?? part_system_create();
         __position = {x: 0, y: 0}
+        __globalSpace = false;
+        __drawOrder = true;
+        __angle = 0;
         __depth = 0;
         __layer = undefined;
         __color = c_white;
@@ -578,10 +611,9 @@ function Pollen() constructor {
         __isStreaming = false;
         __streamNumber = undefined;
         
-        part_system_depth(__gmlData, __depth);
         
         //--- SETTERS ---//
-        static SetPosition = function(_x, _y){__position = {x: _x, y: _y}; return self;}
+        // static SetPosition = function(_x, _y){__position = {x: _x, y: _y}; return self;}
         static SetTypeList = function(_list){__typeList = _list; return self;}
         static SetEmitterList = function(_list){__typeList = _list; return self;}
         static SetColor = function(_color){
@@ -596,7 +628,29 @@ function Pollen() constructor {
             self.RefreshStream();
             return self;
         }
-        
+        static SetPosition = function(_x = undefined, _y = undefined){
+            __position.x = _x ?? __position.x;
+            __position.y = _y ?? __position.y;
+            part_system_position(__gmlData, __position.x, __position.y); //<---NOTE: I am opting to use a custom position instead since it's less confusing and there are issues with live-updating using part_system_position
+            // self.RefreshStream(); //<---NOTE: This will cause a freeze since there is a recursive loop since PfxStream also calls the SetPosition() method
+            return self;
+        }
+        static SetGlobalSpace = function(_enabled){
+            __globalSpace = _enabled;
+            part_system_global_space(__gmlData, _enabled);
+            return self;
+        }
+        static SetDrawOrder = function(_enabled){
+            __drawOrder = _enabled;
+            part_system_draw_order(__gmlData, _enabled);
+            return self;
+        }
+        static SetAngle = function(_angle){
+            __angle = _angle;
+            part_system_angle(__gmlData, _angle);
+            // self.RefreshStream(); //<---NOTE: This is not needed for part_system_angle
+            return self;
+        }
         static SetDepth = function(_depth){
             __depth = _depth; 
             __layer = undefined;
@@ -625,6 +679,10 @@ function Pollen() constructor {
         static GetGmlData = function(){return __gmlData;}
         static GetDepth = function(){return __depth;}
         static GetLayer = function(){return __layer;}
+        static GetPosition = function(){return __position;}
+        static GetGlobalSpace = function(){return __globalSpace;}
+        static GetDrawOrder = function(){return __drawOrder;}
+        static GetAngle = function(){return __angle;}
         static GetColor = function(){return __color;}
         static GetAlpha = function(){return __alpha;}
         static GetTypeList = function(){return __typeList;}
@@ -640,11 +698,11 @@ function Pollen() constructor {
                 var _emitter = __emitterList[_i];
                 part_emitter_clear(__gmlData, _emitter.GetGmlData());
             }
-            Pollen.PfxStream(__tag, __position.x, __position.y, __streamNumber);
+            Pollen.PfxStream(__tag);
         }
     }
     
-    static PfxStream = function(_system_or_tag, _x, _y, _amount = undefined){
+    static PfxStream = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
         if(is_string(_system_or_tag)){
             
             var _data = self.__systemMap[? _system_or_tag];
@@ -652,7 +710,8 @@ function Pollen() constructor {
             var _emitterList = _data.GetEmitterList();
             var _typeList = _data.GetTypeList();
             
-            _data.SetPosition(_x, _y);
+            // var _oldPos = _data.GetPosition();
+            // _x ??= _oldPos.x; _y ??= _oldPos.y;
             _data.__isStreaming = true;
             _data.__streamNumber = _amount;
             
@@ -678,7 +737,7 @@ function Pollen() constructor {
                 part_emitter_stream(_gmlData, _emitterGml, _typeGml, _number);
             }
         }
-        //I'll add support for calling with gml part systems and possibly gml part assets later
+        //I'll add support for calling with raw Pollen.Pfx data, gml part systems & possibly gml part assets later
         return;
     }
     
@@ -710,6 +769,14 @@ function Pollen() constructor {
                 if(_depth != undefined){_tagData.SetDepth(_depth);}
                 var _layer = struct_get(_struct, "layer");
                 if(_layer != undefined){_tagData.SetLayer(_layer);}
+                var _angle = struct_get(_struct, "angle");
+                if(_angle != undefined){_tagData.SetAngle(_angle);}
+                var _position = struct_get(_struct, "position");
+                if(_position != undefined){_tagData.SetPosition(_position.x, _position.y);}
+                var _globalSpace = struct_get(_struct, "globalSpace");
+                if(_globalSpace != undefined){_tagData.SetGlobalSpace(_globalSpace);}
+                var _drawOrder = struct_get(_struct, "drawOrder");
+                if(_drawOrder != undefined){_tagData.SetDrawOrder(_drawOrder);}
                 var _color = struct_get(_struct, "color");
                 if(_color != undefined){_tagData.SetColor(_color);}
                 var _alpha = struct_get(_struct, "alpha");
@@ -723,21 +790,27 @@ function Pollen() constructor {
                         _i++;
                         var _props = _emitterList[_i];
                         var _emitter;
-                        if(_numOldList >= _i + 1){_emitter = _tagData.GetEmitterList()[_i]}
+                        if(_numOldList >= _i + 1){_emitter = _tagData.GetEmitterList()[_i];}
                         else {_emitter = new PfxEmitter(_tagData); array_push(_tagData.GetEmitterList(), _emitter);}
                         var _type = struct_get(_props, "type") ?? _emitter.GetType();
                         var _width = struct_get(_props, "width") ?? _emitter.GetWidth();
                         var _height = struct_get(_props, "height") ?? _emitter.GetHeight();
+                        var _relative = struct_get(_props, "relative") ?? _emitter.GetRelative();
                         var _number = struct_get(_props, "number") ?? _emitter.GetNumber();
                         var _shape = struct_get(_props, "shape") ?? _emitter.GetShape();
                         var _distr = struct_get(_props, "distr") ?? _emitter.GetDistr();
+                        var _delay = struct_get(_props, "delay") ?? _emitter.GetDelay();
+                        var _interval = struct_get(_props, "interval") ?? _emitter.GetInterval();
                         var _offsetX = struct_get(_props, "offsetX") ?? _emitter.GetOffsetX();
                         var _offsetY = struct_get(_props, "offsetY") ?? _emitter.GetOffsetY();
                         _emitter
                             .SetType(_type)
+                            .SetRelative(_relative) //<---NOTE: This must be before .SetNumber or changes won't be reflected properly
                             .SetNumber(_number)
                             .SetShape(_shape)
                             .SetDistr(_distr)
+                            .SetDelay(_delay)
+                            .SetInterval(_interval)
                             .SetSize(_width, _height)
                             .SetOffset(_offsetX, _offsetY);
                     }

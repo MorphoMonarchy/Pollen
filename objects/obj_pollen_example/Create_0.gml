@@ -1,5 +1,4 @@
 
 show_debug_overlay(true);
-
-// var _type = Pollen.TypeTagGetData("test");
-Pollen.PfxStream("test", 500, 300);
+system = Pollen.SystemTagGetData("system_example");
+Pollen.PfxStream("system_example");
