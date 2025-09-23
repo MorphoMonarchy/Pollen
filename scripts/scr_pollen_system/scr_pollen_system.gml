@@ -24,7 +24,7 @@
             ~ Setup hot-reload script                                                                           [X]
             ~ Create default GM-editor particle system                                                          [X]
             ~ Particle builder API                                                                              [X]
-            ~ Util functions for bursting and streaming particles                                               [ ]
+            ~ Util functions for bursting and streaming particles                                               [X]
             ~ Generate particle types from hot-reload script                                                    [X]
             ~ Ability to adjust any part type property from hot-reload script                                   [X]
             ~ Generate particle systems from hot-reload script                                                  [X]
@@ -750,6 +750,43 @@ function Pollen() constructor {
                 
                 part_emitter_region(_gmlData, _emitterGml, _left, _right, _top, _bottom, _shape, _distr);
                 part_emitter_stream(_gmlData, _emitterGml, _typeGml, _number);
+            }
+        }
+        //I'll add support for calling with raw Pollen.Pfx data, gml part systems & possibly gml part assets later
+        return;
+    }
+    
+    static PfxBurst = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
+        if(is_string(_system_or_tag)){
+            
+            var _data = self.__systemMap[? _system_or_tag];
+            var _gmlData = _data.GetGmlData();
+            var _emitterList = _data.GetEmitterList();
+            var _typeList = _data.GetTypeList();
+            
+            // var _oldPos = _data.GetPosition();
+            // _x ??= _oldPos.x; _y ??= _oldPos.y;
+            
+            var _i = -1;
+            var _numEmitters = array_length(_emitterList);
+            repeat(_numEmitters){
+                _i++;
+                var _emitter = _emitterList[_i];
+                var _emitterGml = _emitter.GetGmlData();
+                
+                var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
+                var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
+                var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
+                var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
+                var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
+                var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
+                
+                var _type = _emitter.GetType();
+                if(is_string(_type)){_type = self.TypeTagGetData(_type);}
+                var _typeGml = _type.GetGmlData();
+                
+                part_emitter_region(_gmlData, _emitterGml, _left, _right, _top, _bottom, _shape, _distr);
+                part_emitter_burst(_gmlData, _emitterGml, _typeGml, _number);
             }
         }
         //I'll add support for calling with raw Pollen.Pfx data, gml part systems & possibly gml part assets later
