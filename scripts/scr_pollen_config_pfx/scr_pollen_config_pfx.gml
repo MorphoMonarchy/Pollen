@@ -33,9 +33,9 @@ global.pollen_config_pfx = [
         type : "type_example_full",
         // shape: pt_shape_line,
         sprite : {id: spr_pollen_test},
-        speed: {min: 2, max: 10, incr: -0.05, wiggle: 0.1},
         size: {min: 1, max: 3, wiggle: 0.1, incr: -0.01},
         scale: {x: 0.2, y: 0.2},
+        speed: {min: 2, max: 10, incr: -0.05, wiggle: 0.1},
         direction: {min: 0, max: 359, incr: 5, wiggle: 1},
         gravity: {amount: 0.05, direction: 270},
         orientation: {min: 0, max: 359, wiggle: 1, relative: true},
@@ -46,8 +46,8 @@ global.pollen_config_pfx = [
         alpha: [0.5, 1, 0.35],
         blend: false,
         life: {min: 0, max: 100},
-        // step: {number: 0, type: type_example_min"} //<--- Should I parse structs first to add types to typeMap before setting properties so that way users can do this without having to worry about defining particles in order?
-        death: {number: 1, type: "type_example_min"}
+        // step: {number: 1, type: "type_example_min"}, //<--- Should I parse structs first to add types to typeMap before setting properties so that way users can do this without having to worry about defining particles in order?
+        death: {number: 1, type: "type_example_min"},
     },
     
     
@@ -61,7 +61,7 @@ global.pollen_config_pfx = [
         globalSpace: true,
         drawOrder: false,
         // angle: 45,
-        // color: c_white,
+        // color: c_red,
         // alpha: 1,
         emitterList : [
             {
@@ -72,12 +72,12 @@ global.pollen_config_pfx = [
             },
             {
                 type: "type_example_min",
+                relative: false, //<---NOTE: This must be before .SetNumber or changes won't be reflected properly
+                number: 20,
                 width: 64,
                 height: 64,
-                relative: false,
                 delay: {min: 120, max: 200, unit: time_source_units_frames},
                 interval: {min: 0, max: 5, unit: time_source_units_frames},
-                number: 20,
                 shape: ps_shape_diamond,
                 distr: ps_distr_gaussian,
                 offsetX: 8,
