@@ -14,6 +14,7 @@
   <tpe x="76" y="215" tpage="default_0.bz2">res_pt_shape_star.tpe</tpe>
   <tpe x="74" y="281" tpage="default_0.bz2">spr_pollen_test_Pollen_9abfb012-b943-46d8-a221-b5b8aae6a999.tpe</tpe>
   <tpe x="74" y="345" tpage="default_0.bz2">res_pt_shape_cloud.tpe</tpe>
-  <tpe x="74" y="410" tpage="default_0.bz2">res_pt_shape_line.tpe</tpe>
-  <tpe x="74" y="428" tpage="default_0.bz2">res_pt_shape_pixel.tpe</tpe>
+  <tpe x="72" y="408" tpage="default_0.bz2">GM_Fire_spr_Fire_Pollen_99b670f1-db0c-4487-9f47-d3f17e2445bb.tpe</tpe>
+  <tpe x="74" y="474" tpage="default_0.bz2">res_pt_shape_line.tpe</tpe>
+  <tpe x="103" y="410" tpage="default_0.bz2">res_pt_shape_pixel.tpe</tpe>
 </TextureGroup>

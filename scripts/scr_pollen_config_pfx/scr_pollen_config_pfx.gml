@@ -61,7 +61,7 @@ global.pollen_config_pfx = [
         globalSpace: true,
         drawOrder: false,
         // angle: 45,
-        // color: c_red,
+        color: c_white,
         // alpha: 1,
         emitterList : [
             {
@@ -85,4 +85,8 @@ global.pollen_config_pfx = [
             },
         ],
     },
+    
+    {
+        system : ps_test,
+    }
 ];

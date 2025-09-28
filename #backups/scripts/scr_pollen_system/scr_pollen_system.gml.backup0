@@ -1,4 +1,4 @@
-// 2025-09-22 21:10:13
+// 2025-09-27 13:36:50
 // Feather ignore all
 //======================================================================================================================
 #region ~ INDEX ~
@@ -40,6 +40,7 @@
         ~ Testing & polish:                                                                                     [ ]
             ~ Check builder functions to make sure all of them return self                                      [ ]
             ~ Add tests to ensure JSON data is valid                                                            [ ]
+                ~ Refactor import functions to use struct_get_games to test for invalid JSON members            [X]
             ~ Add options to use structs or split-up variables for position, offset, size, etc                  [ ]
                 -> e.g. can do "size: {w: 64, h: 64}" OR "width: 64, height: 64"
             ~ Make functional on Gamemaker LTS version                                                          [ ]
@@ -95,7 +96,6 @@ function Pollen() constructor {
             self.__bootSetupTimer--;
             if (self.__bootSetupTimer <= 0){
                 self.__bootSetupTimer = 60;
-                // self.Log("TEST");
                 
                 var _newHash = md5_file(self.__bootSetupPath);
                 if (_newHash != self.__bootSetupHash){
@@ -566,8 +566,8 @@ function Pollen() constructor {
             __system.RefreshStream();
             return self;
         }
-        static SetOffsetX = function(_offsetX){SetSize(_offsetX, __offsetY); return self;}
-        static SetOffsetY = function(_offsetY){SetSize(__offsetX, _offsetY); return self;}
+        static SetOffsetX = function(_offsetX){SetOffset(_offsetX, __offsetY); return self;}
+        static SetOffsetY = function(_offsetY){SetOffset(__offsetX, _offsetY); return self;}
         
         //--- GETTERS ---//
         static GetGmlData = function(){return __gmlData;}
@@ -818,57 +818,64 @@ function Pollen() constructor {
                 var _tag = struct_get(_struct, "system");
                 var _tagData = self.SystemTagGetData(_tag);
                 if(_tagData == undefined){_tagData = new Pfx(_tag);}
-                var _depth = struct_get(_struct, "depth");
-                if(_depth != undefined){_tagData.SetDepth(_depth);}
-                var _layer = struct_get(_struct, "layer");
-                if(_layer != undefined){_tagData.SetLayer(_layer);}
-                var _angle = struct_get(_struct, "angle");
-                if(_angle != undefined){_tagData.SetAngle(_angle);}
-                var _position = struct_get(_struct, "position");
-                if(_position != undefined){_tagData.SetPosition(_position.x, _position.y);}
-                var _globalSpace = struct_get(_struct, "globalSpace");
-                if(_globalSpace != undefined){_tagData.SetGlobalSpace(_globalSpace);}
-                var _drawOrder = struct_get(_struct, "drawOrder");
-                if(_drawOrder != undefined){_tagData.SetDrawOrder(_drawOrder);}
-                var _color = struct_get(_struct, "color");
-                if(_color != undefined){_tagData.SetColor(_color);}
-                var _alpha = struct_get(_struct, "alpha");
-                if(_alpha != undefined){_tagData.SetAlpha(_alpha);}
-                var _emitterList = struct_get(_struct, "emitterList");
-                if(_emitterList != undefined){
-                    var _numOldList = array_length(_tagData.GetEmitterList());
-                    var _numNewList = array_length(_emitterList);
-                    var _i = -1;
-                    repeat(_numNewList){
-                        _i++;
-                        var _props = _emitterList[_i];
-                        var _emitter;
-                        if(_numOldList >= _i + 1){_emitter = _tagData.GetEmitterList()[_i];}
-                        else {_emitter = new PfxEmitter(_tagData); array_push(_tagData.GetEmitterList(), _emitter);}
-                        var _type = struct_get(_props, "type") ?? _emitter.GetType();
-                        var _width = struct_get(_props, "width") ?? _emitter.GetWidth();
-                        var _height = struct_get(_props, "height") ?? _emitter.GetHeight();
-                        var _relative = struct_get(_props, "relative") ?? _emitter.GetRelative();
-                        var _number = struct_get(_props, "number") ?? _emitter.GetNumber();
-                        var _shape = struct_get(_props, "shape") ?? _emitter.GetShape();
-                        var _distr = struct_get(_props, "distr") ?? _emitter.GetDistr();
-                        var _delay = struct_get(_props, "delay") ?? _emitter.GetDelay();
-                        var _interval = struct_get(_props, "interval") ?? _emitter.GetInterval();
-                        var _offsetX = struct_get(_props, "offsetX") ?? _emitter.GetOffsetX();
-                        var _offsetY = struct_get(_props, "offsetY") ?? _emitter.GetOffsetY();
-                        self.Log($"Import PFX: _interval = {_interval}");
-                        _emitter
-                            .SetType(_type)
-                            .SetRelative(_relative) //<---NOTE: This must be before .SetNumber or changes won't be reflected properly
-                            .SetNumber(_number)
-                            .SetShape(_shape)
-                            .SetDistr(_distr)
-                            .SetDelay(_delay)
-                            .SetInterval(_interval)
-                            .SetSize(_width, _height)
-                            .SetOffset(_offsetX, _offsetY);
+                if(asset_get_index(_tag) != -1){ConvertGmlPartAssetToPollenStruct(_tag, _tagData);} //<---handle GM part assets
+                
+                var _sysNames = struct_get_names(_struct);
+                var _numSysNames = array_length(_sysNames);
+                var _iSys = -1;
+                repeat(_numSysNames){
+                    _iSys++;
+                    var _name = _sysNames[_iSys];
+                    switch(_name){
+                        case "system": break; //<---Not needed since it's handled above
+                        case "depth": var _depth = _struct.depth; _tagData.SetDepth(_depth); break;
+                        case "layer": var _layer = _struct.layer; _tagData.SetLayer(_layer); break;
+                        case "angle": var _angle = _struct.angle; _tagData.SetAngle(_angle); break;
+                        case "position": var _position = _struct.position; _tagData.SetPosition(_position); break;
+                        case "globalSpace": var _globalSpace = _struct.globalSpace; _tagData.SetGlobalSpace(_globalSpace); break;
+                        case "drawOrder": var _drawOrder = _struct.drawOrder; _tagData.SetDrawOrder(_drawOrder); break;
+                        case "color": var _color = _struct.color; _tagData.SetColor(_color); break;
+                        case "alpha": var _alpha = _struct.alpha; _tagData.SetDepth(_alpha); break;
+                        case "emitterList":
+                            var _emitterList = _struct.emitterList;
+                            var _numOldList = array_length(_tagData.GetEmitterList());
+                            var _numNewList = array_length(_emitterList);
+                            var _iEmList = -1;
+                            repeat(_numNewList){
+                                _iEmList++;
+                                var _props = _emitterList[_iEmList];
+                                var _emitter;
+                                if(_numOldList >= _iEmList + 1){_emitter = _tagData.GetEmitterList()[_iEmList];}
+                                else {_emitter = new PfxEmitter(_tagData); array_push(_tagData.GetEmitterList(), _emitter);}
+                                
+                                var _iEm = -1;
+                                var _emNameList = struct_get_names(_props);
+                                var _numEmNames = array_length(_emNameList);
+                                repeat(_numEmNames){
+                                    _iEm++;
+                                    var _emName = _emNameList[_iEm];
+                                    // Log(_emName);
+                                    switch(_emName){
+                                        case "type": var _type = _props.type; _emitter.SetType(_type); break;
+                                        case "width": var _width = _props.width; _emitter.SetWidth(_width); break;
+                                        case "height": var _height = _props.height; _emitter.SetHeight(_height); break;
+                                        case "relative": var _relative = _props.relative; _emitter.SetRelative(_relative); break; 
+                                        case "number": var _number = _props.number; _emitter.SetNumber(_number); break;
+                                        case "shape": var _shape = _props.shape; _emitter.SetShape(_shape); break;
+                                        case "distr": var _distr = _props.distr; _emitter.SetDistr(_distr); break;
+                                        case "delay": var _delay = _props.delay; _emitter.SetDelay(_delay); break;
+                                        case "interval": var _interval = _props.interval; _emitter.SetInterval(_interval); break;
+                                        case "offsetX": var _offsetX = _props.offsetX; _emitter.SetOffsetX(_offsetX); break;
+                                        case "offsetY": var _offsetY = _props.offsetY; _emitter.SetOffsetY(_offsetY); break;
+                                        default: Log($"Emitter property {_emName} is not supported!");
+                                    }
+                                }
+                            }
+                            _tagData.RefreshStream();
+                            break;
+                        
+                        default: Log($"System property: {_name} is not supported!");
                     }
-                    _tagData.RefreshStream();
                 }
                 self.Log($"System: '{_tag}' was reloaded.");
             }
@@ -879,202 +886,193 @@ function Pollen() constructor {
         }
     }
     
-    //NOTE: Refactor this to use struct get names instead so we can test for mispellings and what not!!!
     static ImportPfxType = function(_import_data, _type_data){
-        
-        //--- SHAPE ---//
-        var _shape = struct_get(_import_data, "shape");
-        if(_shape != undefined){_type_data.SetShape(_shape);}
-    
-        //--- SPRITE ---//
-        var _sprite = struct_get(_import_data, "sprite");
-        if(_sprite != undefined){
-            var _id = struct_get(_sprite, "id");
-            if(_id == undefined){
-                Pollen.Error($"Sprite struct defined in '{_import_data.type}' must contain 'id' property!");
+        var _i = -1;
+        var _nameList = struct_get_names(_import_data);
+        var _numNames = array_length(_nameList);
+        repeat(_numNames){
+            _i++;
+            var _name = _nameList[_i];
+            switch(_name){
+                
+                case "type": break; //<---'type' is checked before ImportPfxType function is called.
+                
+                case "shape": var _shape = _import_data.shape; _type_data.SetShape(_shape); break;
+                
+                case "sprite":
+                    var _sprite = _import_data.sprite;
+                    var _id = struct_get(_sprite, "id");
+                    if(_id == undefined){
+                        Pollen.Error($"Sprite struct defined in '{_import_data.type}' must contain 'id' property!");
+                    }
+                    var _default   = _type_data.GetSpriteData();
+                    var _subImg    = struct_get(_sprite, "subImg")    ?? _default.subImg;
+                    var _animate   = struct_get(_sprite, "animate")   ?? _default.animate;
+                    var _stretch   = struct_get(_sprite, "stretch")   ?? _default.stretch;
+                    var _randomImg = struct_get(_sprite, "randomImg") ?? _default.randomImg;
+                    _type_data.SetSprite(_id, _subImg, _animate, _stretch, _randomImg);
+                    break;
+                    
+                case "size":
+                    var _size = _import_data.size;
+                    var _def = _type_data.GetSize();
+                    if (_def == undefined) { _def = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
+                    var _min    = struct_get(_size, "min")    ?? _def.min;
+                    var _max    = struct_get(_size, "max")    ?? _def.max;
+                    var _incr   = struct_get(_size, "incr")   ?? _def.incr;
+                    var _wiggle = struct_get(_size, "wiggle") ?? _def.wiggle;
+                    _type_data.SetSize(_min, _max, _incr, _wiggle);
+                    break;
+                    
+                case "sizeX":
+                    var _sizeX = _import_data.sizeX;
+                    var _defX = _type_data.GetSizeX();
+                    if (_defX == undefined) { _defX = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
+                    var _minX    = struct_get(_sizeX, "min")    ?? _defX.min;
+                    var _maxX    = struct_get(_sizeX, "max")    ?? _defX.max;
+                    var _incrX   = struct_get(_sizeX, "incr")   ?? _defX.incr;
+                    var _wiggleX = struct_get(_sizeX, "wiggle") ?? _defX.wiggle;
+                    _type_data.SetSizeX(_minX, _maxX, _incrX, _wiggleX);
+                    break;
+                    
+                case "sizeY":
+                    var _sizeY = _import_data.sizeY;
+                    var _defY = _type_data.GetSizeY();
+                    if (_defY == undefined) { _defY = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
+                    var _minY    = struct_get(_sizeY, "min")    ?? _defY.min;
+                    var _maxY    = struct_get(_sizeY, "max")    ?? _defY.max;
+                    var _incrY   = struct_get(_sizeY, "incr")   ?? _defY.incr;
+                    var _wiggleY = struct_get(_sizeY, "wiggle") ?? _defY.wiggle;
+                    _type_data.SetSizeY(_minY, _maxY, _incrY, _wiggleY);
+                    break;
+                    
+                case "scale":
+                    var _scale = _import_data.scale;
+                    var _defScale = _type_data.GetScale();
+                    var _sx = struct_get(_scale, "x") ?? _defScale.x;
+                    var _sy = struct_get(_scale, "y") ?? _defScale.y;
+                    _type_data.SetScale(_sx, _sy);
+                    break;
+                    
+                case "speed":
+                    var _speed = _import_data.speed;
+                    var _defSpeed = _type_data.GetSpeed();
+                    var _smin    = struct_get(_speed, "min")    ?? _defSpeed.min;
+                    var _smax    = struct_get(_speed, "max")    ?? _defSpeed.max;
+                    var _sincr   = struct_get(_speed, "incr")   ?? _defSpeed.incr;
+                    var _swiggle = struct_get(_speed, "wiggle") ?? _defSpeed.wiggle;
+                    _type_data.SetSpeed(_smin, _smax, _sincr, _swiggle);
+                    break;
+                    
+                case "direction":
+                    var _direction = _import_data.direction;
+                    var _defDir = _type_data.GetDirection();
+                    var _dmin    = struct_get(_direction, "min")    ?? _defDir.min;
+                    var _dmax    = struct_get(_direction, "max")    ?? _defDir.max;
+                    var _dincr   = struct_get(_direction, "incr")   ?? _defDir.incr;
+                    var _dwiggle = struct_get(_direction, "wiggle") ?? _defDir.wiggle;
+                    _type_data.SetDirection(_dmin, _dmax, _dincr, _dwiggle);
+                    break;
+                    
+                case "orientation":
+                    var _orientation = _import_data.orientation;
+                    var _defOri = _type_data.GetOrientation();
+                    var _omin  = struct_get(_orientation, "min")      ?? _defOri.min;
+                    var _omax  = struct_get(_orientation, "max")      ?? _defOri.max;
+                    var _oinc  = struct_get(_orientation, "incr")     ?? _defOri.incr;
+                    var _owig  = struct_get(_orientation, "wiggle")   ?? _defOri.wiggle;
+                    var _orel  = struct_get(_orientation, "relative") ?? _defOri.relative;
+                    _type_data.SetOrientation(_omin, _omax, _oinc, _owig, _orel);
+                    break;
+                    
+                case "gravity":
+                    var _gravity = _import_data.gravity;
+                    var _defGrav = _type_data.GetGravity();
+                    var _gamt = struct_get(_gravity, "amount")    ?? _defGrav.amount;
+                    var _gdir = struct_get(_gravity, "direction") ?? _defGrav.direction;
+                    _type_data.SetGravity(_gamt, _gdir);
+                    break;
+                    
+                case "colorMix": var _colorMix = _import_data.colorMix; _type_data.SetColorMix(_colorMix); break;
+                    
+                case "colorRgb":
+                    var _colorRgb = _import_data.colorRgb;
+                    var _rmin = struct_get(_colorRgb, "rmin");
+                    var _rmax = struct_get(_colorRgb, "rmax");
+                    _rmin ??= _rmax; _rmax ??= _rmin; //<---if only one of the values exist, the other value defaults to that
+                    if(_rmin == undefined && _rmax == undefined){self.Error("colorRgb needs at least one of the two values 'rmin' or 'rmax' defined.");}
+                    
+                    var _gmin = struct_get(_colorRgb, "gmin");
+                    var _gmax = struct_get(_colorRgb, "gmax");
+                    _gmin ??= _gmax; _gmax ??= _gmin;
+                    if(_gmin == undefined && _gmax == undefined){self.Error("colorRgb needs at least one of the two values 'gmin' or 'gmax' defined.");}
+                    
+                    var _bmin = struct_get(_colorRgb, "bmin");
+                    var _bmax = struct_get(_colorRgb, "bmax");
+                    _bmin ??= _bmax; _bmax ??= _bmin;
+                    if(_bmin == undefined && _bmax == undefined){self.Error("colorRgb needs at least one of the two values 'bmin' or 'bmax' defined.");}
+                    
+                    _type_data.SetColorRgb(_rmin, _rmax, _gmin, _gmax, _bmin, _bmax);
+                    break;
+                    
+                case "colorHsv":
+                    var _colorHsv = _import_data.colorHsv;
+                    var _hmin = struct_get(_colorHsv, "hmin");
+                    var _hmax = struct_get(_colorHsv, "hmax");
+                    _hmin ??= _hmax; _hmax ??= _hmin; //<---if only one of the values exist, the other value defaults to that
+                    if(_hmin == undefined && _hmax == undefined){self.Error("colorHsv needs at least one of the two values 'hmin' or 'hmax' defined.");}
+                    
+                    var _smin = struct_get(_colorHsv, "smin");
+                    var _smax = struct_get(_colorHsv, "smax");
+                    _smin ??= _smax; _smax ??= _smin;
+                    if(_smin == undefined && _smax == undefined){self.Error("colorHsv needs at least one of the two values 'smin' or 'smax' defined.");}
+                    
+                    var _vmin = struct_get(_colorHsv, "vmin");
+                    var _vmax = struct_get(_colorHsv, "vmax");
+                    _vmin ??= _vmax; _vmax ??= _vmin;
+                    if(_vmin == undefined && _vmax == undefined){self.Error("colorHsv needs at least one of the two values 'vmin' or 'vmax' defined.");}
+                    
+                    _type_data.SetColorHsv(_hmin, _hmax, _smin, _smax, _vmin, _vmax);
+                    break;
+                    
+                case "color": var _color = _import_data.color; _type_data.SetColor(_color); break;
+                    
+                case "alpha": var _alpha = _import_data.alpha; _type_data.SetAlpha(_alpha); break;
+                    
+                case "blend": var _blend = _import_data.blend; _type_data.SetBlend(_blend); break;
+                    
+                case "life":
+                    var _life = _import_data.life;
+                    var _defLife = _type_data.GetLife();
+                    var _min = struct_get(_life, "min") ?? _defLife.min;
+                    var _max = struct_get(_life, "max") ?? _defLife.max;
+                    _type_data.SetLife(_min, _max);
+                    break;
+                    
+                case "step":
+                    var _step = _import_data.step;
+                    var _defStep = _type_data.GetLife();
+                    var _number = struct_get(_step, "number") ?? _defStep.number;
+                    var _type = struct_get(_step, "type") ?? _defStep.type;
+                    _type_data.SetStep(_number, _type);
+                    break;
+                    
+                case "death":
+                    var _death = _import_data.death;
+                    var _defDeath = _type_data.GetLife();
+                    var _number = struct_get(_death, "number") ?? _defDeath.number;
+                    var _type = struct_get(_death, "type") ?? _defDeath.type;
+                    _type_data.SetDeath(_number, _type);
+                    break;
+                    
+                default: Log($"Part type property: {_name} is not supported!");
             }
-            var _default   = _type_data.GetSpriteData();
-            var _subImg    = struct_get(_sprite, "subImg")    ?? _default.subImg;
-            var _animate   = struct_get(_sprite, "animate")   ?? _default.animate;
-            var _stretch   = struct_get(_sprite, "stretch")   ?? _default.stretch;
-            var _randomImg = struct_get(_sprite, "randomImg") ?? _default.randomImg;
-            _type_data.SetSprite(_id, _subImg, _animate, _stretch, _randomImg);
         }
+        
+    }
     
-        //--- SIZE (uniform) ---//
-        var _size = struct_get(_import_data, "size");
-        if(_size != undefined){
-            var _def = _type_data.GetSize();
-            if (_def == undefined) { _def = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
-            var _min    = struct_get(_size, "min")    ?? _def.min;
-            var _max    = struct_get(_size, "max")    ?? _def.max;
-            var _incr   = struct_get(_size, "incr")   ?? _def.incr;
-            var _wiggle = struct_get(_size, "wiggle") ?? _def.wiggle;
-            _type_data.SetSize(_min, _max, _incr, _wiggle);
-        }
-    
-        //--- SIZE X (axis override) ---//
-        var _sizeX = struct_get(_import_data, "sizeX");
-        if(_sizeX != undefined){
-            var _defX = _type_data.GetSizeX();
-            if (_defX == undefined) { _defX = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
-            var _minX    = struct_get(_sizeX, "min")    ?? _defX.min;
-            var _maxX    = struct_get(_sizeX, "max")    ?? _defX.max;
-            var _incrX   = struct_get(_sizeX, "incr")   ?? _defX.incr;
-            var _wiggleX = struct_get(_sizeX, "wiggle") ?? _defX.wiggle;
-            _type_data.SetSizeX(_minX, _maxX, _incrX, _wiggleX);
-        }
-    
-        //--- SIZE Y (axis override) ---//
-        var _sizeY = struct_get(_import_data, "sizeY");
-        if(_sizeY != undefined){
-            var _defY = _type_data.GetSizeY();
-            if (_defY == undefined) { _defY = { min: 0, max: 0, incr: 0, wiggle: 0 }; }
-            var _minY    = struct_get(_sizeY, "min")    ?? _defY.min;
-            var _maxY    = struct_get(_sizeY, "max")    ?? _defY.max;
-            var _incrY   = struct_get(_sizeY, "incr")   ?? _defY.incr;
-            var _wiggleY = struct_get(_sizeY, "wiggle") ?? _defY.wiggle;
-            _type_data.SetSizeY(_minY, _maxY, _incrY, _wiggleY);
-        }
-    
-        //--- SCALE ---//
-        var _scale = struct_get(_import_data, "scale");
-        if(_scale != undefined){
-            var _defScale = _type_data.GetScale();
-            var _sx = struct_get(_scale, "x") ?? _defScale.x;
-            var _sy = struct_get(_scale, "y") ?? _defScale.y;
-            _type_data.SetScale(_sx, _sy);
-        }
-    
-        //--- SPEED ---//
-        var _speed = struct_get(_import_data, "speed");
-        if(_speed != undefined){
-            var _defSpeed = _type_data.GetSpeed();
-            var _smin    = struct_get(_speed, "min")    ?? _defSpeed.min;
-            var _smax    = struct_get(_speed, "max")    ?? _defSpeed.max;
-            var _sincr   = struct_get(_speed, "incr")   ?? _defSpeed.incr;
-            var _swiggle = struct_get(_speed, "wiggle") ?? _defSpeed.wiggle;
-            _type_data.SetSpeed(_smin, _smax, _sincr, _swiggle);
-        }
-    
-        //--- DIRECTION ---//
-        var _direction = struct_get(_import_data, "direction");
-        if(_direction != undefined){
-            var _defDir = _type_data.GetDirection();
-            var _dmin    = struct_get(_direction, "min")    ?? _defDir.min;
-            var _dmax    = struct_get(_direction, "max")    ?? _defDir.max;
-            var _dincr   = struct_get(_direction, "incr")   ?? _defDir.incr;
-            var _dwiggle = struct_get(_direction, "wiggle") ?? _defDir.wiggle;
-            _type_data.SetDirection(_dmin, _dmax, _dincr, _dwiggle);
-        }
-        
-        //--- ORIENTATION ---//
-        var _orientation = struct_get(_import_data, "orientation");
-        if(_orientation != undefined){
-            var _defOri = _type_data.GetOrientation();
-            var _omin  = struct_get(_orientation, "min")      ?? _defOri.min;
-            var _omax  = struct_get(_orientation, "max")      ?? _defOri.max;
-            var _oinc  = struct_get(_orientation, "incr")     ?? _defOri.incr;
-            var _owig  = struct_get(_orientation, "wiggle")   ?? _defOri.wiggle;
-            var _orel  = struct_get(_orientation, "relative") ?? _defOri.relative;
-            _type_data.SetOrientation(_omin, _omax, _oinc, _owig, _orel);
-        }
-    
-        //--- GRAVITY ---//
-        var _gravity = struct_get(_import_data, "gravity");
-        if(_gravity != undefined){
-            var _defGrav = _type_data.GetGravity();
-            var _gamt = struct_get(_gravity, "amount")    ?? _defGrav.amount;
-            var _gdir = struct_get(_gravity, "direction") ?? _defGrav.direction;
-            _type_data.SetGravity(_gamt, _gdir);
-        }
-        
-        //--- COLOR MIX ---//
-        var _colorMix = struct_get(_import_data, "colorMix");
-        if(_colorMix != undefined){_type_data.SetColorMix(_colorMix);}
-        
-        //--- COLOR RGB ---//
-        var _colorRgb = struct_get(_import_data, "colorRgb");
-        if(_colorRgb != undefined){
-            
-            var _rmin = struct_get(_colorRgb, "rmin");
-            var _rmax = struct_get(_colorRgb, "rmax");
-            _rmin ??= _rmax; _rmax ??= _rmin; //<---if only one of the values exist, the other value defaults to that
-            if(_rmin == undefined && _rmax == undefined){self.Error("colorRgb needs at least one of the two values 'rmin' or 'rmax' defined.");}
-            
-            var _gmin = struct_get(_colorRgb, "gmin");
-            var _gmax = struct_get(_colorRgb, "gmax");
-            _gmin ??= _gmax; _gmax ??= _gmin;
-            if(_gmin == undefined && _gmax == undefined){self.Error("colorRgb needs at least one of the two values 'gmin' or 'gmax' defined.");}
-            
-            var _bmin = struct_get(_colorRgb, "bmin");
-            var _bmax = struct_get(_colorRgb, "bmax");
-            _bmin ??= _bmax; _bmax ??= _bmin;
-            if(_bmin == undefined && _bmax == undefined){self.Error("colorRgb needs at least one of the two values 'bmin' or 'bmax' defined.");}
-            
-            _type_data.SetColorRgb(_rmin, _rmax, _gmin, _gmax, _bmin, _bmax);
-        }
-        
-        //--- COLOR HSV ---//
-        var _colorHsv = struct_get(_import_data, "colorHsv");
-        if(_colorHsv != undefined){
-            
-            var _hmin = struct_get(_colorHsv, "hmin");
-            var _hmax = struct_get(_colorHsv, "hmax");
-            _hmin ??= _hmax; _hmax ??= _hmin; //<---if only one of the values exist, the other value defaults to that
-            if(_hmin == undefined && _hmax == undefined){self.Error("colorHsv needs at least one of the two values 'hmin' or 'hmax' defined.");}
-            
-            var _smin = struct_get(_colorHsv, "smin");
-            var _smax = struct_get(_colorHsv, "smax");
-            _smin ??= _smax; _smax ??= _smin;
-            if(_smin == undefined && _smax == undefined){self.Error("colorHsv needs at least one of the two values 'smin' or 'smax' defined.");}
-            
-            var _vmin = struct_get(_colorHsv, "vmin");
-            var _vmax = struct_get(_colorHsv, "vmax");
-            _vmin ??= _vmax; _vmax ??= _vmin;
-            if(_vmin == undefined && _vmax == undefined){self.Error("colorHsv needs at least one of the two values 'vmin' or 'vmax' defined.");}
-            
-            _type_data.SetColorHsv(_hmin, _hmax, _smin, _smax, _vmin, _vmax);
-        }
-        
-        //--- COLOR (STANDARD) ---//
-        var _color = struct_get(_import_data, "color");
-        if(_color != undefined){_type_data.SetColor(_color);}
-        
-        //--- ALPHA ---//
-        var _alpha = struct_get(_import_data, "alpha");
-        if(_alpha != undefined){_type_data.SetAlpha(_alpha);}
-        
-        //--- BLEND ---//
-        var _blend = struct_get(_import_data, "blend");
-        if(_blend != undefined){_type_data.SetBlend(_blend);}
-        
-        //--- LIFE ---//
-        var _life = struct_get(_import_data, "life");
-        if(_life != undefined){
-            var _defLife = _type_data.GetLife();
-            var _min = struct_get(_life, "min") ?? _defLife.min;
-            var _max = struct_get(_life, "max") ?? _defLife.max;
-            _type_data.SetLife(_min, _max);
-        }
-        
-        //--- SUB-PARTICLE STEP ---//
-        var _step = struct_get(_import_data, "step");
-        if(_step != undefined){
-            var _defStep = _type_data.GetLife();
-            var _number = struct_get(_step, "number") ?? _defStep.number;
-            var _type = struct_get(_step, "type") ?? _defStep.type;
-            _type_data.SetStep(_number, _type);
-        }
-        
-        //--- SUB-PARTICLE DEATH ---//
-        var _death = struct_get(_import_data, "death");
-        if(_death != undefined){
-            var _defDeath = _type_data.GetLife();
-            var _number = struct_get(_death, "number") ?? _defDeath.number;
-            var _type = struct_get(_death, "type") ?? _defDeath.type;
-            _type_data.SetDeath(_number, _type);
-        }
+    static ConvertGmlPartAssetToPollenStruct = function(_asset, _pollen_struct){
+        Log("Successfully converted Gml part asset!");
     }
     
 

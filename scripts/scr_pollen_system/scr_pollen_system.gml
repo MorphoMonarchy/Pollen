@@ -95,7 +95,6 @@ function Pollen() constructor {
             self.__bootSetupTimer--;
             if (self.__bootSetupTimer <= 0){
                 self.__bootSetupTimer = 60;
-                // self.Log("TEST");
                 
                 var _newHash = md5_file(self.__bootSetupPath);
                 if (_newHash != self.__bootSetupHash){
@@ -815,10 +814,10 @@ function Pollen() constructor {
                 self.Log($"Type: '{_tag}' was reloaded.");
             }
             else if (struct_exists(_struct, "system")){
-                
                 var _tag = struct_get(_struct, "system");
                 var _tagData = self.SystemTagGetData(_tag);
                 if(_tagData == undefined){_tagData = new Pfx(_tag);}
+                if(asset_get_index(_tag) != -1){ConvertGmlPartAssetToPollenStruct(_tag, _tagData);} //<---handle GM part assets
                 
                 var _sysNames = struct_get_names(_struct);
                 var _numSysNames = array_length(_sysNames);
@@ -827,6 +826,7 @@ function Pollen() constructor {
                     _iSys++;
                     var _name = _sysNames[_iSys];
                     switch(_name){
+                        case "system": break; //<---Not needed since it's handled above
                         case "depth": var _depth = _struct.depth; _tagData.SetDepth(_depth); break;
                         case "layer": var _layer = _struct.layer; _tagData.SetLayer(_layer); break;
                         case "angle": var _angle = _struct.angle; _tagData.SetAngle(_angle); break;
@@ -839,12 +839,12 @@ function Pollen() constructor {
                             var _emitterList = _struct.emitterList;
                             var _numOldList = array_length(_tagData.GetEmitterList());
                             var _numNewList = array_length(_emitterList);
-                            var _i = -1;
+                            var _iEmList = -1;
                             repeat(_numNewList){
-                                _i++;
-                                var _props = _emitterList[_i];
+                                _iEmList++;
+                                var _props = _emitterList[_iEmList];
                                 var _emitter;
-                                if(_numOldList >= _i + 1){_emitter = _tagData.GetEmitterList()[_i];}
+                                if(_numOldList >= _iEmList + 1){_emitter = _tagData.GetEmitterList()[_iEmList];}
                                 else {_emitter = new PfxEmitter(_tagData); array_push(_tagData.GetEmitterList(), _emitter);}
                                 
                                 var _iEm = -1;
@@ -1069,6 +1069,11 @@ function Pollen() constructor {
         }
         
     }
+    
+    static ConvertGmlPartAssetToPollenStruct = function(_asset, _pollen_struct){
+        Log("Successfully converted Gml part asset!");
+    }
+    
 
 #endregion    
 //======================================================================================================================
