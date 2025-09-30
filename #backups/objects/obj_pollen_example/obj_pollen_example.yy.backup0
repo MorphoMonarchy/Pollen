@@ -1,4 +1,4 @@
-// 2025-09-22 21:05:36
+// 2025-09-30 15:01:59
 #event properties (no comments/etc. here are saved)
 parent_index = -1;
 sprite_index = spr_pollen_test;
@@ -8,13 +8,15 @@ uses_physics = false;
 
 show_debug_overlay(true);
 system = Pollen.SystemTagGetData("system_example");
-// Pollen.PfxStream("system_example");
+template = Pollen.SystemTagGetData("template_example");
+Pollen.PfxStream("system_example");
+// Pollen.Log($"{system}");
 
-#event draw_gui
+#event step
 
 system.SetPosition(mouse_x, mouse_y);
-// draw_text(100, 100, $"Pollen struct = {global.pollen_config_pfx}");
 
 #event mouse_global_left_button
 
-Pollen.PfxBurst("system_example");
+template.SetPosition(mouse_x, mouse_y);
+Pollen.PfxBurst("template_example");

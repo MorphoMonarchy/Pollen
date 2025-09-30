@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":4,
   "parent":{
-    "name":"Pollen",
-    "path":"folders/Pollen.yy",
+    "name":"Example",
+    "path":"folders/Pollen/Example.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
