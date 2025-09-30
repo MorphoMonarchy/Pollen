@@ -54,6 +54,13 @@ global.pollen_config_pfx = [
     //--- DEFINE SYSTEMS HERE ---//
     
     {
+        system : "template_example",
+        template : ps_example,
+        globalSpace: true,
+        depth: 0,
+    },
+
+    {
         system : "system_example",
         depth: 100,
         // layer: "Asset",
@@ -85,12 +92,4 @@ global.pollen_config_pfx = [
             },
         ],
     },
-    
-    {
-        system : "template_example",
-        template : ps_example,
-        globalSpace: true,
-        depth: 0,
-        color: c_white,
-    }
 ];

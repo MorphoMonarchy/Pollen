@@ -1,4 +1,4 @@
-// 2025-09-30 15:01:59
+// 2025-09-30 16:02:39
 #event properties (no comments/etc. here are saved)
 parent_index = -1;
 sprite_index = spr_pollen_test;
@@ -10,7 +10,7 @@ show_debug_overlay(true);
 system = Pollen.SystemTagGetData("system_example");
 template = Pollen.SystemTagGetData("template_example");
 Pollen.PfxStream("system_example");
-// Pollen.Log($"{system}");
+ //Pollen.Log($"{system}");
 
 #event step
 
