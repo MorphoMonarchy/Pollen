@@ -1,2 +1,2 @@
 template.SetPosition(mouse_x, mouse_y);
-Pollen.PfxBurst("system_template_example_2");
+Pollen.PfxBurst("system_template_example");

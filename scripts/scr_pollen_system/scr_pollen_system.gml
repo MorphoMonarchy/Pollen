@@ -44,6 +44,7 @@
             ~ Add options to use structs or split-up variables for position, offset, size, etc?                 [ ]
                 -> e.g. can do "size: {w: 64, h: 64}" OR "width: 64, height: 64"
             ~ Make functional on Gamemaker LTS version?                                                         [ ]
+            ~ Test speed of calling stream/burst compared to regular GML backend                                [ ]
             ~ Code cleanup and documentation                                                                    [ ]
             
     DOCUMENTATION:
@@ -53,8 +54,14 @@
             ~ https://delfos1.itch.io/pulse - A custom particle emitter library that extends GM's capabilities
             
         ~ FAQ:
+        
             ~ When compiling in YYC, users have to uncheck "automatically remove unused assets" when using 
               particle asset templates
+              
+            ~ Each particle type & system struct takes up roughly 0.1 - 0.3[+] mb, so it may be easiest to simply keep
+              them in the global JSON rather than trying to manually create/destroy them, even if you only need them
+              for specific levels/modes in your game (however, having an immense amount of emitters on one system will
+              effect how much memory that system will take up, but even then, I don't think it's a huge concern).
              
         
         
@@ -460,30 +467,21 @@ function Pollen() constructor {
         __system = _system;
         __enabled = true;
         __type = undefined;
+        __number = 1;
         __shape = ps_shape_ellipse;
         __distr = ps_distr_linear;
+        __relative = false;
         __delay = {min: 0, max: 0, unit: time_source_units_frames};
         __interval = {min: 0, max: 0, unit: time_source_units_frames};
-        __relative = false;
-        __number = 1;
-        __offsetX = 0;
-        __offsetY = 0;
         __width = 0;
         __height = 0;
+        __offsetX = 0;
+        __offsetY = 0;
         
         //--- SETTERS ---//
         static SetEnabled = function(_enabled){__enabled = _enabled; return self;}
-        static SetSize = function(_width, _height){
-            __width = _width; 
-            __height = _height; 
-            __system.RefreshStream();
-            return self;
-        }
-        static SetWidth = function(_width){SetSize(_width, __height); return self;}
-        static SetHeight = function(_height){SetSize(__width, _height); return self;}
-        
-        static SetNumber = function(_number){__number = _number; __system.RefreshStream(); return self;}
         static SetType = function(_type){__type = _type; __system.RefreshStream(); return self;}
+        static SetNumber = function(_number){__number = _number; __system.RefreshStream(); return self;}
         static SetShape = function(_shape){__shape = _shape; __system.RefreshStream(); return self;}
         static SetDistr = function(_distr){__distr = _distr; __system.RefreshStream(); return self;}
         
@@ -493,7 +491,6 @@ function Pollen() constructor {
             __system.RefreshStream(); 
             return self;
         }
-        
         static SetDelay = function(_delay){
             __delay = _delay; 
             part_emitter_delay(__system.GetGmlData(), __gmlData, _delay.min, _delay.max, _delay.unit);
@@ -507,6 +504,15 @@ function Pollen() constructor {
             return self;
         }
         
+        static SetSize = function(_width, _height){
+            __width = _width; 
+            __height = _height; 
+            __system.RefreshStream();
+            return self;
+        }
+        static SetWidth = function(_width){SetSize(_width, __height); return self;}
+        static SetHeight = function(_height){SetSize(__width, _height); return self;}
+        
         static SetOffset = function(_offsetX, _offsetY){
             __offsetX = _offsetX;
             __offsetY = _offsetY;
@@ -517,21 +523,30 @@ function Pollen() constructor {
         static SetOffsetY = function(_offsetY){SetOffset(__offsetX, _offsetY); return self;}
         
         //--- GETTERS ---//
-        static IsEnabled = function(){return __enabled;}
         static GetGmlData = function(){return __gmlData;}
+        static GetSystem = function(){return __system;}
+        static IsEnabled = function(){return __enabled;}
+        static GetEnabled = function(){return __enabled;}
         static GetType = function(){return __type;}
-        static GetRelative = function(){return __relative;}
         static GetNumber = function(){return __number;}
         static GetShape = function(){return __shape;}
         static GetDistr = function(){return __distr;}
+        static GetRelative = function(){return __relative;}
         static GetDelay = function(){return __delay;}
         static GetInterval = function(){return __interval;}
+        static GetSize = function(){return {w: __width, h: __height}}
         static GetWidth = function(){return __width;}
         static GetHeight = function(){return __height;}
-        static GetSize = function(){return {w: __width, h: __height}}
+        static GetOffset = function(){return {x: __offsetX, y: __offsetY}}
         static GetOffsetX = function(){return __offsetX;}
         static GetOffsetY = function(){return __offsetY;}
-        static GetOffset = function(){return {x: __offsetX, y: __offsetY}}
+    }
+    
+    static EmitterDestroy = function(_pfxEmitter){
+        var _system = _pfxEmitter.GetSystem();
+        part_emitter_destroy(_system.GetGmlData(), _pfxEmitter.GetGmlData());
+        delete _pfxEmitter;
+        Log($"Destroyed emitter from {_system.GetTag()}");
     }
    
   
@@ -669,7 +684,7 @@ function Pollen() constructor {
             Pollen.PfxStream(__tag);
         }
         
-        static Copy = function(_pfx) {
+        static Copy = function(_pfx, _ignore_emitter_list = false) {
             SetPosition(_pfx.__position.x, _pfx.__position.y);
             SetGlobalSpace(_pfx.__globalSpace);
             SetDrawOrder(_pfx.__drawOrder);
@@ -678,6 +693,33 @@ function Pollen() constructor {
             SetLayer(_pfx.__layer);
             SetColor(_pfx.__color);
             SetAlpha(_pfx.__alpha);
+            
+            if(!_ignore_emitter_list){
+                var _emitterList = _pfx.__emitterList;
+                var _numEmitters = array_length(_emitterList);
+                var _copyList = [];
+                var _iEm = -1;
+                repeat(_numEmitters){
+                    _iEm++;
+                    var _emitter = _emitterList[_iEm];
+                    var _newEm = new Pollen.PfxEmitter(self)
+                        .SetEnabled(_emitter.IsEnabled())
+                        .SetWidth(_emitter.GetWidth())
+                        .SetHeight(_emitter.GetHeight())
+                        .SetNumber(_emitter.GetNumber())
+                        .SetType(_emitter.GetType())
+                        .SetShape(_emitter.GetShape())
+                        .SetDistr(_emitter.GetDistr())
+                        .SetRelative(_emitter.GetRelative())
+                        .SetDelay(_emitter.GetDelay())
+                        .SetInterval(_emitter.GetInterval())
+                        .SetOffsetX(_emitter.GetOffsetX())
+                        .SetOffsetY(_emitter.GetOffsetY());
+                    array_push(_copyList, _newEm);
+                }
+                SetEmitterList(_copyList);
+            }
+            
             Pollen.Log($"Successfully copied from system: {_pfx.GetTag()}");
         }
     }
@@ -787,12 +829,13 @@ function Pollen() constructor {
                 var _template = struct_get(_struct, "template");
                 var _oldTemplate = _tagData.GetTemplate();
                 if(_template!= undefined && _oldTemplate != _template){
+                    var _ignoreEmitterList = struct_exists(_struct, "emitterList");
                     if(is_string(_template)){
                         var _templateID = SystemTagGetData(_template);
                         if(_templateID == undefined){Error($"Unable to find system: '{_template}' make sure system is defined before using it as a template!");}
-                        _tagData.Copy(_templateID);
+                        _tagData.Copy(_templateID, _ignoreEmitterList);
                     }
-                    else if(asset_get_index(_template) != -1){ConvertGmlPartAssetToPollenStruct(_template, _tagData);}
+                    else if(asset_get_index(_template) != -1){ConvertGmlPartAssetToPollenStruct(_template, _tagData, _ignoreEmitterList);}
                 } 
                 
                 var _sysNames = struct_get_names(_struct);
@@ -816,6 +859,19 @@ function Pollen() constructor {
                             var _emitterList = _struct.emitterList;
                             var _numOldList = array_length(_tagData.GetEmitterList());
                             var _numNewList = array_length(_emitterList);
+                            var _numDiff = _numNewList - _numOldList;
+                            
+                            //Get rid of old emitters
+                            if(_numDiff < 0){
+                                var _iOld = 0;
+                                repeat(abs(_numDiff)){
+                                    _iOld++;
+                                    var _deadEmit = _tagData.GetEmitterList()[_numOldList - _iOld];
+                                    EmitterDestroy(_deadEmit);
+                                    array_pop(_tagData.GetEmitterList());
+                                }
+                            }
+                            
                             var _iEmList = -1;
                             repeat(_numNewList){
                                 _iEmList++;
@@ -1047,7 +1103,7 @@ function Pollen() constructor {
         
     }
     
-    static ConvertGmlPartAssetToPollenStruct = function(_asset, _pollen_struct){
+    static ConvertGmlPartAssetToPollenStruct = function(_asset, _pollen_struct, _ignore_emitter_list = false){
         
         _pollen_struct.__template = _asset; //<----This ensures that templates are only loaded once
         
@@ -1064,6 +1120,9 @@ function Pollen() constructor {
             .SetGlobalSpace(_globalSpace)
             .SetDrawOrder(_drawOrder);
             
+        //This will be an optimization in case we detect in the JSON that the emitterList is being overridden by the new system
+        if(_ignore_emitter_list){Log($"Successfully converted Gml part asset: {_pollen_struct.GetTag()}!"); return;}
+        
         //--- EMITTERS ---//
         var _typeList = [];
         var _emitterList = [];
