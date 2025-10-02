@@ -38,11 +38,12 @@
             
         ~ Testing & polish:                                                                                     [ ]
             ~ Check builder functions to make sure all of them return self                                      [ ]
+            ~ Ensure new types can be defined in emitter JSON (i.e. you can set "type" property as a struct)    [ ]
             ~ Add tests to ensure JSON data is valid                                                            [ ]
                 ~ Refactor import functions to use struct_get_games to test for invalid JSON members            [X]
-            ~ Add options to use structs or split-up variables for position, offset, size, etc                  [ ]
+            ~ Add options to use structs or split-up variables for position, offset, size, etc?                 [ ]
                 -> e.g. can do "size: {w: 64, h: 64}" OR "width: 64, height: 64"
-            ~ Make functional on Gamemaker LTS version                                                          [ ]
+            ~ Make functional on Gamemaker LTS version?                                                         [ ]
             ~ Code cleanup and documentation                                                                    [ ]
             
     DOCUMENTATION:
@@ -607,6 +608,7 @@ function Pollen() constructor {
             return self;
         }
         static SetDepth = function(_depth){
+            if(_depth == undefined){return;}
             __depth = _depth; 
             __layer = undefined;
             part_system_depth(__gmlData, _depth); 
@@ -614,6 +616,7 @@ function Pollen() constructor {
             return self;
         }
         static SetLayer = function(_layer){
+            if(_layer == undefined){return;}
             var _id = layer_get_id(_layer);
             if(_id == -1){Pollen.Error("layer: '{_layer}' does not exist in current room!");}
             __layer = _layer;
@@ -664,6 +667,18 @@ function Pollen() constructor {
                 part_emitter_relative(__gmlData, _emitterGml, _emitterRelative);
             }
             Pollen.PfxStream(__tag);
+        }
+        
+        static Copy = function(_pfx) {
+            SetPosition(_pfx.__position.x, _pfx.__position.y);
+            SetGlobalSpace(_pfx.__globalSpace);
+            SetDrawOrder(_pfx.__drawOrder);
+            SetAngle(_pfx.__angle);
+            SetDepth(_pfx.__depth);
+            SetLayer(_pfx.__layer);
+            SetColor(_pfx.__color);
+            SetAlpha(_pfx.__alpha);
+            Pollen.Log($"Successfully copied from system: {_pfx.GetTag()}");
         }
     }
     
@@ -771,8 +786,14 @@ function Pollen() constructor {
                 if(_tagData == undefined){_tagData = new Pfx(_tag);}
                 var _template = struct_get(_struct, "template");
                 var _oldTemplate = _tagData.GetTemplate();
-                if(_template!= undefined && asset_get_index(_template) != -1 && _oldTemplate != _template)
-                    {ConvertGmlPartAssetToPollenStruct(_template, _tagData);} //<---handle GM part assets
+                if(_template!= undefined && _oldTemplate != _template){
+                    if(is_string(_template)){
+                        var _templateID = SystemTagGetData(_template);
+                        if(_templateID == undefined){Error($"Unable to find system: '{_template}' make sure system is defined before using it as a template!");}
+                        _tagData.Copy(_templateID);
+                    }
+                    else if(asset_get_index(_template) != -1){ConvertGmlPartAssetToPollenStruct(_template, _tagData);}
+                } 
                 
                 var _sysNames = struct_get_names(_struct);
                 var _numSysNames = array_length(_sysNames);
@@ -809,7 +830,6 @@ function Pollen() constructor {
                                 repeat(_numEmNames){
                                     _iEm++;
                                     var _emName = _emNameList[_iEm];
-                                    // Log(_emName);
                                     switch(_emName){
                                         case "type": var _type = _props.type; _emitter.SetType(_type); break;
                                         case "enabled": var _enabled = _props.enabled; _emitter.SetEnabled(_enabled); break;

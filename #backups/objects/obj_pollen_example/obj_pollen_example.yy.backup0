@@ -1,4 +1,4 @@
-// 2025-09-30 16:02:39
+// 2025-10-02 14:22:50
 #event properties (no comments/etc. here are saved)
 parent_index = -1;
 sprite_index = spr_pollen_test;
@@ -8,7 +8,7 @@ uses_physics = false;
 
 show_debug_overlay(true);
 system = Pollen.SystemTagGetData("system_example");
-template = Pollen.SystemTagGetData("template_example");
+template = Pollen.SystemTagGetData("system_template_example_2");
 Pollen.PfxStream("system_example");
  //Pollen.Log($"{system}");
 
@@ -17,6 +17,5 @@ Pollen.PfxStream("system_example");
 system.SetPosition(mouse_x, mouse_y);
 
 #event mouse_global_left_button
-
 template.SetPosition(mouse_x, mouse_y);
-Pollen.PfxBurst("template_example");
+Pollen.PfxBurst("system_template_example_2");

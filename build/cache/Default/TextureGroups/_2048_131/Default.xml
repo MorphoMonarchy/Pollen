@@ -2,20 +2,20 @@
 <TextureGroup>
   <texture scale="1" mipsToGenerate="0" texwidth="512" texheight="512">default_0.bz2</texture>
   <tpe x="2" y="2" tpage="default_0.bz2">spr_pollen_test_Pollen_d39ca286-f8b1-46ca-abee-c5d184e6e7c3.tpe</tpe>
-  <tpe x="4" y="227" tpage="default_0.bz2">res_pt_shape_explosion.tpe</tpe>
-  <tpe x="76" y="227" tpage="default_0.bz2">res_pt_shape_flare.tpe</tpe>
-  <tpe x="4" y="299" tpage="default_0.bz2">res_pt_shape_smoke.tpe</tpe>
-  <tpe x="148" y="227" tpage="default_0.bz2">res_pt_shape_spark.tpe</tpe>
-  <tpe x="76" y="299" tpage="default_0.bz2">res_pt_shape_circle.tpe</tpe>
-  <tpe x="4" y="371" tpage="default_0.bz2">res_pt_shape_disk.tpe</tpe>
-  <tpe x="146" y="299" tpage="default_0.bz2">res_pt_shape_ring.tpe</tpe>
-  <tpe x="76" y="369" tpage="default_0.bz2">res_pt_shape_square.tpe</tpe>
-  <tpe x="4" y="441" tpage="default_0.bz2">res_pt_shape_snow.tpe</tpe>
-  <tpe x="146" y="369" tpage="default_0.bz2">res_pt_shape_sphere.tpe</tpe>
-  <tpe x="74" y="439" tpage="default_0.bz2">res_pt_shape_star.tpe</tpe>
-  <tpe x="146" y="438" tpage="default_0.bz2">res_pt_shape_cloud.tpe</tpe>
-  <tpe x="214" y="297" tpage="default_0.bz2">GM_Fire_spr_Fire_Pollen_99b670f1-db0c-4487-9f47-d3f17e2445bb.tpe</tpe>
-  <tpe x="209" y="436" tpage="default_0.bz2">spr_pollen_example_bg_Pollen_ae28667a-3ab4-40dd-9263-ccbba848756a.tpe</tpe>
+  <tpe x="4" y="229" tpage="default_0.bz2">res_pt_shape_explosion.tpe</tpe>
+  <tpe x="76" y="229" tpage="default_0.bz2">res_pt_shape_flare.tpe</tpe>
+  <tpe x="4" y="301" tpage="default_0.bz2">res_pt_shape_smoke.tpe</tpe>
+  <tpe x="148" y="229" tpage="default_0.bz2">res_pt_shape_spark.tpe</tpe>
+  <tpe x="76" y="301" tpage="default_0.bz2">res_pt_shape_circle.tpe</tpe>
+  <tpe x="4" y="373" tpage="default_0.bz2">res_pt_shape_disk.tpe</tpe>
+  <tpe x="146" y="301" tpage="default_0.bz2">res_pt_shape_ring.tpe</tpe>
+  <tpe x="76" y="371" tpage="default_0.bz2">res_pt_shape_square.tpe</tpe>
+  <tpe x="4" y="443" tpage="default_0.bz2">res_pt_shape_snow.tpe</tpe>
+  <tpe x="146" y="371" tpage="default_0.bz2">res_pt_shape_sphere.tpe</tpe>
+  <tpe x="74" y="441" tpage="default_0.bz2">res_pt_shape_star.tpe</tpe>
+  <tpe x="146" y="440" tpage="default_0.bz2">res_pt_shape_cloud.tpe</tpe>
+  <tpe x="214" y="299" tpage="default_0.bz2">GM_Fire_spr_Fire_Pollen_99b670f1-db0c-4487-9f47-d3f17e2445bb.tpe</tpe>
+  <tpe x="209" y="438" tpage="default_0.bz2">spr_pollen_example_bg_Pollen_ae28667a-3ab4-40dd-9263-ccbba848756a.tpe</tpe>
   <tpe x="247" y="4" tpage="default_0.bz2">res_pt_shape_line.tpe</tpe>
   <tpe x="247" y="22" tpage="default_0.bz2">res_pt_shape_pixel.tpe</tpe>
 </TextureGroup>

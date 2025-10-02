@@ -54,7 +54,7 @@ global.pollen_config_pfx = [
     //--- DEFINE SYSTEMS HERE ---//
     
     {
-        system : "template_example",
+        system : "system_template_example",
         template : ps_example,
         globalSpace: true,
         depth: 0,
@@ -70,6 +70,34 @@ global.pollen_config_pfx = [
         // angle: 45,
         // color: c_red,
         // alpha: 1,
+        emitterList : [
+            {
+                type: "type_example_full",
+                width: 64,
+                height: 64,
+                number: 10,
+            },
+            {
+                type: "type_example_min",
+                relative: false, //<---NOTE: This must be before .SetNumber or changes won't be reflected properly
+                number: 20,
+                width: 64,
+                height: 64,
+                delay: {min: 120, max: 200, unit: time_source_units_frames},
+                interval: {min: 0, max: 5, unit: time_source_units_frames},
+                shape: ps_shape_diamond,
+                distr: ps_distr_gaussian,
+                offsetX: 8,
+                offsetY: 8,
+            },
+        ],
+    },
+    
+    {
+        system : "system_template_example_2",
+        template : "system_example",
+        color: c_red,
+        globalSpace: false,
         emitterList : [
             {
                 type: "type_example_full",
