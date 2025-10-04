@@ -29,7 +29,7 @@
             ~ Generate particle systems from hot-reload script                                                  [X]
             ~ Ability to adjust any part system/emitter property from hot-reload script                         [X]
             ~ Generate particle types from templates                                                            [ ]
-            ~ Generate particle systems from templates (GM part assets, pollen systems, more?)                  [ ]
+            ~ Generate particle systems from templates (GM part assets, pollen systems, more?)                  [X]
             ~ Allow GM types/systems/part_assets to stream/burst using Pollen functions                         [ ]
             ~ Ensure easy cleanup of data (add .Destroy methods and check for mem-leaks)                        [ ]
             ~ Add error checks and basic debug tools                                                            [ ]
