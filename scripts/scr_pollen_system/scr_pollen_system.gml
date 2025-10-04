@@ -565,12 +565,12 @@ function Pollen() constructor {
             }
 
             var _step = GetStep();
-            if(_step != undefined){
+            if(_step.type != undefined){
                 _target.SetStep(_step.number, _step.type);
             }
 
             var _death = GetDeath();
-            if(_death != undefined){
+            if(_death.type != undefined){
                 _target.SetDeath(_death.number, _death.type);
             }
         }

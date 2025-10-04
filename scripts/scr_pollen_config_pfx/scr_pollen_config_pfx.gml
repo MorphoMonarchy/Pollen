@@ -51,6 +51,13 @@ global.pollen_config_pfx = [
         death: {number: 1, type: "type_example_min"},
     },
     
+    {
+        type: "type_example_template", 
+        template: "type_example_full", 
+        speed: {min:0, max:0},
+        color: [ #2beB34, #D422B7, c_orange ],
+    }, //<--- Make sure you define the template before using it on another type 
+    
     
     //--- DEFINE SYSTEMS HERE ---//
     
@@ -73,7 +80,7 @@ global.pollen_config_pfx = [
         // alpha: 1,
         emitterList : [
             {
-                type: "type_example_full",
+                type: "type_example_template", //<---set this to 'type_example_template' to see how templates work with part types
                 width: 64,
                 height: 64,
                 number: 10,

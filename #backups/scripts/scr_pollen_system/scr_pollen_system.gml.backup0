@@ -1,4 +1,4 @@
-// 2025-10-02 16:22:34
+// 2025-10-04 12:53:21
 // Feather ignore all
 //======================================================================================================================
 #region ~ INDEX ~
@@ -447,6 +447,133 @@ function Pollen() constructor {
             }
             part_type_death(__gmlData, _number, _type);
             return self;
+        }
+
+        static Copy = function(_target){
+            if(_target == undefined || _target == self){return;}
+
+            var _sprite = GetSpriteData();
+            var _shape = GetShape();
+            if(_sprite != undefined && _sprite.id != undefined){
+                _target.SetSprite(
+                    _sprite.id,
+                    _sprite.subImg,
+                    _sprite.animate,
+                    _sprite.stretch,
+                    _sprite.randomImg
+                );
+            }
+            else if(_shape != undefined){
+                _target.SetShape(_shape);
+            }
+
+            var _size = GetSize();
+            if(_size != undefined){
+                _target.SetSize(_size.min, _size.max, _size.incr, _size.wiggle);
+            }
+
+            var _sizeX = GetSizeX();
+            if(_sizeX != undefined){
+                _target.SetSizeX(_sizeX.min, _sizeX.max, _sizeX.incr, _sizeX.wiggle);
+            }
+
+            var _sizeY = GetSizeY();
+            if(_sizeY != undefined){
+                _target.SetSizeY(_sizeY.min, _sizeY.max, _sizeY.incr, _sizeY.wiggle);
+            }
+
+            var _scale = GetScale();
+            if(_scale != undefined){
+                _target.SetScale(_scale.x, _scale.y);
+            }
+
+            var _speed = GetSpeed();
+            if(_speed != undefined){
+                _target.SetSpeed(_speed.min, _speed.max, _speed.incr, _speed.wiggle);
+            }
+
+            var _direction = GetDirection();
+            if(_direction != undefined){
+                _target.SetDirection(_direction.min, _direction.max, _direction.incr, _direction.wiggle);
+            }
+
+            var _gravity = GetGravity();
+            if(_gravity != undefined){
+                _target.SetGravity(_gravity.amount, _gravity.direction);
+            }
+
+            var _orientation = GetOrientation();
+            if(_orientation != undefined){
+                _target.SetOrientation(
+                    _orientation.min,
+                    _orientation.max,
+                    _orientation.incr,
+                    _orientation.wiggle,
+                    _orientation.relative
+                );
+            }
+
+            var _colorMix = GetColorMix();
+            if(_colorMix != undefined){
+                _target.SetColorMix(_colorMix);
+            }
+            else{
+                var _colorRgb = GetColorRgb();
+                if(_colorRgb != undefined){
+                    _target.SetColorRgb(
+                        _colorRgb.rmin,
+                        _colorRgb.rmax,
+                        _colorRgb.gmin,
+                        _colorRgb.gmax,
+                        _colorRgb.bmin,
+                        _colorRgb.bmax
+                    );
+                }
+                else{
+                    var _colorHsv = GetColorHsv();
+                    if(_colorHsv != undefined){
+                        _target.SetColorHsv(
+                            _colorHsv.hmin,
+                            _colorHsv.hmax,
+                            _colorHsv.smin,
+                            _colorHsv.smax,
+                            _colorHsv.vmin,
+                            _colorHsv.vmax
+                        );
+                    }
+                    else{
+                        var _color = GetColor();
+                        if(_color != undefined){
+                            _target.SetColor(_color);
+                        }
+                    }
+                }
+            }
+
+            var _alpha = GetAlpha();
+            if(_alpha != undefined){
+                _target.SetAlpha(_alpha);
+            }
+
+            var _blend = GetBlend();
+            if(_blend != undefined){
+                _target.SetBlend(_blend);
+            }
+
+            var _life = GetLife();
+            if(_life != undefined){
+                _target.SetLife(_life.min, _life.max);
+            }
+
+            var _step = GetStep();
+            if(_step.type != undefined){
+                _target.SetStep(_step.number, _step.type);
+            }
+
+            var _death = GetDeath();
+            if(_death.type != undefined){
+                _target.SetDeath(_death.number, _death.type);
+            }
         }
         
     }
@@ -920,6 +1047,22 @@ function Pollen() constructor {
     }
     
     static ImportPfxType = function(_import_data, _type_data){
+        var _template = struct_get(_import_data, "template");
+        if(_template != undefined){
+            if(!is_string(_template)){
+                Error($"Template defined for type '{_import_data.type}' must be a string!");
+            }
+            else{
+                var _templateData = TypeTagGetData(_template);
+                if(_templateData == undefined){
+                    Error($"Unable to find template type '{_template}' while loading '{_import_data.type}'!");
+                }
+                else if(_templateData != _type_data){
+                    _templateData.Copy(_type_data);
+                }
+            }
+        }
+
         var _i = -1;
         var _nameList = struct_get_names(_import_data);
         var _numNames = array_length(_nameList);
@@ -927,8 +1070,10 @@ function Pollen() constructor {
             _i++;
             var _name = _nameList[_i];
             switch(_name){
-                
+
                 case "type": break; //<---'type' is checked before ImportPfxType function is called.
+
+                case "template": break;
                 
                 case "shape": var _shape = _import_data.shape; _type_data.SetShape(_shape); break;
                 
