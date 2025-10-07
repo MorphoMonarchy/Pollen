@@ -33,7 +33,7 @@ global.pollen_config_pfx = [
     {
         type : "type_example_full",
         // shape: pt_shape_line,
-        sprite : {id: spr_pollen_test},
+        sprite : {id: spr_pollen_test, subImg: 0, animate: false, stretch: false, randomImg: false},
         size: {min: 0.5, max: 2, wiggle: 0.1, incr: -0.01},
         scale: {x: 0.1, y: 0.1},
         speed: {min: 2, max: 10, incr: -0.05, wiggle: 0.1},
@@ -43,7 +43,7 @@ global.pollen_config_pfx = [
         // color: [ #2beB34, #D422B7, c_orange ],
         // colorMix: [c_red, c_blue],
         // colorRgb: {rmin: 0, rmax: 255, gmin: 0, gmax: 255,  bmin: 0, bmax: 255},
-        colorHsv: {hmin: 0, hmax: 255, smin: 0, smax: 255,  vmin: 0, vmax: 255},
+        colorHsv: {hmin: 0, hmax: 255, smin: 0, smax: 255,  vmin: 0, vmax: 255}, //<---Comment this out and uncomment the color lines above for different color modes
         alpha: [0.5, 1, 0.35],
         blend: false,
         life: {min: 0, max: 100},

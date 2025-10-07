@@ -38,10 +38,9 @@
         ~ Testing & polish:                                                                                     [ ]
             ~ Check builder functions to make sure all of them return self                                      [X]
             ~ Ensure new types can be defined in emitter JSON (i.e. you can set "type" property as a struct)    [X]
-            ~ Add tests to ensure JSON data is valid                                                            []
+            ~ Test all the sprite animation settings in part types                                              [ ]
+            ~ Add tests to ensure JSON data is valid                                                            [X]
                 ~ Refactor import functions to use struct_get_games to test for invalid JSON members            [X]
-            ~ Add options to use structs or split-up variables for position, offset, size, etc?                 [ ]
-                -> e.g. can do "size: {w: 64, h: 64}" OR "width: 64, height: 64"
             ~ Make functional on Gamemaker LTS version?                                                         [ ]
             ~ Test YYC version                                                                                  [ ]
             ~ Test speed of calling stream/burst compared to regular GML backend                                [ ]
@@ -180,34 +179,6 @@ function Pollen() constructor {
         __gmlData = _gml_type ?? part_type_create();
         static GetTag = function(){return __tag;}
         static GetGmlData = function(){return __gmlData;}
-
-        //--- ARGUMENT TESTS ---//
-        static __AssertBool = function(_value, _method, _arg){
-            if(!is_bool(_value)){
-                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
-            }
-        };
-        static __AssertReal = function(_value, _method, _arg){
-            if(!is_real(_value)){
-                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a real number but received {typeof(_value)}!");
-            }
-        };
-        static __AssertArray = function(_value, _method, _arg){
-            if(!is_array(_value)){
-                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be an array but received {typeof(_value)}!");
-            }
-        };
-        static __AssertArrayOfReals = function(_value, _method, _arg){
-            __AssertArray(_value, _method, _arg);
-            var _length = array_length(_value);
-            var _i = -1;
-            repeat(_length){
-                _i++;
-                if(!is_real(_value[_i])){
-                    Pollen.Error($"PfxType.{_method}() expects all entries of '{_arg}' to be real numbers but received {typeof(_value[_i])} at index {_i}!");
-                }
-            }
-        };
         
         //--- SHAPE ---//
         __shape = undefined;
@@ -224,7 +195,7 @@ function Pollen() constructor {
         __sprite = {id: undefined, subImg: 0, animate: false, stretch: false, randomImg: false}
         static GetSpriteData = function(){return __sprite;}
         static SetSprite = function(_sprite, _subImg = 0, _animate = false, _stretch = false, _randomImg = false){
-            __AssertReal(_sprite, "SetSprite", "_sprite");
+            if(asset_get_type(_sprite) != asset_sprite){Pollen.Error($"Attempting to set sprite of type: {__tag} but '{_sprite}' is not a valid GM sprite!");};
             __AssertReal(_subImg, "SetSprite", "_subImg");
             __AssertBool(_animate, "SetSprite", "_animate");
             __AssertBool(_stretch, "SetSprite", "_stretch");
@@ -688,6 +659,35 @@ function Pollen() constructor {
             }
         }
         
+        //--- DEBUG ---//
+        
+        static __AssertBool = function(_value, _method, _arg){
+            if(!is_bool(_value)){
+                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
+            }
+        };
+        static __AssertReal = function(_value, _method, _arg){
+            if(!is_real(_value) && !is_int64(_value)){
+                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a real number but received {typeof(_value)}!");
+            }
+        };
+        static __AssertArray = function(_value, _method, _arg){
+            if(!is_array(_value)){
+                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be an array but received {typeof(_value)}!");
+            }
+        };
+        static __AssertArrayOfReals = function(_value, _method, _arg){
+            __AssertArray(_value, _method, _arg);
+            var _length = array_length(_value);
+            var _i = -1;
+            repeat(_length){
+                _i++;
+                if(!is_real(_value[_i]) && !is_int64(_value[_i])){
+                    Pollen.Error($"PfxType.{_method}() expects all entries of '{_arg}' to be real numbers but received {typeof(_value[_i])} at index {_i}!");
+                }
+            }
+        };
+        
     }
     
     static TypeDestroy = function(_type){
@@ -717,11 +717,8 @@ function Pollen() constructor {
 //======================================================================================================================
 #region ~ EMITTERS ~
 //======================================================================================================================
-
-    // static __emitterMap = ds_map_create();
-    // static EmitterTagGetData = function(_tag){return __emitterMap[? _tag];}
     
-    //NOTE: Emitters must be tied to systems which is why I'm defining the data inside Pfx instead of Pollen
+    //NOTE: Emitters must be tied to systems which is why there are no maps/tags associated with it
     static Emitter = function(_system, _gml_emitter = undefined) constructor {
         
         if(!is_instanceof(_system, Pollen.System)){Pollen.Error("Trying to create an emitter using a system that is not a valid Pollen.System struct!");}
@@ -931,7 +928,7 @@ function Pollen() constructor {
             return self;
         }
         static SetColor = function(_color){
-            if(!is_real(_color)){Pollen.Error($"Attempting to set color of system: {__tag} but {_color} is not a valid color!");}
+            if(!is_real(_color) && !is_int64(_color)){Pollen.Error($"Attempting to set color of system: {__tag} but {_color} is not a valid color!");}
             __color = _color; 
             part_system_color(__gmlData, _color, __alpha); 
             RefreshStream();
