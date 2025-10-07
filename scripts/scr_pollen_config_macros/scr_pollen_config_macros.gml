@@ -1,4 +1,3 @@
-// 2025-10-07 15:49:02
 // Feather ignore all
 //======================================================================================================================
 /*
@@ -16,6 +15,9 @@
 #macro POLLEN_LIVE_EDIT true
 
 
-// If a property is not defined in global.pollen_config_pfx, you can choose whether the type/emitter/system
-// should default to a constant default value or to the last value it was defined as. 
+// If you delete a property in global.pollen_config_pfx, you can choose whether the type/emitter/system
+// should default to a constant default value or to the last value it was defined as.
+
+// WARNING: Setting this to "true" may cause particles to not appear as they would when initially 
+// compiling the game. Furthermore, you may experience issues with Emitters that may result in a crash.
 #macro POLLEN_FALLBACK_TO_PRIOR_VALUES false

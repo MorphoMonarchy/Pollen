@@ -1,4 +1,4 @@
-// 2025-10-06 20:08:27
+// 2025-10-07 15:25:02
 // Feather ignore all
 //======================================================================================================================
 /*
@@ -99,21 +99,22 @@ global.pollen_config_pfx = [
                 offsetX: 8,
                 offsetY: 8,
             },
-            // { //<---Example of how to define a type inside an emitter struct (uncomment and save to see how it works)
-            //     type: {
-            //         type: "type_in_emitter",
-            //         // tag: "type_in_emitter", //<---Can also use 'tag' instead to prevent confusion from nesting 'type' property inside of another 'type' property
-            //         shape: pt_shape_line,
-            //         size: {min: 0.1, max: 0.3}, 
-            //         orientation: {relative: true},
-            //         direction: {incr: 10},
-            //         colorMix: [c_orange, c_aqua],
-            //         alpha: [1, 0],
-            //     },
-            //     number: 1,
-            //     width: 64,
-            //     height: 64,
-            // }
+            { //--- Example of how to define a type inside an emitter struct ---
+                type: {
+                    type: "type_in_emitter",
+                    scale: {x: 1, y: 1},
+                    // tag: "type_in_emitter", //<---Can also use 'tag' instead to prevent confusion from nesting 'type' property inside of another 'type' property
+                    shape: pt_shape_line,
+                    size: {min: 0.3, max: 0.5}, 
+                    orientation: {relative: true},
+                    direction: {incr: 10},
+                    colorMix: [c_orange, c_aqua],
+                    alpha: [1, 0],
+                },
+                number: -5,
+                width: 64,
+                height: 64,
+            }
         ],
     },
     

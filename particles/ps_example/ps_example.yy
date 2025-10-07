@@ -13,8 +13,8 @@
   ],
   "name":"ps_example",
   "parent":{
-    "name":"Example",
-    "path":"folders/Pollen/Example.yy",
+    "name":"Pollen Example",
+    "path":"folders/Pollen Example.yy",
   },
   "resourceType":"GMParticleSystem",
   "resourceVersion":"2.0",

@@ -1,4 +1,4 @@
-// 2025-10-06 20:09:16
+// 2025-10-07 15:58:44
 // Feather ignore all
 //======================================================================================================================
 #region ~ INDEX ~
@@ -39,12 +39,10 @@
         ~ Testing & polish:                                                                                     [ ]
             ~ Check builder functions to make sure all of them return self                                      [X]
             ~ Ensure new types can be defined in emitter JSON (i.e. you can set "type" property as a struct)    [X]
-            ~ Test all the sprite animation settings in part types                                              [ ]
+            ~ Test all the sprite animation settings in part types                                              [X]
             ~ Add tests to ensure JSON data is valid                                                            [X]
                 ~ Refactor import functions to use struct_get_games to test for invalid JSON members            [X]
-            ~ Make functional on Gamemaker LTS version?                                                         [ ]
-            ~ Test YYC version                                                                                  [ ]
-            ~ Test speed of calling stream/burst compared to regular GML backend                                [ ]
+            ~ Test YYC version                                                                                  [X]
             ~ Code cleanup and documentation                                                                    [ ]
             
     DOCUMENTATION:
@@ -53,10 +51,21 @@
             ~ https://github.com/GamemakerCasts/particles - A lightweight particle wrapper for GM
             ~ https://delfos1.itch.io/pulse - A custom particle emitter library that extends GM's capabilities
             
+        ~ Known bugs:
+            ~ Adding and deleting emitters repeatedly may cause game to crash when POLLEN_FALLBACK_TO_PRIOR_VALUES is true
+            
         ~ FAQ:
         
             ~ When compiling in YYC, users have to uncheck "automatically remove unused assets" when using 
               particle asset templates
+              
+            ~ When deleting a property from JSON, the types/systems/emitters will fallback to constant default values
+              rather than their previous defined properties. This can be configured in scr_pollen_config_global
+              
+            ~ When POLLEN_FALLBACK_TO_PRIOR_VALUES is true, deleting emitters that are higher up the list may result
+              in the rest of the emitters defaulting to the deleted emitters values. For example, if you delete 
+              the first emitter on the emitterList, then the second emitter will default to the first emitter's values
+              rather than it's own.
               
             ~ Each particle type & system struct takes up roughly 0.1 - 0.3[+] mb, so it may be easiest to simply keep
               them in the global JSON rather than trying to manually create/destroy them, even if you only need them
@@ -182,7 +191,7 @@ function Pollen() constructor {
         static GetGmlData = function(){return __gmlData;}
         
         //--- SHAPE ---//
-        __shape = undefined;
+        __shape = pt_shape_pixel;
         static GetShape = function(){return __shape;}
         static SetShape = function(_shape){
             __AssertReal(_shape, "SetShape", "_shape");
@@ -209,7 +218,7 @@ function Pollen() constructor {
         }
         
         //--- SIZE ---// 
-        __size = {min: 0, max: 0, incr: 0, wiggle: 0}
+        __size = {min: 1, max: 1, incr: 0, wiggle: 0}
         __sizeX = undefined; //<--- I hate this but oh well...
         __sizeY = undefined;
         static GetSize = function(){return __size;}
@@ -230,7 +239,7 @@ function Pollen() constructor {
         static SetSizeX = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
             if(__sizeX != undefined){_min ??= __sizeX.min; _max ??= __sizeX.max; _incr ??= __sizeX.incr; _wiggle ??= __sizeX.wiggle;}
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
-            __sizeX = undefined;
+            __size = undefined;
             __AssertReal(_min, "SetSizeX", "_min");
             __AssertReal(_max, "SetSizeX", "_max");
             __AssertReal(_incr, "SetSizeX", "_incr");
@@ -265,7 +274,7 @@ function Pollen() constructor {
         }
         
         //--- SPEED ---//
-        __speed = { min: 1, max: 1, incr: 0, wiggle: 0 };
+        __speed = { min: 0, max: 0, incr: 0, wiggle: 0 };
         static GetSpeed = function(){ return __speed; }
         static SetSpeed = function(
             _min    = __speed.min,
@@ -735,8 +744,8 @@ function Pollen() constructor {
         __relative = false;
         __delay = {min: 0, max: 0, unit: time_source_units_frames};
         __interval = {min: 0, max: 0, unit: time_source_units_frames};
-        __width = 0;
-        __height = 0;
+        __width = 32;
+        __height = 32;
         __offsetX = 0;
         __offsetY = 0;
         
@@ -1060,81 +1069,6 @@ function Pollen() constructor {
                 }
                 SetEmitterList(_copyList);
             }
-            
-            Pollen.Log($"Successfully copied from system: {_pfx.GetTag()}");
-        }
-    }
-    
-    static PfxStream = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
-        
-        var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag);
-        if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
-            
-        var _data = (_isTag) ? __systemMap[? _system_or_tag] : _system_or_tag;
-        var _gmlData = _data.GetGmlData();
-        var _emitterList = _data.GetEmitterList();
-        
-        // var _oldPos = _data.GetPosition();
-        // _x ??= _oldPos.x; _y ??= _oldPos.y;
-        _data.__isStreaming = true;
-        _data.__streamNumber = _amount;
-        
-        var _i = -1;
-        var _numEmitters = array_length(_emitterList);
-        repeat(_numEmitters){
-            _i++;
-            var _emitter = _emitterList[_i];
-            if(!_emitter.IsEnabled()){continue;}
-            var _emitterGml = _emitter.GetGmlData();
-            
-            var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
-            var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
-            var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
-            var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
-            var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
-            var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
-            
-            var _type = _emitter.GetType();
-            if(is_string(_type)){_type = TypeTagGetData(_type); _emitter.SetType(_type);}
-            var _typeGml = _type.GetGmlData();
-            
-            part_emitter_region(_gmlData, _emitterGml, _left, _right, _top, _bottom, _shape, _distr);
-            part_emitter_stream(_gmlData, _emitterGml, _typeGml, _number);
-        }
-        
-        return;
-    }
-    
-    static PfxBurst = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
-        
-        var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag);
-        if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
-        
-        var _data = (_isTag) ? __systemMap[? _system_or_tag] : _system_or_tag;
-        var _gmlData = _data.GetGmlData();
-        var _emitterList = _data.GetEmitterList();
-        
-        var _i = -1;
-        var _numEmitters = array_length(_emitterList);
-        repeat(_numEmitters){
-            _i++;
-            var _emitter = _emitterList[_i];
-            if(!_emitter.IsEnabled()){continue;}
-            var _emitterGml = _emitter.GetGmlData();
-            
-            var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
-            var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
-            var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
-            var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
-            var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
-            var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
-            
-            var _type = _emitter.GetType();
-            if(is_string(_type)){_type = TypeTagGetData(_type); _emitter.SetType(_type);}
-            var _typeGml = _type.GetGmlData();
-            
-            part_emitter_region(_gmlData, _emitterGml, _left, _right, _top, _bottom, _shape, _distr);
-            part_emitter_burst(_gmlData, _emitterGml, _typeGml, abs(_number)); //<---Take abs since in stream mode a number can be set to negative so always default to the positive of that value when bursting
         }
     }
     
@@ -1176,6 +1110,88 @@ function Pollen() constructor {
 
 #endregion   
 //======================================================================================================================
+#region ~ CREATE PARTICLES ~
+//======================================================================================================================
+
+    static PfxStream = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
+        
+        var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag);
+        if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
+            
+        var _data = (_isTag) ? __systemMap[? _system_or_tag] : _system_or_tag;
+        var _gmlData = _data.GetGmlData();
+        var _emitterList = _data.GetEmitterList();
+        
+        // var _oldPos = _data.GetPosition();
+        // _x ??= _oldPos.x; _y ??= _oldPos.y;
+        _data.__isStreaming = true;
+        _data.__streamNumber = _amount;
+        
+        var _i = -1;
+        var _numEmitters = array_length(_emitterList);
+        repeat(_numEmitters){
+            _i++;
+            var _emitter = _emitterList[_i];
+            if(!_emitter.IsEnabled()){continue;}
+            var _emitterGml = _emitter.GetGmlData();
+            
+            var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
+            var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
+            var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
+            var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
+            var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
+            var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
+            
+            var _type = _emitter.GetType();
+            // Log($"{_type}");
+            if(is_string(_type)){_type = TypeTagGetData(_type); _emitter.SetType(_type);}
+            if(_type == undefined){continue;}
+            var _typeGml = _type.GetGmlData();
+            
+            part_emitter_region(_gmlData, _emitterGml, _left, _right, _top, _bottom, _shape, _distr);
+            part_emitter_stream(_gmlData, _emitterGml, _typeGml, _number);
+        }
+        
+        return;
+    }
+    
+    static PfxBurst = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
+        
+        var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag);
+        if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
+        
+        var _data = (_isTag) ? __systemMap[? _system_or_tag] : _system_or_tag;
+        var _gmlData = _data.GetGmlData();
+        var _emitterList = _data.GetEmitterList();
+        
+        var _i = -1;
+        var _numEmitters = array_length(_emitterList);
+        repeat(_numEmitters){
+            _i++;
+            var _emitter = _emitterList[_i];
+            if(!_emitter.IsEnabled()){continue;}
+            var _emitterGml = _emitter.GetGmlData();
+            
+            var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
+            var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
+            var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
+            var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
+            var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
+            var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
+            
+            var _type = _emitter.GetType();
+            if(is_string(_type)){_type = TypeTagGetData(_type); _emitter.SetType(_type);}
+            if(_type == undefined){continue;}
+            var _typeGml = _type.GetGmlData();
+            
+            part_emitter_region(_gmlData, _emitterGml, _left, _right, _top, _bottom, _shape, _distr);
+            part_emitter_burst(_gmlData, _emitterGml, _typeGml, abs(_number)); //<---Take abs since in stream mode a number can be set to negative so always default to the positive of that value when bursting
+        }
+    }
+
+
+#endregion   
+//======================================================================================================================
 #region ~ IMPORT ~
 //======================================================================================================================
     
@@ -1195,6 +1211,7 @@ function Pollen() constructor {
             else if (struct_exists(_struct, "system")){
                 var _tag = struct_get(_struct, "system");
                 var _tagData = SystemTagGetData(_tag) ?? new System(_tag);
+                if(!POLLEN_FALLBACK_TO_PRIOR_VALUES){_tagData.Copy(__defaultSystem, true);}
                 var _template = struct_get(_struct, "template");
                 var _oldTemplate = _tagData.GetTemplate();
                 if(_template!= undefined && _oldTemplate != _template){
@@ -1231,23 +1248,30 @@ function Pollen() constructor {
                             var _numNewList = array_length(_emitterList);
                             var _numDiff = _numNewList - _numOldList;
                             
-                            //Get rid of old emitters
-                            if(_numDiff < 0){
-                                var _iOld = 0;
-                                repeat(abs(_numDiff)){
-                                    _iOld++;
-                                    var _deadEmit = _tagData.GetEmitterList()[_numOldList - _iOld];
-                                    EmitterDestroy(_deadEmit);
-                                    array_pop(_tagData.GetEmitterList());
+                            //Get rid of dead emitters
+                            if(POLLEN_FALLBACK_TO_PRIOR_VALUES){
+                                if(_numDiff < 0){
+                                    var _iOld = 0;
+                                    repeat(abs(_numDiff)){
+                                        _iOld++;
+                                        var _deadEmit = _tagData.GetEmitterList()[_numOldList - _iOld];
+                                        EmitterDestroy(_deadEmit);
+                                        array_pop(_tagData.GetEmitterList());
+                                    }
                                 }
                             }
+                            else {Pollen.EmitterListDestroyAll(_tagData);}
                             
                             var _iEmList = -1;
                             repeat(_numNewList){
                                 _iEmList++;
                                 var _props = _emitterList[_iEmList];
                                 var _emitter;
-                                if(_numOldList >= _iEmList + 1){_emitter = _tagData.GetEmitterList()[_iEmList];}
+                                
+                                if(POLLEN_FALLBACK_TO_PRIOR_VALUES){
+                                    if(_numOldList >= _iEmList + 1){_emitter = _tagData.GetEmitterList()[_iEmList];}
+                                    else {_emitter = new Emitter(_tagData); array_push(_tagData.GetEmitterList(), _emitter);}
+                                }
                                 else {_emitter = new Emitter(_tagData); array_push(_tagData.GetEmitterList(), _emitter);}
                                 
                                 var _iEm = -1;
@@ -1259,12 +1283,14 @@ function Pollen() constructor {
                                     switch(_emName){
                                         case "type": 
                                             var _type = _props.type; 
-                                            if(is_struct(_type) && !is_instanceof(_type, Type)){
+                                            if(is_struct(_type) && ! is_instanceof(_type, Pollen.Type)){
                                                 var _tag = struct_get(_props.type, "tag") ?? struct_get(_props.type, "type"); 
                                                 if(_tag == undefined){Error("Type structs defined in emitterLists must have a 'type' or 'tag' property defined with a valid string!");}
                                                 _type = TypeTagGetData(_tag) ?? new Type(_tag); 
+                                                if(_type == undefined){Error($"Unable to get type data or create a new type for tag: '{_tag}'.");}
                                                 ImportType(_props.type, _type);
                                             }
+                                            if(_type == undefined){Error($"Unable to load data from 'type' property of emitter: {_iEm} in '{_emitter.GetSystem()}'.");}
                                             _emitter.SetType(_type); 
                                             break;
                                         case "enabled": var _enabled = _props.enabled; _emitter.SetEnabled(_enabled); break;
@@ -1313,6 +1339,7 @@ function Pollen() constructor {
                 }
             }
         }
+        else if (_template == undefined && !POLLEN_FALLBACK_TO_PRIOR_VALUES){_type_data.Copy(__defaultType);}
 
         var _i = -1;
         var _nameList = struct_get_names(_import_data);
@@ -1704,17 +1731,20 @@ function Pollen() constructor {
 #region ~ DEBUG/UTIL ~
 //======================================================================================================================
     
+    static DestroyAll = function(){TypeDestroyAll(); SystemDestroyAll();}
+    
     static Log = function(_message){show_debug_message("Pollen -> " + _message);}
     static Warn = function(_message){show_debug_message("Pollen -> Warning! " + _message);}
     static Error = function(_message){show_error("Pollen -> Error! " + _message, true);}
     
-    static DestroyAll = function(){TypeDestroyAll(); SystemDestroyAll();}
-
-
+    
 #endregion    
 //======================================================================================================================
 #region ~ SETUP ~
 //======================================================================================================================
+
+    static __defaultType = new Pollen.Type("__pollen_type_default");
+    static __defaultSystem = new Pollen.System("__pollen_system_default");
 
 } //<---DON'T DELETE THIS!!!
 

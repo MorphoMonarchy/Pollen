@@ -10,8 +10,8 @@
   "name":"obj_pollen_example",
   "overriddenProperties":[],
   "parent":{
-    "name":"Example",
-    "path":"folders/Pollen/Example.yy",
+    "name":"Pollen Example",
+    "path":"folders/Pollen Example.yy",
   },
   "parentObjectId":null,
   "persistent":false,
