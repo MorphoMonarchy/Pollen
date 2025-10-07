@@ -1,4 +1,4 @@
-// 2025-09-06 12:49:14
+// 2025-10-06 15:05:25
 // Feather ignore all
 
 function __PollenBufferReadGML(_buffer, _offset, _size)
@@ -507,6 +507,7 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
             all: all,
             
             //Colours
+            c_aqua:    c_aqua,
             c_black:   c_black,
             c_blue:    c_blue,
             c_dkgray:  c_dkgray,
@@ -553,6 +554,10 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
             ps_distr_gaussian: ps_distr_gaussian,
             ps_distr_invgaussian: ps_distr_invgaussian,
             ps_distr_linear: ps_distr_linear,
+            
+            //Time
+            time_source_units_frames: time_source_units_frames,
+            time_source_units_seconds: time_source_units_seconds,
     
         };
         

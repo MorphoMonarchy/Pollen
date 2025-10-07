@@ -1,4 +1,4 @@
-// 2025-10-02 15:56:39
+// 2025-10-06 16:29:16
 #event properties (no comments/etc. here are saved)
 parent_index = -1;
 sprite_index = spr_pollen_test;
@@ -10,11 +10,26 @@ show_debug_overlay(true);
 system = Pollen.SystemTagGetData("system_example");
 template = Pollen.SystemTagGetData("system_template_example");
 Pollen.PfxStream("system_example");
- //Pollen.Log($"{system}");
+
+//--- TEST ---//
+// __id = 0;
 
 #event step
 
 system.SetPosition(mouse_x, mouse_y);
+
+//--- TEST ---//
+// if(keyboard_check_pressed(vk_space)){
+//     repeat(100){
+//         __id++;
+//         var _ps = part_system_create();
+//         var _test = new Pollen.System($"system_{__id}", _ps);
+//         var _emitterList = [new Pollen.Emitter(_test)];
+//         _test.SetEmitterList(_emitterList);
+//         new Pollen.Type($"type_{__id}", part_type_create());
+//     }
+// }
+// if(keyboard_check_pressed(vk_delete)){Pollen.DestroyAll();}
 
 #event mouse_global_left_button
 template.SetPosition(mouse_x, mouse_y);

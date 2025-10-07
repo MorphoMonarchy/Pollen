@@ -506,6 +506,7 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
             all: all,
             
             //Colours
+            c_aqua:    c_aqua,
             c_black:   c_black,
             c_blue:    c_blue,
             c_dkgray:  c_dkgray,
