@@ -605,49 +605,124 @@ function Pollen() constructor {
         __offsetX = 0;
         __offsetY = 0;
         
+        //--- ARGUMENT TESTS ---//
+        static __AssertBool = function(_value, _method, _arg){
+            if(!is_bool(_value)){
+                Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
+            }
+        }
+        static __AssertReal = function(_value, _method, _arg){
+            if(!is_real(_value)){
+                Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a real number but received {typeof(_value)}!");
+            }
+        }
+        static __AssertRangeStruct = function(_value, _method, _arg){
+            if(!is_struct(_value)){
+                Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a struct but received {typeof(_value)}!");
+            }
+            if(!struct_exists(_value, "min") || !is_real(_value.min)){
+                Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.min' to be a real number!");
+            }
+            if(!struct_exists(_value, "max") || !is_real(_value.max)){
+                Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.max' to be a real number!");
+            }
+            if(!struct_exists(_value, "unit") || !is_real(_value.unit)){
+                Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.unit' to be a real number!");
+            }
+        }
+
         //--- SETTERS ---//
-        static SetEnabled = function(_enabled){__enabled = _enabled; return self;}
-        static SetType = function(_type){__type = _type; __system.RefreshStream(); return self;}
-        static SetNumber = function(_number){__number = _number; __system.RefreshStream(); return self;}
-        static SetShape = function(_shape){__shape = _shape; __system.RefreshStream(); return self;}
-        static SetDistr = function(_distr){__distr = _distr; __system.RefreshStream(); return self;}
-        
-        static SetRelative = function(_enabled){
-            __relative = _enabled; 
-            part_emitter_relative(__system.GetGmlData(), __gmlData, _enabled);
-            __system.RefreshStream(); 
+        static SetEnabled = function(_enabled){
+            __AssertBool(_enabled, "SetEnabled", "_enabled");
+            __enabled = _enabled;
             return self;
         }
-        static SetDelay = function(_delay){
-            __delay = _delay; 
-            part_emitter_delay(__system.GetGmlData(), __gmlData, _delay.min, _delay.max, _delay.unit);
-            __system.RefreshStream(); 
-            return self;
-        }
-        static SetInterval = function(_interval){
-            __interval = _interval; 
-            part_emitter_interval(__system.GetGmlData(), __gmlData, _interval.min, _interval.max, _interval.unit);
-            __system.RefreshStream(); 
-            return self;
-        }
-        
-        static SetSize = function(_width, _height){
-            __width = _width; 
-            __height = _height; 
+        static SetType = function(_type){
+            if((_type != undefined) && !is_struct(_type) && !is_string(_type)){
+                Pollen.Error($"PfxEmitter.SetType() expects argument '_type' to be a struct, string, or undefined but received {typeof(_type)}!");
+            }
+            __type = _type;
             __system.RefreshStream();
             return self;
         }
-        static SetWidth = function(_width){SetSize(_width, __height); return self;}
-        static SetHeight = function(_height){SetSize(__width, _height); return self;}
-        
+        static SetNumber = function(_number){
+            __AssertReal(_number, "SetNumber", "_number");
+            __number = _number;
+            __system.RefreshStream();
+            return self;
+        }
+        static SetShape = function(_shape){
+            __AssertReal(_shape, "SetShape", "_shape");
+            __shape = _shape;
+            __system.RefreshStream();
+            return self;
+        }
+        static SetDistr = function(_distr){
+            __AssertReal(_distr, "SetDistr", "_distr");
+            __distr = _distr;
+            __system.RefreshStream();
+            return self;
+        }
+
+        static SetRelative = function(_enabled){
+            __AssertBool(_enabled, "SetRelative", "_enabled");
+            __relative = _enabled;
+            part_emitter_relative(__system.GetGmlData(), __gmlData, _enabled);
+            __system.RefreshStream();
+            return self;
+        }
+        static SetDelay = function(_delay){
+            __AssertRangeStruct(_delay, "SetDelay", "_delay");
+            __delay = _delay;
+            part_emitter_delay(__system.GetGmlData(), __gmlData, _delay.min, _delay.max, _delay.unit);
+            __system.RefreshStream();
+            return self;
+        }
+        static SetInterval = function(_interval){
+            __AssertRangeStruct(_interval, "SetInterval", "_interval");
+            __interval = _interval;
+            part_emitter_interval(__system.GetGmlData(), __gmlData, _interval.min, _interval.max, _interval.unit);
+            __system.RefreshStream();
+            return self;
+        }
+
+        static SetSize = function(_width, _height){
+            __AssertReal(_width, "SetSize", "_width");
+            __AssertReal(_height, "SetSize", "_height");
+            __width = _width;
+            __height = _height;
+            __system.RefreshStream();
+            return self;
+        }
+        static SetWidth = function(_width){
+            __AssertReal(_width, "SetWidth", "_width");
+            SetSize(_width, __height);
+            return self;
+        }
+        static SetHeight = function(_height){
+            __AssertReal(_height, "SetHeight", "_height");
+            SetSize(__width, _height);
+            return self;
+        }
+
         static SetOffset = function(_offsetX, _offsetY){
+            __AssertReal(_offsetX, "SetOffset", "_offsetX");
+            __AssertReal(_offsetY, "SetOffset", "_offsetY");
             __offsetX = _offsetX;
             __offsetY = _offsetY;
             __system.RefreshStream();
             return self;
         }
-        static SetOffsetX = function(_offsetX){SetOffset(_offsetX, __offsetY); return self;}
-        static SetOffsetY = function(_offsetY){SetOffset(__offsetX, _offsetY); return self;}
+        static SetOffsetX = function(_offsetX){
+            __AssertReal(_offsetX, "SetOffsetX", "_offsetX");
+            SetOffset(_offsetX, __offsetY);
+            return self;
+        }
+        static SetOffsetY = function(_offsetY){
+            __AssertReal(_offsetY, "SetOffsetY", "_offsetY");
+            SetOffset(__offsetX, _offsetY);
+            return self;
+        }
         
         //--- GETTERS ---//
         static GetGmlData = function(){return __gmlData;}
