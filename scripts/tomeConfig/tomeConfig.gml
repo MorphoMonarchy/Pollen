@@ -14,7 +14,7 @@
 #macro TOME_GITHUB_REPO_BRANCH "master"
 
 //The directory within your Github repo where your docs will be pushed (In the case you don't want your doc folder at the root of your repo) 
-#macro TOME_GITHUB_REPO_DOC_DIRECTORY "docs/" // This is the root by default (""). When specifying a directory, always append a "/" at the end like: "myDirectory/"
+#macro TOME_GITHUB_REPO_DOC_DIRECTORY "" // This is the root by default (""). When specifying a directory, always append a "/" at the end like: "myDirectory/"
 
 // Show extended debug information in the console 
 #macro TOME_VERBOSE true
