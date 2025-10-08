@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__tome",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__tome",
+  "parent":{
+    "name":"_system",
+    "path":"folders/Tome/_system.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
