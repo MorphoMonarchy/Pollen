@@ -171,11 +171,24 @@ function Pollen() constructor {
 #region ~ TYPES ~
 //======================================================================================================================
     
+    /// @title      Types
+    /// @category   API
+    /// @text       A particle type constructor that uses similar properties found in GM's part_type family of functions. 
+    
+    
+    //--- PROPERTIES ---/
+    
     enum pollen_type_property {shape, sprite, size, scale, speed, direction, gravity, orientation, color, blend, life, step, death}
-    
     static __typeMap = ds_map_create();
-    static TypeTagGetData = function(_tag){return __typeMap[? _tag];}
     
+    
+    //--- CLASS ---/
+    
+    /// @constructor
+    /// @func   Type(tag, [gml_type])
+    /// @desc   A Pollen object that represents GM's part types with additional util functions to simplify building types and getting their data
+    /// @param  {string} tag A unique tag used to identity the type
+    /// @param  {Id.ParticleType|undefined} [gml_type] An optional reference to a GML part type you can pass in to initialize the type with (i.e. with part_type_create(). Defaults to 'undefined') 
     static Type = function(_tag, _gml_type = undefined) constructor {
         
         //--- SETUP BACKEND ---//
@@ -183,15 +196,34 @@ function Pollen() constructor {
         if(Pollen.__typeMap[? _tag] != undefined){Pollen.Error($"Attempting to create pollen part type, but type tag: '{_tag}' already exists!");}
         Pollen.__typeMap[? _tag] = self; 
         
+        
         //--- GML TYPE ---//
         __tag = _tag;
         __gmlData = _gml_type ?? part_type_create();
+        
+        ///@method  GetTag()
+        ///@desc    Returns the unique tag used to identify the type
+        ///@return  {string}
         static GetTag = function(){return __tag;}
+        
+        ///@method  GetGmlData()
+        ///@desc    Returns the gml part type data that the Pollen type uses in the backend
+        ///@return  {Id.ParticleType}
         static GetGmlData = function(){return __gmlData;}
+        
         
         //--- SHAPE ---//
         __shape = pt_shape_pixel;
+        
+        ///@method  GetShape()
+        ///@desc    Returns the part type shape that is being used or undefined if in sprite mode
+        ///@return  {pt_shape?}
         static GetShape = function(){return __shape;}
+        
+        ///@method SetShape(shape)
+        ///@desc Sets the shape to a GM part type shape (i.e. pt_shape_snow, etc.) instead of a sprite
+        ///@param {pt_shape} shape The pt_shape to set the type to
+        ///@return {self}
         static SetShape = function(_shape){
             __AssertReal(_shape, "SetShape", "_shape");
             __sprite.id = undefined;
@@ -200,27 +232,54 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- SPRITE ---//
         __sprite = {id: undefined, subImg: 0, animate: false, stretch: false, randomImg: false}
+        
+        ///@method GetSpriteData()
+        ///@desc   Returns the current sprite configuration for the type or undefined if using a primitive shape
+        ///@return {struct?}
         static GetSpriteData = function(){return __sprite;}
-        static SetSprite = function(_sprite, _subImg = 0, _animate = false, _stretch = false, _randomImg = false){
+    
+        ///@method SetSprite(sprite, [sub_img], [animate], [stretch], [random_img])
+        ///@desc   Sets the particle to use a sprite instead of a pt_shape
+        ///@param  {sprite} sprite The sprite asset to render for particles
+        ///@param  {real} [sub_img] The starting subimage index
+        ///@param  {bool} [animate] Whether the sprite should animate
+        ///@param  {bool} [stretch] Whether the sprite should stretch its animation across the life of the particle
+        ///@param  {bool} [random_img] Whether to use a random subimage
+        ///@return {self}
+        static SetSprite = function(_sprite, _sub_img = 0, _animate = false, _stretch = false, _random_img = false){
             if(asset_get_type(_sprite) != asset_sprite){Pollen.Error($"Attempting to set sprite of type: {__tag} but '{_sprite}' is not a valid GM sprite!");};
-            __AssertReal(_subImg, "SetSprite", "_subImg");
+            __AssertReal(_sub_img, "SetSprite", "_sub_img");
             __AssertBool(_animate, "SetSprite", "_animate");
             __AssertBool(_stretch, "SetSprite", "_stretch");
-            __AssertBool(_randomImg, "SetSprite", "_randomImg");
+            __AssertBool(_random_img, "SetSprite", "_random_img");
             __shape = undefined;
-            __sprite = {id: _sprite, subImg: _subImg, animate: _animate, stretch: _stretch, randomImg: _randomImg};
-            part_type_sprite(__gmlData, _sprite, _animate, _stretch, _randomImg);
-            part_type_subimage(__gmlData, _subImg);
+            __sprite = {id: _sprite, subImg: _sub_img, animate: _animate, stretch: _stretch, randomImg: _random_img};
+            part_type_sprite(__gmlData, _sprite, _animate, _stretch, _random_img);
+            part_type_subimage(__gmlData, _sub_img);
             return self;
         }
+        
         
         //--- SIZE ---// 
         __size = {min: 1, max: 1, incr: 0, wiggle: 0}
         __sizeX = undefined; //<--- I hate this but oh well...
         __sizeY = undefined;
+    
+        ///@method GetSize()
+        ///@desc   Returns the uniform size configuration or undefined if using axis-specific sizes
+        ///@return {struct?}
         static GetSize = function(){return __size;}
+    
+        ///@method SetSize([min], [max], [incr], [wiggle])
+        ///@desc   Sets uniform particle size parameters for both axes and clears axis-specific settings
+        ///@param  {real} [min] The minimum size
+        ///@param  {real} [max] The maximum size
+        ///@param  {real} [incr] The size increment per step
+        ///@param  {real} [wiggle] The random variation applied to size
+        ///@return {self}
         static SetSize = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
             if(__size != undefined){_min ??= __size.min; _max ??= __size.max; _incr ??= __size.incr; _wiggle ??= __size.wiggle;}
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
@@ -234,7 +293,19 @@ function Pollen() constructor {
             part_type_size(__gmlData, _min, _max, _incr, _wiggle);
             return self;
         }
+    
+        ///@method GetSizeX()
+        ///@desc   Returns the X-axis size configuration or undefined if using uniform size
+        ///@return {struct?}
         static GetSizeX = function(){return __sizeX;}
+    
+        ///@method SetSizeX(min, max, incr, wiggle)
+        ///@desc   Sets size parameters for the X-axis and clears uniform size
+        ///@param  {real} [min] The minimum X size
+        ///@param  {real} [max] The maximum X size
+        ///@param  {real} [incr] The X size increment per step
+        ///@param  {real} [wiggle] The random variation applied to X size
+        ///@return {self}
         static SetSizeX = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
             if(__sizeX != undefined){_min ??= __sizeX.min; _max ??= __sizeX.max; _incr ??= __sizeX.incr; _wiggle ??= __sizeX.wiggle;}
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
@@ -247,7 +318,19 @@ function Pollen() constructor {
             part_type_size_offsetX(__gmlData, _min, _max, _incr, _wiggle);
             return self;
         }
+    
+        ///@method GetSizeY()
+        ///@desc   Returns the Y-axis size configuration or undefined if using uniform size
+        ///@return {struct?}
         static GetSizeY = function(){return __sizeY;}
+    
+        ///@method SetSizeY([min], [max], [incr], [wiggle])
+        ///@desc   Sets size parameters for the Y-axis and clears uniform size
+        ///@param  {real} [min] The minimum Y size
+        ///@param  {real} [max] The maximum Y size
+        ///@param  {real} [incr] The Y size increment per step
+        ///@param  {real} [wiggle] The random variation applied to Y size
+        ///@return {self}
         static SetSizeY = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
             if(__sizeY != undefined){_min ??= __sizeY.min; _max ??= __sizeY.max; _incr ??= __sizeY.incr; _wiggle ??= __sizeY.wiggle;}
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
@@ -261,9 +344,20 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- SCALE ---//
         __scale = {x: 1, y: 1};
+    
+        ///@method GetScale()
+        ///@desc   Returns the current particle render scale (x & y)
+        ///@return {struct}
         static GetScale = function(){return __scale;}
+    
+        ///@method SetScale(x, y)
+        ///@desc   Sets the particle render scale on each axis
+        ///@param  {real} [x] The horizontal scale factor
+        ///@param  {real} [y] The vertical scale factor
+        ///@return {self}
         static SetScale = function(_x = __scale.x, _y = __scale.y){
             __AssertReal(_x, "SetScale", "_x");
             __AssertReal(_y, "SetScale", "_y");
@@ -272,9 +366,22 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- SPEED ---//
         __speed = { min: 0, max: 0, incr: 0, wiggle: 0 };
+    
+        ///@method GetSpeed()
+        ///@desc   Returns the speed configuration for particles
+        ///@return {struct}
         static GetSpeed = function(){ return __speed; }
+    
+        ///@method SetSpeed([min], [max], [incr], [wiggle])
+        ///@desc   Sets the particle speed range and dynamics
+        ///@param  {real} [min] The minimum speed
+        ///@param  {real} [max] The maximum speed
+        ///@param  {real} [incr] The speed increment per step
+        ///@param  {real} [wiggle] The random variation applied to speed
+        ///@return {self}
         static SetSpeed = function(
             _min    = __speed.min,
             _max    = __speed.max,
@@ -290,9 +397,22 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- DIRECTION ---//
         __direction = { min: 0, max: 0, incr: 0, wiggle: 0 };
+    
+        ///@method GetDirection()
+        ///@desc   Returns the emission direction parameters
+        ///@return {struct}
         static GetDirection = function(){ return __direction; }
+    
+        ///@method SetDirection([min], [max], [incr], [wiggle])
+        ///@desc   Sets the emission direction range and dynamics
+        ///@param  {real} [min] The minimum direction (degrees)
+        ///@param  {real} [max] The maximum direction (degrees)
+        ///@param  {real} [incr] The direction increment per step (degrees)
+        ///@param  {real} [wiggle] The random variation applied to direction
+        ///@return {self}
         static SetDirection = function(
             _min    = __direction.min,
             _max    = __direction.max,
@@ -308,9 +428,20 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- GRAVITY ---//
         __gravity = { amount: 0, direction: 270 };
+    
+        ///@method GetGravity()
+        ///@desc   Returns the gravity settings (amount and direction)
+        ///@return {struct}
         static GetGravity = function(){ return __gravity; }
+    
+        ///@method SetGravity([amount], [direction])
+        ///@desc   Sets the gravity amount and direction applied to particles
+        ///@param  {real} [amount] The gravity strength
+        ///@param  {real} [direction] The gravity direction in degrees
+        ///@return {self}
         static SetGravity = function(
             _amount    = __gravity.amount,
             _direction = __gravity.direction
@@ -322,9 +453,23 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- ORIENTATION ---//
         __orientation = { min: 0, max: 0, incr: 0, wiggle: 0, relative: false };
+    
+        ///@method GetOrientation()
+        ///@desc   Returns the image orientation parameters
+        ///@return {struct}
         static GetOrientation = function(){ return __orientation; }
+    
+        ///@method SetOrientation([min], [max], [incr], [wiggle], [relative])
+        ///@desc   Sets the image orientation range and whether it tracks particle direction
+        ///@param  {real} [min] The minimum image angle
+        ///@param  {real} [max] The maximum image angle
+        ///@param  {real} [incr] The angle increment per step
+        ///@param  {real} [wiggle] The random variation applied to angle
+        ///@param  {bool} [relative] Whether to orient relative to motion
+        ///@return {self}
         static SetOrientation = function(
             _min      = __orientation.min,
             _max      = __orientation.max,
@@ -342,9 +487,19 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- COLOR MIX ---//
         __colorMix = undefined;
+    
+        ///@method GetColorMix()
+        ///@desc   Returns the two-color mix array if set, otherwise undefined
+        ///@return {array<color>?}
         static GetColorMix = function(){return __colorMix;}
+    
+        ///@method SetColorMix(colors_or_array)
+        ///@desc   Sets a two-color gradient mix for particles (accepts two arguments or an array of colors)
+        ///@param  {array<color>|color} colors_or_array Two colors as an array, or pass as two separate arguments
+        ///@return {self}
         static SetColorMix = function(_colors_or_array){
             var _array = _colors_or_array;
             if(argument_count > 1){
@@ -369,9 +524,24 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- COLOR RGB ---//
         __colorRgb = undefined;
+    
+        ///@method GetColorRgb()
+        ///@desc   Returns the RGB range configuration or undefined if not set
+        ///@return {struct?}
         static GetColorRgb = function(){return __colorRgb;}
+    
+        ///@method SetColorRgb(rmin, rmax, gmin, gmax, bmin, bmax)
+        ///@desc   Sets randomized RGB color channel ranges for particles
+        ///@param  {real} rmin Minimum red channel (0–255)
+        ///@param  {real} rmax Maximum red channel (0–255)
+        ///@param  {real} gmin Minimum green channel (0–255)
+        ///@param  {real} gmax Maximum green channel (0–255)
+        ///@param  {real} bmin Minimum blue channel (0–255)
+        ///@param  {real} bmax Maximum blue channel (0–255)
+        ///@return {self}
         static SetColorRgb = function(_rmin, _rmax, _gmin, _gmax, _bmin, _bmax){
             __AssertReal(_rmin, "SetColorRgb", "_rmin");
             __AssertReal(_rmax, "SetColorRgb", "_rmax");
@@ -386,10 +556,25 @@ function Pollen() constructor {
             part_type_color_rgb(__gmlData, _rmin, _rmax, _gmin, _gmax, _bmin, _bmax);
             return self;
         }
-
+    
+    
         //--- COLOR HSV ---//
         __colorHsv = undefined;
+    
+        ///@method GetColorHsv()
+        ///@desc   Returns the HSV range configuration or undefined if not set
+        ///@return {struct?}
         static GetColorHsv = function(){return __colorHsv;}
+    
+        ///@method SetColorHsv(hmin, hmax, smin, smax, vmin, vmax)
+        ///@desc   Sets randomized HSV color ranges for particles
+        ///@param  {real} hmin Minimum hue (0–255)
+        ///@param  {real} hmax Maximum hue (0–255)
+        ///@param  {real} smin Minimum saturation (0–255)
+        ///@param  {real} smax Maximum saturation (0–255)
+        ///@param  {real} vmin Minimum value/brightness (0–255)
+        ///@param  {real} vmax Maximum value/brightness (0–255)
+        ///@return {self}
         static SetColorHsv = function(_hmin, _hmax, _smin, _smax, _vmin, _vmax){
             __AssertReal(_hmin, "SetColorHsv", "_hmin");
             __AssertReal(_hmax, "SetColorHsv", "_hmax");
@@ -405,9 +590,19 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- COLOR (STANDARD) ---//
         __color = c_white;
+    
+        ///@method GetColor()
+        ///@desc   Returns the standard color configuration (single, two, or three colors) if set
+        ///@return {color|array<color>}
         static GetColor = function(){return __color;}
+    
+        ///@method SetColor(color_or_array)
+        ///@desc   Sets standard color using one, two, or three colors; accepts a single color or an array of up to three colors
+        ///@param  {color|array<color>} color_or_array A single color or an array of colors (1–3 entries)
+        ///@return {self}
         static SetColor = function(_color_or_array){
             if(!is_array(_color_or_array)){
                 __AssertReal(_color_or_array, "SetColor", "_color_or_array");
@@ -447,9 +642,19 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- ALPHA ---//
         __alpha = 1;
+    
+        ///@method GetAlpha()
+        ///@desc   Returns the alpha (opacity) configuration (single, two, or three values)
+        ///@return {real|array<real>}
         static GetAlpha = function(){return __alpha;}
+    
+        ///@method SetAlpha(alpha_or_array)
+        ///@desc   Sets alpha (opacity) using one, two, or three values; accepts a single number or an array
+        ///@param  {real|array<real>} alpha_or_array A single alpha value or an array (1–3 entries)
+        ///@return {self}
         static SetAlpha = function(_alpha_or_array){
             if(!is_array(_alpha_or_array)){
                 __AssertReal(_alpha_or_array, "SetAlpha", "_alpha_or_array");
@@ -483,19 +688,40 @@ function Pollen() constructor {
             return self;
         }
         
+        
         //--- BLEND ---//
         __blend = false;
+    
+        ///@method GetBlend()
+        ///@desc   Returns whether additive blending is enabled for this particle type
+        ///@return {bool}
         static GetBlend = function(){return __blend;}
-        static SetBlend = function(_blend){
-            __AssertBool(_blend, "SetBlend", "_blend");
-            __blend = _blend;
-            part_type_blend(__gmlData, _blend);
+    
+        ///@method SetBlend(enable)
+        ///@desc   Enables or disables additive blending for particles
+        ///@param  {bool} enable True to enable additive blending, false for normal blending
+        ///@return {self}
+        static SetBlend = function(_enable){
+            __AssertBool(_enable, "SetBlend", "_enable");
+            __blend = _enable;
+            part_type_blend(__gmlData, _enable);
             return self;
         }
-
+    
+    
         //--- LIFE ---//
         __life = { min: 100, max: 100};
+    
+        ///@method GetLife()
+        ///@desc   Returns the particle lifetime range in steps
+        ///@return {struct}
         static GetLife = function(){ return __life; }
+    
+        ///@method SetLife([min], [max])
+        ///@desc   Sets the particle lifetime range in steps
+        ///@param  {real} [min] The minimum lifetime (steps)
+        ///@param  {real} [max] The maximum lifetime (steps)
+        ///@return {self}
         static SetLife = function(_min = __life.min, _max = __life.max){
             __AssertReal(_min, "SetLife", "_min");
             __AssertReal(_max, "SetLife", "_max");
@@ -503,10 +729,21 @@ function Pollen() constructor {
             part_type_life(__gmlData, _min, _max);
             return self;
         }
-
+    
+    
         //--- SUB-PARTICLE STEP ---//
         __step = { number: 0, type: undefined};
+    
+        ///@method GetStep()
+        ///@desc   Returns the sub-particle step emission settings
+        ///@return {struct}
         static GetStep = function(){ return __step; }
+    
+        ///@method SetStep([number], [type])
+        ///@desc   Emits sub-particles every given number of steps using the specified type
+        ///@param  {real} [number] The step interval between emissions
+        ///@param  {struct|string|undefined} [type] The sub-particle type (Pollen.Type instance, tag, or undefined)
+        ///@return {self}
         static SetStep = function(_number = __step.number, _type = __step.type){
             __AssertReal(_number, "SetStep", "_number");
             if((_type != undefined) && !is_struct(_type) && !is_string(_type)){
@@ -521,10 +758,21 @@ function Pollen() constructor {
             part_type_step(__gmlData, _number, _type);
             return self;
         }
-
+    
+    
         //--- SUB-PARTICLE DEATH ---//
         __death = { number: 0, type: undefined};
+    
+        ///@method GetDeath()
+        ///@desc   Returns the sub-particle death emission settings
+        ///@return {struct}
         static GetDeath = function(){ return __death; }
+    
+        ///@method SetDeath([number], [type])
+        ///@desc   Emits sub-particles upon death using the specified type and particle count
+        ///@param  {real} [number] The number of sub-particles to create on death
+        ///@param  {struct|string|undefined} [type] The sub-particle type (Pollen.Type instance, tag, or undefined)
+        ///@return {self}
         static SetDeath = function(_number = __death.number, _type = __death.type){
             __AssertReal(_number, "SetDeath", "_number");
             if((_type != undefined) && !is_struct(_type) && !is_string(_type)){
@@ -539,7 +787,14 @@ function Pollen() constructor {
             part_type_death(__gmlData, _number, _type);
             return self;
         }
-
+    
+    
+        //--- UTIL ---//
+        
+        ///@method Copy()
+        ///@desc   Copies all configurable properties from another Pollen.Type into this type
+        ///@param  {Pollen.Type} target The source type to copy from
+        ///@return {undefined}
         static Copy = function(_target) {
             if (_target == undefined || _target == self) { return; }
             if (!is_instanceof(_target, Pollen.Type)){Pollen.Error($"Attempting to have type: '{__tag}'' copy data from target, but the target is not a valid Pollen.Type!");}
@@ -670,6 +925,7 @@ function Pollen() constructor {
         
         //--- DEBUG ---//
         
+        //No need for JSDOC functions since these are not meant to be called by users
         static __AssertBool = function(_value, _method, _arg){
             if(!is_bool(_value)){
                 Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
@@ -699,6 +955,17 @@ function Pollen() constructor {
         
     }
     
+    //--- TYPE CONTROL ---/
+    
+    ///@func    TypeTagGetData(tag)
+    ///@desc    Get the data associated with a Pollen.Type tag (or undefined if data does not exist for the tag)
+    ///@param   {string} tag The tag of the Pollen.Type that you want to get the data for
+    ///@return {Pollen.Type|undefined}
+    static TypeTagGetData = function(_tag){return __typeMap[? _tag];}
+    
+    ///@func    TypeDestroy(type)
+    ///@desc    Destroys a Pollen.Type and clears all of its data (including the GM part_type it holds)
+    ///@return  {undefined}
     static TypeDestroy = function(_type){
         if(!is_instanceof(_type, Type)){Error("Cannot destroy type that is not a valid Pollen.Type struct!");}
         part_type_destroy(_type.GetGmlData());
@@ -708,6 +975,9 @@ function Pollen() constructor {
         Log($"Successfully destroyed Pollen type: {_tag}");
     }
     
+    ///@func    TypeDestroyAll()
+    ///@desc    Destroys all Pollen.Types that exist and clears all their data
+    ///@return  {undefined}
     static TypeDestroyAll = function(){
         var _mapArray = ds_map_values_to_array(__typeMap);
         var _numTypes = array_length(_mapArray);
@@ -727,9 +997,18 @@ function Pollen() constructor {
 #region ~ EMITTERS ~
 //======================================================================================================================
     
+    /// @title      Emitters
+    /// @category   API
+    /// @text       A particle emitter constructor that uses similar properties found in GM's part_emitter family of functions.
+    
+    /// @constructor
+    /// @func   Emitter(system, [gml_emitter])
+    /// @desc   A Pollen object that represents GM's part emitters with additional util functions to simplify building emitters and getting their data
+    /// @param  {Pollen.System} system The Pollen.System the emitter is tied to
+    /// @param  {Id.ParticleEmitter|undefined} [gml_emitter] An optional reference to a GML part emitter you can pass in to initialize the emitter with (i.e. with part_emitter_create(). Defaults to 'undefined') 
     //NOTE: Emitters must be tied to systems which is why there are no maps/tags associated with it
     static Emitter = function(_system, _gml_emitter = undefined) constructor {
-        
+            
         if(!is_instanceof(_system, Pollen.System)){Pollen.Error("Trying to create an emitter using a system that is not a valid Pollen.System struct!");}
         
         //--- SETUP PROPERTIES ---//
@@ -748,7 +1027,262 @@ function Pollen() constructor {
         __offsetX = 0;
         __offsetY = 0;
         
-        //--- ARGUMENT TESTS ---//
+
+        //--- SETTERS ---//
+
+        ///@method SetEnabled(enabled)
+        ///@desc   Whether to enable the emitter to emit particles or not
+        ///@param  {bool} enabled True to enable, false to disable
+        ///@return {self}
+        static SetEnabled = function(_enabled){
+            __AssertBool(_enabled, "SetEnabled", "_enabled");
+            __enabled = _enabled;
+            return self;
+        }
+
+        ///@method SetType(type)
+        ///@desc   Sets the particle type emitted (Pollen.Type instance or tag)
+        ///@param  {struct|string|undefined} type The type struct or tag, or undefined to clear
+        ///@return {self}
+        static SetType = function(_type){
+            if((_type != undefined) && !is_struct(_type) && !is_string(_type)){
+                Pollen.Error($"PfxEmitter.SetType() expects argument '_type' to be a struct, string, or undefined but received {typeof(_type)}!");
+            }
+            __type = _type;
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetNumber(number)
+        ///@desc   Sets how many particles this emitter creates per burst/tick
+        ///@param  {real} number The number of particles
+        ///@return {self}
+        static SetNumber = function(_number){
+            __AssertReal(_number, "SetNumber", "_number");
+            __number = _number;
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetShape(shape)
+        ///@desc   Sets the emitter region shape (e.g., ps_shape_rectangle, ps_shape_ellipse)
+        ///@param  {ps_shape} shape The emitter shape constant
+        ///@return {self}
+        static SetShape = function(_shape){
+            __AssertReal(_shape, "SetShape", "_shape");
+            __shape = _shape;
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetDistr(distr)
+        ///@desc   Sets the particle distribution shape within the emitter region (e.g., ps_distr_linear)
+        ///@param  {ps_distr} distr The distribution constant
+        ///@return {self}
+        static SetDistr = function(_distr){
+            __AssertReal(_distr, "SetDistr", "_distr");
+            __distr = _distr;
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetRelative(enabled)
+        ///@desc   Toggles whether the number of particles (changed via .SetNumber) is an exact number or a relative percentage of emitter area filled
+        /// (see "part_emitter_relative" in GM manual for more info)
+        ///@param  {bool} enabled True for relative, false for absolute
+        ///@return {self}
+        static SetRelative = function(_enabled){
+            __AssertBool(_enabled, "SetRelative", "_enabled");
+            __relative = _enabled;
+            part_emitter_relative(__system.GetGmlData(), __gmlData, _enabled);
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetDelay(delay)
+        ///@desc   Sets the initial delay before emission begins when streaming a particle
+        ///@param  {struct} delay A struct containing the following properties {min, max, unit}
+        ///@return {self}
+        static SetDelay = function(_delay){
+            __AssertRangeStruct(_delay, "SetDelay", "_delay");
+            __delay = _delay;
+            part_emitter_delay(__system.GetGmlData(), __gmlData, _delay.min, _delay.max, _delay.unit);
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetInterval(interval)
+        ///@desc   Sets the interval between emissions when streaming a particle
+        ///@param  {struct} interval A struct containing the following properties {min, max, unit}
+        ///@return {self}
+        static SetInterval = function(_interval){
+            __AssertRangeStruct(_interval, "SetInterval", "_interval");
+            __interval = _interval;
+            part_emitter_interval(__system.GetGmlData(), __gmlData, _interval.min, _interval.max, _interval.unit);
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetSize(width, height)
+        ///@desc   Sets the emitter region size
+        ///@param  {real} width The emitter width
+        ///@param  {real} height The emitter height
+        ///@return {self}
+        static SetSize = function(_width, _height){
+            __AssertReal(_width, "SetSize", "_width");
+            __AssertReal(_height, "SetSize", "_height");
+            __width = _width;
+            __height = _height;
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetWidth(width)
+        ///@desc   Sets the emitter region width
+        ///@param  {real} width The emitter width
+        ///@return {self}
+        static SetWidth = function(_width){
+            __AssertReal(_width, "SetWidth", "_width");
+            SetSize(_width, __height);
+            return self;
+        }
+
+        ///@method SetHeight(height)
+        ///@desc   Sets the emitter region height
+        ///@param  {real} height The emitter height
+        ///@return {self}
+        static SetHeight = function(_height){
+            __AssertReal(_height, "SetHeight", "_height");
+            SetSize(__width, _height);
+            return self;
+        }
+
+        ///@method SetOffset(offsetX, offsetY)
+        ///@desc   Sets the emitter offset from its origin
+        ///@param  {real} offsetX Horizontal offset
+        ///@param  {real} offsetY Vertical offset
+        ///@return {self}
+        static SetOffset = function(_offsetX, _offsetY){
+            __AssertReal(_offsetX, "SetOffset", "_offsetX");
+            __AssertReal(_offsetY, "SetOffset", "_offsetY");
+            __offsetX = _offsetX;
+            __offsetY = _offsetY;
+            __system.RefreshStream();
+            return self;
+        }
+
+        ///@method SetOffsetX(offsetX)
+        ///@desc   Sets only the horizontal emitter offset
+        ///@param  {real} offsetX Horizontal offset
+        ///@return {self}
+        static SetOffsetX = function(_offsetX){
+            __AssertReal(_offsetX, "SetOffsetX", "_offsetX");
+            SetOffset(_offsetX, __offsetY);
+            return self;
+        }
+
+        ///@method SetOffsetY(offsetY)
+        ///@desc   Sets only the vertical emitter offset
+        ///@param  {real} offsetY Vertical offset
+        ///@return {self}
+        static SetOffsetY = function(_offsetY){
+            __AssertReal(_offsetY, "SetOffsetY", "_offsetY");
+            SetOffset(__offsetX, _offsetY);
+            return self;
+        }
+        
+        
+        //--- GETTERS ---//
+
+        ///@method GetGmlData()
+        ///@desc   Returns the underlying GM emitter handle used by the system
+        ///@return {Id.Emitter}
+        static GetGmlData = function(){return __gmlData;}
+
+        ///@method GetSystem()
+        ///@desc   Returns the parent Pollen.System that owns this emitter
+        ///@return {Pollen.System}
+        static GetSystem = function(){return __system;}
+
+        ///@method IsEnabled()
+        ///@desc   Returns whether the emitter is enabled
+        ///@return {bool}
+        static IsEnabled = function(){return __enabled;}
+
+        ///@method GetEnabled()
+        ///@desc   Alias for IsEnabled(); returns whether the emitter is enabled
+        ///@return {bool}
+        static GetEnabled = function(){return __enabled;}
+
+        ///@method GetType()
+        ///@desc   Returns the particle type set on this emitter (struct or tag), or undefined
+        ///@return {struct|string|undefined}
+        static GetType = function(){return __type;}
+
+        ///@method GetNumber()
+        ///@desc   Returns the number of particles emitted per burst/tick
+        ///@return {real}
+        static GetNumber = function(){return __number;}
+
+        ///@method GetShape()
+        ///@desc   Returns the emitter region shape constant
+        ///@return {ps_shape|undefined}
+        static GetShape = function(){return __shape;}
+
+        ///@method GetDistr()
+        ///@desc   Returns the emitter distribution
+        ///@return {bool}
+        static GetDistr = function(){return __distr;}
+
+        ///@method GetRelative()
+        ///@desc   Returns whether the emitter is emitting exact number of particles (true) or a relative percentage (false)
+        ///@return {bool}
+        static GetRelative = function(){return __relative;}
+
+        ///@method GetDelay()
+        ///@desc   Returns the initial delay settings for streaming {min, max, unit}
+        ///@return {struct}
+        static GetDelay = function(){return __delay;}
+
+        ///@method GetInterval()
+        ///@desc   Returns the interval settings for streaming {min, max, unit}
+        ///@return {struct}
+        static GetInterval = function(){return __interval;}
+
+        ///@method GetSize()
+        ///@desc   Returns the emitter region size as a struct {w, h}
+        ///@return {struct}
+        static GetSize = function(){return {w: __width, h: __height}}
+
+        ///@method GetWidth()
+        ///@desc   Returns the emitter region width
+        ///@return {real}
+        static GetWidth = function(){return __width;}
+
+        ///@method GetHeight()
+        ///@desc   Returns the emitter region height
+        ///@return {real}
+        static GetHeight = function(){return __height;}
+
+        ///@method GetOffset()
+        ///@desc   Returns the emitter offset as a struct {x, y}
+        ///@return {struct}
+        static GetOffset = function(){return {x: __offsetX, y: __offsetY}}
+
+        ///@method GetOffsetX()
+        ///@desc   Returns the horizontal emitter offset
+        ///@return {real}
+        static GetOffsetX = function(){return __offsetX;}
+
+        ///@method GetOffsetY()
+        ///@desc   Returns the vertical emitter offset
+        ///@return {real}
+        static GetOffsetY = function(){return __offsetY;}
+        
+        
+        //--- DEBUG ---//
+        
+        //NOTE: No need for JSDOC since users shouldn't use these functions
         static __AssertBool = function(_value, _method, _arg){
             if(!is_bool(_value)){
                 Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
@@ -773,120 +1307,12 @@ function Pollen() constructor {
                 Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.unit' to be a real number!");
             }
         }
-
-        //--- SETTERS ---//
-        static SetEnabled = function(_enabled){
-            __AssertBool(_enabled, "SetEnabled", "_enabled");
-            __enabled = _enabled;
-            return self;
-        }
-        static SetType = function(_type){
-            if((_type != undefined) && !is_struct(_type) && !is_string(_type)){
-                Pollen.Error($"PfxEmitter.SetType() expects argument '_type' to be a struct, string, or undefined but received {typeof(_type)}!");
-            }
-            __type = _type;
-            __system.RefreshStream();
-            return self;
-        }
-        static SetNumber = function(_number){
-            __AssertReal(_number, "SetNumber", "_number");
-            __number = _number;
-            __system.RefreshStream();
-            return self;
-        }
-        static SetShape = function(_shape){
-            __AssertReal(_shape, "SetShape", "_shape");
-            __shape = _shape;
-            __system.RefreshStream();
-            return self;
-        }
-        static SetDistr = function(_distr){
-            __AssertReal(_distr, "SetDistr", "_distr");
-            __distr = _distr;
-            __system.RefreshStream();
-            return self;
-        }
-
-        static SetRelative = function(_enabled){
-            __AssertBool(_enabled, "SetRelative", "_enabled");
-            __relative = _enabled;
-            part_emitter_relative(__system.GetGmlData(), __gmlData, _enabled);
-            __system.RefreshStream();
-            return self;
-        }
-        static SetDelay = function(_delay){
-            __AssertRangeStruct(_delay, "SetDelay", "_delay");
-            __delay = _delay;
-            part_emitter_delay(__system.GetGmlData(), __gmlData, _delay.min, _delay.max, _delay.unit);
-            __system.RefreshStream();
-            return self;
-        }
-        static SetInterval = function(_interval){
-            __AssertRangeStruct(_interval, "SetInterval", "_interval");
-            __interval = _interval;
-            part_emitter_interval(__system.GetGmlData(), __gmlData, _interval.min, _interval.max, _interval.unit);
-            __system.RefreshStream();
-            return self;
-        }
-
-        static SetSize = function(_width, _height){
-            __AssertReal(_width, "SetSize", "_width");
-            __AssertReal(_height, "SetSize", "_height");
-            __width = _width;
-            __height = _height;
-            __system.RefreshStream();
-            return self;
-        }
-        static SetWidth = function(_width){
-            __AssertReal(_width, "SetWidth", "_width");
-            SetSize(_width, __height);
-            return self;
-        }
-        static SetHeight = function(_height){
-            __AssertReal(_height, "SetHeight", "_height");
-            SetSize(__width, _height);
-            return self;
-        }
-
-        static SetOffset = function(_offsetX, _offsetY){
-            __AssertReal(_offsetX, "SetOffset", "_offsetX");
-            __AssertReal(_offsetY, "SetOffset", "_offsetY");
-            __offsetX = _offsetX;
-            __offsetY = _offsetY;
-            __system.RefreshStream();
-            return self;
-        }
-        static SetOffsetX = function(_offsetX){
-            __AssertReal(_offsetX, "SetOffsetX", "_offsetX");
-            SetOffset(_offsetX, __offsetY);
-            return self;
-        }
-        static SetOffsetY = function(_offsetY){
-            __AssertReal(_offsetY, "SetOffsetY", "_offsetY");
-            SetOffset(__offsetX, _offsetY);
-            return self;
-        }
-        
-        //--- GETTERS ---//
-        static GetGmlData = function(){return __gmlData;}
-        static GetSystem = function(){return __system;}
-        static IsEnabled = function(){return __enabled;}
-        static GetEnabled = function(){return __enabled;}
-        static GetType = function(){return __type;}
-        static GetNumber = function(){return __number;}
-        static GetShape = function(){return __shape;}
-        static GetDistr = function(){return __distr;}
-        static GetRelative = function(){return __relative;}
-        static GetDelay = function(){return __delay;}
-        static GetInterval = function(){return __interval;}
-        static GetSize = function(){return {w: __width, h: __height}}
-        static GetWidth = function(){return __width;}
-        static GetHeight = function(){return __height;}
-        static GetOffset = function(){return {x: __offsetX, y: __offsetY}}
-        static GetOffsetX = function(){return __offsetX;}
-        static GetOffsetY = function(){return __offsetY;}
     }
     
+    ///@func    EmitterDestroy(emitter)
+    ///@desc    Destroys a single Pollen.Emitter and clears all of its data (including its underlying GM part_emitter data)
+    ///@param   {Pollen.Emitter} emitter The Pollen.Emitter data to destroy
+    ///@returns {undefined}
     static EmitterDestroy = function(_emitter){
         if(!is_instanceof(_emitter, Emitter)){Error("Cannot destroy emitter that is not a valid Pollen.Emitter struct!");}
         var _system = _emitter.GetSystem();
@@ -901,9 +1327,23 @@ function Pollen() constructor {
 #region ~ SYSTEMS ~
 //======================================================================================================================
 
-    static __systemMap = ds_map_create();
-    static SystemTagGetData = function(_tag){return __systemMap[? _tag];}
+    /// @title      System
+    /// @category   API
+    /// @text       A particle system constructor that uses similar properties found in GM's part_system family of functions. 
 
+
+    //--- PROPERTIES ---//
+    
+    static __systemMap = ds_map_create();
+
+
+    //--- CLASS ---//
+    
+    /// @constructor
+    /// @func   System(tag, [gml_system])
+    /// @desc   A Pollen object that represents GM's part systems with additional util functions to simplify building systems and getting their data
+    /// @param  {string} tag A unique tag used to identity the system
+    /// @param  {Id.ParticleType|undefined} [gml_system] An optional reference to a GML part system you can pass in to initialize the type with (i.e. with part_system_create(). Defaults to 'undefined') 
     static System = function(_tag, _gml_system = undefined) constructor {
         
         //--- SETUP BACKEND ---//
@@ -930,12 +1370,31 @@ function Pollen() constructor {
         
         
         //--- SETTERS ---//
+        ///@method  SetTemplate(template, [copy_on_set])
+        ///@desc    Sets the template that the system will default to
+        ///@param   {string|Pollen.System|undefined} template The tag or Pollen.Instance to set the template as, or set as 'undefined' clear the template
+        ///@return  {self}
+        static SetTemplate = function(_template, _copy_on_set = false){
+            __template = _template;
+            if(_copy_on_set && _template != undefined){Copy(_template);}
+            return self;
+        }
+
+        ///@method SetEmitterList(list)
+        ///@desc   Replaces the system's emitter list with the provided array; destroys existing emitters first
+        ///@param  {array} list The new list of Pollen.Emitter instances
+        ///@return {self}
         static SetEmitterList = function(_list){
             if(!is_array(_list)){Pollen.Error($"Attempting to set emitterList of system: {__tag} but {_list} is not a valid array!");}
             Pollen.EmitterListDestroyAll(self);
             __emitterList = _list; 
             return self;
         }
+
+        ///@method SetColor(color)
+        ///@desc   Sets a color multiplier applied to all particles rendered by this system
+        ///@param  {color} color The color (e.g., c_white)
+        ///@return {self}
         static SetColor = function(_color){
             if(!is_real(_color) && !is_int64(_color)){Pollen.Error($"Attempting to set color of system: {__tag} but {_color} is not a valid color!");}
             __color = _color; 
@@ -943,6 +1402,11 @@ function Pollen() constructor {
             RefreshStream();
             return self;
         }
+
+        ///@method SetAlpha(alpha)
+        ///@desc   Sets the alpha multiplier applied to all particles rendered by this system
+        ///@param  {real} alpha The alpha value (0..1)
+        ///@return {self}
         static SetAlpha = function(_alpha){
             if(!is_real(_alpha)){Pollen.Error($"Attempting to set alpha of system: {__tag} but {_alpha} is not a valid color!");}
             __alpha = _alpha; 
@@ -950,27 +1414,48 @@ function Pollen() constructor {
             RefreshStream();
             return self;
         }
+
+        ///@method SetPosition([x], [y])
+        ///@desc   Sets the system's origin position
+        ///@param  {real|undefined} [x] X position (or undefined to keep current)
+        ///@param  {real|undefined} [y] Y position (or undefined to keep current)
+        ///@return {self}
         static SetPosition = function(_x = undefined, _y = undefined){
             __position.x = _x ?? __position.x;
             __position.y = _y ?? __position.y;
             if(!is_real(__position.x)){Pollen.Error($"Attempting to set position of system: {__tag} but {__position.x} is not a valid number!");}
             if(!is_real(__position.y)){Pollen.Error($"Attempting to set position of system: {__tag} but {__position.y} is not a valid number!");}
             part_system_position(__gmlData, __position.x, __position.y);
-            // RefreshStream(); //<---NOTE: This will cause a freeze since there is a recursive loop since PfxStream also calls the SetPosition() method
+            // RefreshStream(); //<---NOTE: This will cause a freeze since there is a recursive loop since Stream also calls the SetPosition() method
             return self;
         }
+
+        ///@method SetGlobalSpace(enabled)
+        ///@desc   Toggles whether particle positions maintain their global/room position or are set local/relative to the system's position
+        ///@param  {bool} enabled True for global space, false for local
+        ///@return {self}
         static SetGlobalSpace = function(_enabled){
             if(!is_bool(_enabled)){Pollen.Error($"Attempting to set globalSpace of system: {__tag} but {_enabled} is not a valid bool!");}
             __globalSpace = _enabled;
             part_system_global_space(__gmlData, _enabled);
             return self;
         }
+
+        ///@method SetDrawOrder(enabled)
+        ///@desc   Sets draw order to old-to-new (true) or new-to-old (false)
+        ///@param  {bool} enabled Draw oldest first when true
+        ///@return {self}
         static SetDrawOrder = function(_enabled){
             if(!is_bool(_enabled)){Pollen.Error($"Attempting to set drawOrder of system: {__tag} but {_enabled} is not a valid bool!");}
             __drawOrder = _enabled;
             part_system_draw_order(__gmlData, _enabled);
             return self;
         }
+
+        ///@method SetAngle(angle)
+        ///@desc   Sets a rotation applied to all particles during rendering
+        ///@param  {real} angle Angle in degrees
+        ///@return {self}
         static SetAngle = function(_angle){
             if(!is_real(_angle)){Pollen.Error($"Attempting to set angle of system: {__tag} but {_angle} is not a valid number!");}
             __angle = _angle;
@@ -978,6 +1463,11 @@ function Pollen() constructor {
             // RefreshStream(); //<---NOTE: This is not needed for part_system_angle
             return self;
         }
+
+        ///@method SetDepth(depth)
+        ///@desc   Sets the draw depth for the system and clears any layer binding
+        ///@param  {real|undefined} depth The new depth (smaller = in front)
+        ///@return {self}
         static SetDepth = function(_depth){
             if(_depth == undefined){return;}
             if(!is_real(_depth)){Pollen.Error($"Attempting to set depth of system: {__tag} but {_depth} is not a valid number!");}
@@ -987,9 +1477,15 @@ function Pollen() constructor {
             RefreshStream(); 
             return self;
         }
+
+        ///@method SetLayer(layer)
+        ///@desc   Binds the system to a room layer (overrides depth)
+        ///@param  {string|real|undefined} layer The room layer name or ID
+        ///@return {self}
         static SetLayer = function(_layer){
-            if(_layer == undefined){return;}
-            var _id = layer_get_id(_layer);
+            if(_layer == undefined){__layer = _layer; return;}
+            var _id = _layer;
+            if(is_string(_layer)){_id = layer_get_id(_layer);}
             if(_id == -1){Pollen.Error($"Attempting to set layer of system: {__tag} but layer: '{_layer}' does not exist in current room!");}
             __layer = _layer;
             __depth = layer_get_depth(_id);
@@ -998,20 +1494,72 @@ function Pollen() constructor {
         }
         
         //--- GETTERS ---//
+
+        ///@method GetTag()
+        ///@desc   Returns the unique system tag
+        ///@return {string}
         static GetTag = function(){return __tag;}
+
+        ///@method GetGmlData()
+        ///@desc   Returns the underlying GM particle system handle
+        ///@return {Id.ParticleSystem}
         static GetGmlData = function(){return __gmlData;}
+        
+        ///@method GetGmlData()
+        ///@desc   Returns the part system template the Pollen.System copies from
+        ///@return {string|Id.ParticleSystem|undefined}
         static GetTemplate = function(){return __template;}
+
+        ///@method GetDepth()
+        ///@desc   Returns the system's draw depth (ignored when layer is set)
+        ///@return {real}
         static GetDepth = function(){return __depth;}
+
+        ///@method GetLayer()
+        ///@desc   Returns the bound room layer name/ID, or undefined if unbound
+        ///@return {string|real|undefined}
         static GetLayer = function(){return __layer;}
+
+        ///@method GetPosition()
+        ///@desc   Returns the system position as a struct {x, y}
+        ///@return {struct}
         static GetPosition = function(){return __position;}
+
+        ///@method GetGlobalSpace()
+        ///@desc   Returns whether the system uses global space
+        ///@return {bool}
         static GetGlobalSpace = function(){return __globalSpace;}
+
+        ///@method GetDrawOrder()
+        ///@desc   Returns whether oldest particles are drawn first
+        ///@return {bool}
         static GetDrawOrder = function(){return __drawOrder;}
+
+        ///@method GetAngle()
+        ///@desc   Returns the render rotation angle in degrees
+        ///@return {real}
         static GetAngle = function(){return __angle;}
+
+        ///@method GetColor()
+        ///@desc   Returns the color multiplier applied to particles
+        ///@return {color}
         static GetColor = function(){return __color;}
+
+        ///@method GetAlpha()
+        ///@desc   Returns the alpha multiplier applied to particles
+        ///@return {real}
         static GetAlpha = function(){return __alpha;}
+
+        ///@method GetEmitterList()
+        ///@desc   Returns the array of emitters owned by this system
+        ///@return {array}
         static GetEmitterList = function(){return __emitterList;}
         
         //--- UTIL ---//
+
+        ///@method RefreshStream()
+        ///@desc   Rebuilds and restarts the system's streaming emitters if streaming is active
+        ///@return {undefined}
         static RefreshStream = function(){
             if(!__isStreaming){return;}
             var _numEmitter = array_length(__emitterList);
@@ -1030,9 +1578,14 @@ function Pollen() constructor {
                 part_emitter_interval(__gmlData, _emitterGml, _emitterInterval.min, _emitterInterval.max, _emitterInterval.unit);
                 part_emitter_relative(__gmlData, _emitterGml, _emitterRelative);
             }
-            Pollen.PfxStream(__tag);
+            Pollen.Stream(__tag);
         }
-        
+
+        ///@method Copy(pfx, [ignore_emitter_list])
+        ///@desc   Copies configuration from another Pollen.System into this system
+        ///@param  {Pollen.System} pfx The source system to copy from
+        ///@param  {bool} [ignore_emitter_list] If true, skips copying the emitter list
+        ///@return {undefined}
         static Copy = function(_pfx, _ignore_emitter_list = false) {
             SetPosition(_pfx.__position.x, _pfx.__position.y);
             SetGlobalSpace(_pfx.__globalSpace);
@@ -1071,6 +1624,19 @@ function Pollen() constructor {
         }
     }
     
+    
+    ///--- SYSTEM CONTROL ---//
+    
+    ///@func    SystemTagGetData(tag)
+    ///@desc    Get the data associated with a Pollen.System tag (or undefined if data does not exist for the tag)
+    ///@param   {string} tag The tag of the Pollen.System that you want to get the data for
+    ///@return  {Pollen.System|undefined}
+    static SystemTagGetData = function(_tag){return __systemMap[? _tag];}
+    
+    ///@func    EmitterListDestroyAll(system)
+    ///@desc    Destroys all the emitters tied to a Pollen.System
+    ///@param   {Pollen.System} system The system to clear the emitters from
+    ///@returns {undefined}
     static EmitterListDestroyAll = function(_system){
         var _numEmitters = array_length(_system.__emitterList);
         var _i = -1;
@@ -1083,6 +1649,10 @@ function Pollen() constructor {
         _system.__emitterList = [];
     }
     
+    ///@func    SystemDestroy(system)
+    ///@desc    Destroys a single Pollen.System instance and clears all of its data (including its underlying GM part_system data)
+    ///@param   {Pollen.System} system The Pollen.System instance to destroy
+    ///@returns {undefined}
     static SystemDestroy = function(_system){
         if(!is_instanceof(_system, System)){Error("Cannot destroy system that is not a valid Pollen.System struct!");}
         EmitterListDestroyAll(_system);
@@ -1093,6 +1663,9 @@ function Pollen() constructor {
         Log($"Successfully destroyed Pollen system: {_tag}");
     }
     
+    ///@func    SystemDestroyAll()
+    ///@desc    Destroys all instances of Pollen.System and clears all of their data
+    ///@returns {undefined}
     static SystemDestroyAll = function(){
         var _mapArray = ds_map_values_to_array(__systemMap);
         var _numSystems = array_length(_mapArray);
@@ -1111,8 +1684,19 @@ function Pollen() constructor {
 //======================================================================================================================
 #region ~ CREATE PARTICLES ~
 //======================================================================================================================
-
-    static PfxStream = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
+    
+    /// @title      Create Particles
+    /// @category   API
+    /// @text       Use these methods to create particles in game.
+    
+    ///@func   Stream(system_or_tag, [x_offset], [y_offset], [amount])
+    ///@desc   Starts continuous streaming from all enabled emitters in a system. If `amount` is provided, it overrides each emitter's particle count.
+    ///@param  {Pollen.System|string} system_or_tag The Pollen system instance or its string tag
+    ///@param  {real} [x_offset] An optional horizontal offset to apply to emission position (i.e. relative to particle system position)
+    ///@param  {real} [y_offset] An optional vertical offset to apply to emission position (i.e. relative to particle system position)
+    ///@param  {real|undefined} [amount] Optional particles-per-step override for all emitters
+    ///@return {undefined}
+    static Stream = function(_system_or_tag, _x_offset = 0, _y_offset = 0, _amount = undefined){
         
         var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag);
         if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
@@ -1121,8 +1705,6 @@ function Pollen() constructor {
         var _gmlData = _data.GetGmlData();
         var _emitterList = _data.GetEmitterList();
         
-        // var _oldPos = _data.GetPosition();
-        // _x ??= _oldPos.x; _y ??= _oldPos.y;
         _data.__isStreaming = true;
         _data.__streamNumber = _amount;
         
@@ -1134,9 +1716,9 @@ function Pollen() constructor {
             if(!_emitter.IsEnabled()){continue;}
             var _emitterGml = _emitter.GetGmlData();
             
-            var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
+            var _number = _amount ?? _emitter.GetNumber();
             var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
-            var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
+            var _offsetX = _x_offset + _emitter.GetOffsetX(), _offsetY = _y_offset + _emitter.GetOffsetY();
             var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
             var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
             var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
@@ -1154,7 +1736,14 @@ function Pollen() constructor {
         return;
     }
     
-    static PfxBurst = function(_system_or_tag, _x = 0, _y = 0, _amount = undefined){
+    ///@func   Burst(system_or_tag, [x_offset], [y_offset], [amount])
+    ///@desc   Emits a single burst from all enabled emitters in a system. If `amount` is provided, it overrides each emitter's particle count.
+    ///@param  {Pollen.System|string} system_or_tag The Pollen system instance or its string tag
+    ///@param  {real} [x_offset] An optional horizontal offset to apply to emission position (i.e. relative to particle system position. Defaults to 0)
+    ///@param  {real} [y_offset] An optional vertical offset to apply to emission position (i.e. relative to particle system position. Defaults to 0)
+    ///@param  {real|undefined} [amount] Optional particles-per-step override for all emitters (Defaults to undefined)
+    ///@return {undefined}
+    static Burst = function(_system_or_tag, _x_offset = 0, _y_offset = 0, _amount = undefined){
         
         var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag);
         if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
@@ -1171,9 +1760,9 @@ function Pollen() constructor {
             if(!_emitter.IsEnabled()){continue;}
             var _emitterGml = _emitter.GetGmlData();
             
-            var _number = _amount ?? _emitter.GetNumber(); //<---will give users the ability to set default values when I add emitter data later
+            var _number = _amount ?? _emitter.GetNumber();
             var _halfW = 0.5*_emitter.GetWidth(), _halfH = 0.5*_emitter.GetHeight();
-            var _offsetX = _x + _emitter.GetOffsetX(), _offsetY = _y + _emitter.GetOffsetY();
+            var _offsetX = _x_offset + _emitter.GetOffsetX(), _offsetY = _y_offset + _emitter.GetOffsetY();
             var _left = _offsetX - _halfW, _right = _offsetX + _halfW;
             var _top = _offsetY - _halfH, _bottom = _offsetY + _halfH;
             var _shape = _emitter.GetShape(), _distr = _emitter.GetDistr();
@@ -1194,13 +1783,22 @@ function Pollen() constructor {
 #region ~ IMPORT ~
 //======================================================================================================================
     
+    /// @title      Import particles
+    /// @category   API
+    /// @text       Use these methods to import particle data into Pollen.
+    
+    ///@func    ImportPfx(data)
+    ///@desc    Import data from a GML 'JSON' array (see info about setting up 'JSON' in the 'Config JSON' section of the manual)
+    ///@param   {array} data The array to parse and import data from
+    ///@return  {undefined}
     static ImportPfx = function(_data){
-        if(!is_array(_data)){Error("global.pollen_config_vfx must be an array!");}
+        if(!is_array(_data)){Error("Data must be an array of structs!");}
         var _i = -1;
         var _len = array_length(_data);
         repeat(_len){
             _i++;
             var _struct = _data[_i];
+            if(!is_struct(_struct)){Error($"Import data at index {_i} is not a struct! Data must be an array of structs!");}
             if(struct_exists(_struct, "type")){
                 var _tag = struct_get(_struct, "type");
                 var _tagData = TypeTagGetData(_tag) ?? new Type(_tag);
@@ -1210,17 +1808,25 @@ function Pollen() constructor {
             else if (struct_exists(_struct, "system")){
                 var _tag = struct_get(_struct, "system");
                 var _tagData = SystemTagGetData(_tag) ?? new System(_tag);
-                if(!POLLEN_FALLBACK_TO_PRIOR_VALUES){_tagData.Copy(__defaultSystem, true);}
+                if(!POLLEN_FALLBACK_TO_PRIOR_VALUES){
+                    if(_tagData.GetTemplate() != undefined){_tagData.Copy(SystemTagGetData(_tagData.GetTemplate()));}
+                    else {_tagData.Copy(__defaultSystem, true);}
+                }
                 var _template = struct_get(_struct, "template");
-                var _oldTemplate = _tagData.GetTemplate();
-                if(_template!= undefined && _oldTemplate != _template){
+                var _oldTemplate = _tagData.GetTemplate()
+                if(_template != undefined && _oldTemplate != _template){
                     var _ignoreEmitterList = struct_exists(_struct, "emitterList");
                     if(is_string(_template)){
                         var _templateID = SystemTagGetData(_template);
                         if(_templateID == undefined){Error($"Unable to find system: '{_template}' make sure system is defined before using it as a template!");}
+                        _tagData.SetTemplate(_template);
                         _tagData.Copy(_templateID, _ignoreEmitterList);
                     }
-                    else if(asset_get_type(_template) == asset_particlesystem){ConvertGmlPartAssetToPollenStruct(_template, _tagData, _ignoreEmitterList);}
+                    else if(asset_get_type(_template) == asset_particlesystem){
+                        var _templateData = ConvertGmlPartAssetToPollenStruct(_template, _tagData, _ignoreEmitterList);
+                        _tagData.SetTemplate($"{_templateData.GetTag()}");
+                        _tagData.Copy(_templateData);
+                    }
                     else {Warn($"Could not recognize template: {_template} as either a valid GM part asset or a string tag. Bailing!");}
                 } 
                 
@@ -1322,6 +1928,11 @@ function Pollen() constructor {
         }
     }
     
+    ///@func    ImportType(import_data, type_data)
+    ///@desc    Copy data from a GML 'JSON' type struct into a Pollen.Type instance (see info about setting up 'JSON' in the 'Config JSON' section of the manual)
+    ///@param   {struct} import_data The struct to parse and import data from
+    ///@param   {Pollen.Type} type_data The Pollen.Type instance to copy the data to
+    ///@return  {undefined}
     static ImportType = function(_import_data, _type_data){
         var _template = struct_get(_import_data, "template");
         if(_template != undefined){
@@ -1526,10 +2137,13 @@ function Pollen() constructor {
         
     }
     
-    static ConvertGmlPartAssetToPollenStruct = function(_asset, _pollen_struct, _ignore_emitter_list = false){
+    ///@func    ConvertGmlPartAssetToPollenStruct(asset, pollen_system, [ignore_emitter_list])
+    ///@desc    Copy data from a GML part system *asset* (created using GM's particle editor) into a Pollen.System instance
+    ///@return  {Pollen.System}
+    static ConvertGmlPartAssetToPollenStruct = function(_asset){
         
         if(asset_get_type(_asset) != asset_particlesystem){Error("Failed to convert asset to pollen struct due to asset not being a valid GM particle system asset!");}
-        _pollen_struct.__template = _asset; //<----This ensures that templates are only loaded once
+        if(Pollen.SystemTagGetData($"{_asset}") != undefined){return SystemTagGetData($"{_asset}");}
         
         //--- SYSTEM ---//
         var _data = particle_get_info(_asset);
@@ -1539,13 +2153,12 @@ function Pollen() constructor {
         var _drawOrder = struct_get(_data, "oldtonew") ?? false;
         var _gmEmitters = struct_get(_data, "emitters") ?? [];
         
-        _pollen_struct
+        var _pollenSystem = new Pollen.System($"{_asset}");
+        
+        _pollenSystem
             .SetPosition(_originX, _originY)
             .SetGlobalSpace(_globalSpace)
             .SetDrawOrder(_drawOrder);
-            
-        //This will be an optimization in case we detect in the JSON that the emitterList is being overridden by the new system
-        if(_ignore_emitter_list){Log($"Successfully converted Gml part asset: {_pollen_struct.GetTag()}!"); return;}
         
         //--- EMITTERS ---//
         var _typeList = [];
@@ -1578,7 +2191,7 @@ function Pollen() constructor {
             var _intervalMax = struct_get(_emitter, "interval_max") ?? 0;
             var _intervalUnit = struct_get(_emitter, "interval_unit") ?? time_source_units_frames;
     
-            var _pEmitter = new Emitter(_pollen_struct);
+            var _pEmitter = new Emitter(_pollenSystem);
             _pEmitter
                 .SetEnabled(_enabled)
                 .SetShape(_shape)
@@ -1593,7 +2206,7 @@ function Pollen() constructor {
             array_push(_emitterList, _pEmitter);
         }
         
-        _pollen_struct.SetEmitterList(_emitterList);
+        _pollenSystem.SetEmitterList(_emitterList);
         
         //--- TYPES ---//
         var _numTypes = array_length(_typeList);
@@ -1601,7 +2214,7 @@ function Pollen() constructor {
         repeat(_numTypes){
             _iType++;
             var _type = _typeList[_iType];
-            var _tag = $"{_pollen_struct.GetTag()}_type_{_iType}";
+            var _tag = $"{_pollenSystem.GetTag()}_type_{_iType}";
             
             var _shape = struct_get(_type, "shape");
             var _sprite = struct_get(_type, "sprite");
@@ -1721,7 +2334,8 @@ function Pollen() constructor {
             _emitterList[_iType].SetType(_pType);
         }
         
-        Log($"Successfully converted Gml part asset: {_pollen_struct.GetTag()}!");
+        Log($"Successfully converted Gml part asset: {_pollenSystem.GetTag()}!");
+        return _pollenSystem;
     }
     
 
@@ -1730,6 +2344,13 @@ function Pollen() constructor {
 #region ~ DEBUG/UTIL ~
 //======================================================================================================================
     
+    /// @title      Misc
+    /// @category   API
+    /// @text       Additional util methods.
+    
+    ///@func    DestroyAll()
+    ///@desc    Destroys all Pollen Types, Emitters, & Systems and clears all their data.
+    ///@return  {undefined}
     static DestroyAll = function(){TypeDestroyAll(); SystemDestroyAll();}
     
     static Log = function(_message){show_debug_message("Pollen -> " + _message);}
