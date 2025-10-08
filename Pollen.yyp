@@ -12,6 +12,7 @@
   "Folders":[
     {"$GMFolder":"","%Name":"Pollen Example","folderPath":"folders/Pollen Example.yy","name":"Pollen Example","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Pollen","folderPath":"folders/Pollen.yy","name":"Pollen","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Documentation","folderPath":"folders/Pollen/Documentation.yy","name":"Documentation","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Rooms","folderPath":"folders/Rooms.yy","name":"Rooms","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Tome","folderPath":"folders/Tome.yy","name":"Tome","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"_system","folderPath":"folders/Tome/_system.yy","name":"_system","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -33,6 +34,7 @@
   },
   "name":"Pollen",
   "resources":[
+    {"id":{"name":"doc_welcome","path":"notes/doc_welcome/doc_welcome.yy",},},
     {"id":{"name":"__tomeController","path":"objects/__tomeController/__tomeController.yy",},},
     {"id":{"name":"obj_pollen_example","path":"objects/obj_pollen_example/obj_pollen_example.yy",},},
     {"id":{"name":"ps_example","path":"particles/ps_example/ps_example.yy",},},

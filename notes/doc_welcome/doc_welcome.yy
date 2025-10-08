@@ -1,0 +1,11 @@
+{
+  "$GMNotes":"",
+  "%Name":"doc_welcome",
+  "name":"doc_welcome",
+  "parent":{
+    "name":"Documentation",
+    "path":"folders/Pollen/Documentation.yy",
+  },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
+}
