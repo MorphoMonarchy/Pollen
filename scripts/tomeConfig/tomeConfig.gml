@@ -2,7 +2,7 @@
 #macro TOME_ENABLED true
 
 // Personal access token obtained from github.com/settings/tokens
-#macro TOME_GITHUB_AUTH_TOKEN ""
+#macro TOME_GITHUB_AUTH_TOKEN "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"
 
 // Your Github username
 #macro TOME_GITHUB_USERNAME "MorphoMonarchy"
@@ -11,7 +11,7 @@
 #macro TOME_GITHUB_REPO_NAME "Pollen"
 
 // The branch of the repo where the generated docs will be pushed
-#macro TOME_GITHUB_REPO_BRANCH "master"
+#macro TOME_GITHUB_REPO_BRANCH "docs"
 
 //The directory within your Github repo where your docs will be pushed (In the case you don't want your doc folder at the root of your repo) 
 #macro TOME_GITHUB_REPO_DOC_DIRECTORY "" // This is the root by default (""). When specifying a directory, always append a "/" at the end like: "myDirectory/"
