@@ -2,7 +2,7 @@
 #macro TOME_ENABLED true
 
 // Personal access token obtained from github.com/settings/tokens
-#macro TOME_GITHUB_AUTH_TOKEN "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"
+#macro TOME_GITHUB_AUTH_TOKEN ""
 
 // Your Github username
 #macro TOME_GITHUB_USERNAME "MorphoMonarchy"
