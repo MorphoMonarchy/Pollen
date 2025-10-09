@@ -2,5 +2,5 @@
 
 Additional util methods.
 
-## `DestroyAll()` → `undefined`
+###### `DestroyAll()` → `undefined`
 Destroys all Pollen Types, Emitters, & Systems and clears all their data.

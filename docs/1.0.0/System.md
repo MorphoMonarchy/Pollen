@@ -2,7 +2,7 @@
 
 A particle system constructor that uses similar properties found in GM's part_system family of functions.
 
-## `System(tag, [gml_system])` (*constructor*)
+###### `System(tag, [gml_system])` (*constructor*)
 A Pollen object that represents GM's part systems with additional util functions to simplify building systems and getting their data
 
 | Parameter | Datatype  | Purpose |

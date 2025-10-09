@@ -2,7 +2,7 @@
 
 A particle type constructor that uses similar properties found in GM's part_type family of functions.
 
-## `Type(tag, [gml_type])` (*constructor*)
+###### `Type(tag, [gml_type])` (*constructor*)
 A Pollen object that represents GM's part types with additional util functions to simplify building types and getting their data
 
 | Parameter | Datatype  | Purpose |
@@ -264,15 +264,15 @@ Copies all configurable properties from another Pollen.Type into this type
 |-----------|-----------|---------|
 |`target` |Pollen.Type |The source type to copy from |
 
-## `TypeTagGetData(tag)` → *Pollen.Type <span style="color: red;"> *or* </span> undefined*
+###### `TypeTagGetData(tag)` → *Pollen.Type <span style="color: red;"> *or* </span> undefined*
 Get the data associated with a Pollen.Type tag (or undefined if data does not exist for the tag)
 
 | Parameter | Datatype  | Purpose |
 |-----------|-----------|---------|
 |`tag` |string |The tag of the Pollen.Type that you want to get the data for |
 
-## `TypeDestroy(type)` → `undefined`
+###### `TypeDestroy(type)` → `undefined`
 Destroys a Pollen.Type and clears all of its data (including the GM part_type it holds)
 
-## `TypeDestroyAll()` → `undefined`
+###### `TypeDestroyAll()` → `undefined`
 Destroys all Pollen.Types that exist and clears all their data

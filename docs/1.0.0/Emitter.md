@@ -2,7 +2,7 @@
 
 A particle emitter constructor that uses similar properties found in GM's part_emitter family of functions.
 
-## `Emitter(system, [gml_emitter])` (*constructor*)
+###### `Emitter(system, [gml_emitter])` (*constructor*)
 A Pollen object that represents GM's part emitters with additional util functions to simplify building emitters and getting their data
 
 | Parameter | Datatype  | Purpose |
@@ -187,7 +187,7 @@ Returns the horizontal emitter offset
 ### `.GetOffsetY()` → *real*
 Returns the vertical emitter offset
 
-## `EmitterDestroy(emitter)` → `undefined`
+###### `EmitterDestroy(emitter)` → `undefined`
 Destroys a single Pollen.Emitter and clears all of its data (including its underlying GM part_emitter data)
 
 | Parameter | Datatype  | Purpose |
