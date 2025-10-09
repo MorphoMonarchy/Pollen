@@ -1,7 +1,3 @@
-Update 1.0.0/Type.md
-88b07c7
-1.0.0\Type.md
-@@ -0,0 +1,703 @@
 # Types
 
 A particle type constructor that uses similar properties found in GM's part_type family of functions.
