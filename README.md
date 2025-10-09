@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.imgur.com/Bb1OolA" alt="Pollen Logo" width="200">
+  <img src="https://i.imgur.com/Bb1OolA" style="display:block; margin:auto; width:200px">
 </p>
 
 <h1 align="center">Pollen</h1>
