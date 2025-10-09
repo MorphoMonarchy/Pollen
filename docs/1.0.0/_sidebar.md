@@ -4,6 +4,7 @@
 
 **API**
 
+-    [Type](Type)
 -    [Misc](Misc)
 
 ---
