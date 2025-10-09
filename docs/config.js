@@ -3,6 +3,6 @@ const config = {
   latestVersion:"1.0.0",
   favicon:"assets/docsIcon.png",
   otherVersions:[""],
-  themeColor:"#1C1B21",
+  themeColor:"#AD99FF",
   name:"Pollen",
 };
