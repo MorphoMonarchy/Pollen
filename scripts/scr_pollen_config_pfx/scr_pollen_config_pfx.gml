@@ -76,7 +76,7 @@ global.pollen_config_pfx = [
         globalSpace: true,
         drawOrder: false,
         // angle: 45,
-        // color: c_red,
+        // color: c_purple,
         // alpha: 1,
         emitterList : [
             {

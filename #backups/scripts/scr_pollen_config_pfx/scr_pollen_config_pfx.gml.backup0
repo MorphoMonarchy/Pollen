@@ -1,4 +1,4 @@
-// 2025-10-08 19:05:33
+// 2025-10-08 23:28:10
 // Feather ignore all
 //======================================================================================================================
 /*
@@ -77,7 +77,7 @@ global.pollen_config_pfx = [
         globalSpace: true,
         drawOrder: false,
         // angle: 45,
-        // color: c_red,
+        // color: c_purple,
         // alpha: 1,
         emitterList : [
             {
