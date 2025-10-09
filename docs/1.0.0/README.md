@@ -1,14 +1,14 @@
 <h1 align="center">Pollen</h1>
 
 <p align="center">
-  <img src="pollen_logo.png" alt="Pollen Logo" width="200">
-</p>
+  <img src="Pollen/pollen_logo.png" alt="Pollen Logo" width="200">
 
 Pollen is a live updating particle effects builder library for GameMaker.
 
 [Download the latest version here](https://github.com/MorphoMonarchy/Pollen)
 
-> **ℹ️ Info:**  
+</p>
+
 > Pollen was built and tested on GameMaker v2024.13 but should work with some earlier versions as well.
 
 ---
