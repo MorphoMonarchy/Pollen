@@ -2,14 +2,14 @@
 
 Use these methods to import particle data into Pollen.
 
-#### `ImportPfx(data)` → `undefined`
+######## `ImportPfx(data)` → `undefined`
 Import data from a GML 'JSON' array (see info about setting up 'JSON' in the 'Config JSON' section of the manual)
 
 | Parameter | Datatype  | Purpose |
 |-----------|-----------|---------|
 |`data` |array |The array to parse and import data from |
 
-#### `ImportType(import_data, type_data)` → `undefined`
+######## `ImportType(import_data, type_data)` → `undefined`
 Copy data from a GML 'JSON' type struct into a Pollen.Type instance (see info about setting up 'JSON' in the 'Config JSON' section of the manual)
 
 | Parameter | Datatype  | Purpose |
