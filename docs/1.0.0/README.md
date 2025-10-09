@@ -1,7 +1,7 @@
 <h1 align="center">Pollen</h1>
 
 <p align="center">
-  <img src="https://imgur.com/a/Bb1OolA" alt="Pollen Logo" width="200">
+  <img src=https://i.imgur.com/DnBMqSZ.png alt="Pollen Logo" width="200">
 </p>
 
 <p align="center">
