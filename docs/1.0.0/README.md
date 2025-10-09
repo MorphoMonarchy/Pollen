@@ -1,7 +1,7 @@
 <h1 align="center">Pollen</h1>
 
 <p align="center">
-  <img src="Pollen/1.0.0/pollen_logo.png" alt="Pollen Logo" width="200">
+  <img src="https://imgur.com/a/Bb1OolA" alt="Pollen Logo" width="200">
 </p>
 
 <p align="center">
@@ -37,3 +37,5 @@ So as much as I hate admitting to riding off the coattails of another person's w
 ## Special Thanks
 
 Huge shout out to [JuJuAdams](https://github.com/jujuadams) for all the work done on Vinyl and for the GameMaker community in general. This library would not exist without your work, so thank you!!
+
+Also major thanks to [CataclysmicStudios](https://github.com/CataclysmicStudios) for the ["Tome"](https://github.com/CataclysmicStudios/Tome) library which helped generate this documentation!
