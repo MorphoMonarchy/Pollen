@@ -266,7 +266,7 @@ Copies all configurable properties from another Pollen.Type into this type
 
 ---
 
-### Additional Util Methods
+## Additional Util Methods
 
 ### `TypeTagGetData(tag)` → *Pollen.Type <span style="color: red;"> *or* </span> undefined*
 Get the data associated with a Pollen.Type tag (or undefined if data does not exist for the tag)

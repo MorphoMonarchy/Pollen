@@ -186,6 +186,10 @@ Returns the horizontal emitter offset
 ### `.GetOffsetY()` → *real*
 Returns the vertical emitter offset
 
+---
+
+## Additional Util Methods
+
 ### `EmitterDestroy(emitter)` → `undefined`
 Destroys a single Pollen.Emitter and clears all of its data (including its underlying GM part_emitter data)
 

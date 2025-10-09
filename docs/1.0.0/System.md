@@ -150,6 +150,10 @@ Rebuilds and restarts the system's streaming emitters if streaming is active
 ### `.Copy(pfx, [ignore_emitter_list])` → `undefined`
 Copies configuration from another Pollen.System into this system
 
+---
+
+## Additional Util Methods
+
 | Parameter | Datatype  | Purpose |
 |-----------|-----------|---------|
 |`pfx` |Pollen.System |The source system to copy from |
