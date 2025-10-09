@@ -15,7 +15,6 @@ global.__tomeNavbarItemsArray = [];
 												
 tome_add_script("scr_pollen_system");
 
-tome_set_homepage_from_note("doc_welcome");
 tome_set_site_description("A hot-reload particle effects library for GameMaker 2024.11 (and later)");
 tome_set_site_name("Pollen");
 tome_set_site_latest_version("1.0.0");
