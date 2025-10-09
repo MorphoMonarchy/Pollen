@@ -2,7 +2,7 @@
 
 A particle system constructor that uses similar properties found in GM's part_system family of functions.
 
-###### `System(tag, [gml_system])` (*constructor*)
+### `System(tag, [gml_system])` (*constructor*)
 A Pollen object that represents GM's part systems with additional util functions to simplify building systems and getting their data
 
 | Parameter | Datatype  | Purpose |
@@ -155,26 +155,26 @@ Copies configuration from another Pollen.System into this system
 |`pfx` |Pollen.System |The source system to copy from |
 |`[ignore_emitter_list]` |bool |If true, skips copying the emitter list |
 
-## `SystemTagGetData(tag)` → *Pollen.System <span style="color: red;"> *or* </span> undefined*
+### `SystemTagGetData(tag)` → *Pollen.System <span style="color: red;"> *or* </span> undefined*
 Get the data associated with a Pollen.System tag (or undefined if data does not exist for the tag)
 
 | Parameter | Datatype  | Purpose |
 |-----------|-----------|---------|
 |`tag` |string |The tag of the Pollen.System that you want to get the data for |
 
-## `EmitterListDestroyAll(system)` → `undefined`
+### `EmitterListDestroyAll(system)` → `undefined`
 Destroys all the emitters tied to a Pollen.System
 
 | Parameter | Datatype  | Purpose |
 |-----------|-----------|---------|
 |`system` |Pollen.System |The system to clear the emitters from |
 
-## `SystemDestroy(system)` → `undefined`
+### `SystemDestroy(system)` → `undefined`
 Destroys a single Pollen.System instance and clears all of its data (including its underlying GM part_system data)
 
 | Parameter | Datatype  | Purpose |
 |-----------|-----------|---------|
 |`system` |Pollen.System |The Pollen.System instance to destroy |
 
-## `SystemDestroyAll()` → `undefined`
+### `SystemDestroyAll()` → `undefined`
 Destroys all instances of Pollen.System and clears all of their data
