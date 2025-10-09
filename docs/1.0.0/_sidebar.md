@@ -8,7 +8,7 @@
 -    [Emitter](Emitter)
 -    [System](System)
 -    [Create Particles](<Create Particles.md>)
--    [Import Particles](<Create Particles.md>)
+-    [Import Particles](<Import Particles.md>)
 -    [Misc](Misc)
 
 ---
