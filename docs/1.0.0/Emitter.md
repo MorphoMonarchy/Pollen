@@ -3,196 +3,171 @@
 A particle emitter constructor that uses similar properties found in GM's part_emitter family of functions.
 
 ### `Emitter(system, [gml_emitter])` (*constructor*)
-A Pollen object that represents GM's part emitters with additional util functions to simplify building emitters and getting their data
+A Pollen object that represents GM's part emitters with additional util functions to simplify building emitters and getting their data.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`system` |Pollen.System |The Pollen.System the emitter is tied to |
-|`[gml_emitter]` |Id.ParticleEmitter|undefined |An optional reference to a GML part emitter you can pass in to initialize the emitter with (i.e. with part_emitter_create(). Defaults to 'undefined') |
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `system` | Pollen.System | The Pollen.System the emitter is tied to |
+| `[gml_emitter]` | Id.ParticleEmitter | An optional reference to a GML part emitter you can pass in to initialize the emitter with (i.e. with `part_emitter_create()`. Defaults to `undefined`) |
 
+## Methods
 
+### `.SetEnabled(enabled)` → `self`
+Whether to enable the emitter to emit particles or not.
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `enabled` | bool | True to enable, false to disable |
 
+### `.SetType(type)` → `self`
+Sets the particle type emitted (Pollen.Type instance or tag).
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `type` | struct or string or undefined | The type struct or tag, or `undefined` to clear |
 
+### `.SetNumber(number)` → `self`
+Sets how many particles this emitter creates per burst/tick.
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `number` | real | The number of particles |
 
+### `.SetShape(shape)` → `self`
+Sets the emitter region shape (e.g., `ps_shape_rectangle`, `ps_shape_ellipse`).
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `shape` | ps_shape | The emitter shape constant |
 
+### `.SetDistr(distr)` → `self`
+Sets the particle distribution shape within the emitter region (e.g., `ps_distr_linear`).
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `distr` | ps_distr | The distribution constant |
 
+### `.SetRelative(enabled)` → `self`
+Toggles whether the number of particles (changed via `.SetNumber`) is an exact number or a relative percentage of emitter area filled (see `part_emitter_relative` in the GM manual for more info).
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `enabled` | bool | True for relative, false for absolute |
 
+### `.SetDelay(delay)` → `self`
+Sets the initial delay before emission begins when streaming a particle.
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `delay` | struct | A struct containing the following properties `{min, max, unit}` |
 
+### `.SetInterval(interval)` → `self`
+Sets the interval between emissions when streaming a particle.
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `interval` | struct | A struct containing the following properties `{min, max, unit}` |
 
+### `.SetSize(width, height)` → `self`
+Sets the emitter region size.
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `width` | real | The emitter width |
+| `height` | real | The emitter height |
 
+### `.SetWidth(width)` → `self`
+Sets the emitter region width.
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `width` | real | The emitter width |
 
+### `.SetHeight(height)` → `self`
+Sets the emitter region height.
 
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `height` | real | The emitter height |
 
-###Methods**
-### `.SetEnabled(enabled)` → *self*
-Whether to enable the emitter to emit particles or not
+### `.SetOffset(offsetX, offsetY)` → `self`
+Sets the emitter offset from its origin.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`enabled` |bool |True to enable, false to disable |
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `offsetX` | real | Horizontal offset |
+| `offsetY` | real | Vertical offset |
 
-### `.SetType(type)` → *self*
-Sets the particle type emitted (Pollen.Type instance or tag)
+### `.SetOffsetX(offsetX)` → `self`
+Sets only the horizontal emitter offset.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`type` |struct|string|undefined |The type struct or tag, or undefined to clear |
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `offsetX` | real | Horizontal offset |
 
-### `.SetNumber(number)` → *self*
-Sets how many particles this emitter creates per burst/tick
+### `.SetOffsetY(offsetY)` → `self`
+Sets only the vertical emitter offset.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`number` |real |The number of particles |
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `offsetY` | real | Vertical offset |
 
-### `.SetShape(shape)` → *self*
-Sets the emitter region shape (e.g., ps_shape_rectangle, ps_shape_ellipse)
+### `.GetGmlData()` → `Id.Emitter`
+Returns the underlying GM emitter handle used by the system.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`shape` |ps_shape |The emitter shape constant |
+### `.GetSystem()` → `Pollen.System`
+Returns the parent Pollen.System that owns this emitter.
 
-### `.SetDistr(distr)` → *self*
-Sets the particle distribution shape within the emitter region (e.g., ps_distr_linear)
+### `.IsEnabled()` → `bool`
+Returns whether the emitter is enabled.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`distr` |ps_distr |The distribution constant |
+### `.GetEnabled()` → `bool`
+Alias for `IsEnabled()`; returns whether the emitter is enabled.
 
-### `.SetRelative(enabled)` → *self*
-Toggles whether the number of particles (changed via .SetNumber) is an exact number or a relative percentage of emitter area filled
-(see "part_emitter_relative" in GM manual for more info)
+### `.GetType()` → `struct or string or undefined`
+Returns the particle type set on this emitter (struct or tag), or `undefined`.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`enabled` |bool |True for relative, false for absolute |
+### `.GetNumber()` → `real`
+Returns the number of particles emitted per burst/tick.
 
-### `.SetDelay(delay)` → *self*
-Sets the initial delay before emission begins when streaming a particle
+### `.GetShape()` → `ps_shape or undefined`
+Returns the emitter region shape constant.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`delay` |struct |A struct containing the following properties {min, max, unit} |
+### `.GetDistr()` → `bool`
+Returns the emitter distribution.
 
-### `.SetInterval(interval)` → *self*
-Sets the interval between emissions when streaming a particle
+### `.GetRelative()` → `bool`
+Returns whether the emitter is emitting exact number of particles (true) or a relative percentage (false).
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`interval` |struct |A struct containing the following properties {min, max, unit} |
+### `.GetDelay()` → `struct`
+Returns the initial delay settings for streaming `{min, max, unit}`.
 
-### `.SetSize(width, height)` → *self*
-Sets the emitter region size
+### `.GetInterval()` → `struct`
+Returns the interval settings for streaming `{min, max, unit}`.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`width` |real |The emitter width |
-|`height` |real |The emitter height |
+### `.GetSize()` → `struct`
+Returns the emitter region size as a struct `{w, h}`.
 
-### `.SetWidth(width)` → *self*
-Sets the emitter region width
+### `.GetWidth()` → `real`
+Returns the emitter region width.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`width` |real |The emitter width |
+### `.GetHeight()` → `real`
+Returns the emitter region height.
 
-### `.SetHeight(height)` → *self*
-Sets the emitter region height
+### `.GetOffset()` → `struct`
+Returns the emitter offset as a struct `{x, y}`.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`height` |real |The emitter height |
+### `.GetOffsetX()` → `real`
+Returns the horizontal emitter offset.
 
-### `.SetOffset(offsetX, offsetY)` → *self*
-Sets the emitter offset from its origin
+### `.GetOffsetY()` → `real`
+Returns the vertical emitter offset.
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`offsetX` |real |Horizontal offset |
-|`offsetY` |real |Vertical offset |
-
-### `.SetOffsetX(offsetX)` → *self*
-Sets only the horizontal emitter offset
-
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`offsetX` |real |Horizontal offset |
-
-### `.SetOffsetY(offsetY)` → *self*
-Sets only the vertical emitter offset
-
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`offsetY` |real |Vertical offset |
-
-### `.GetGmlData()` → *Id.Emitter*
-Returns the underlying GM emitter handle used by the system
-
-### `.GetSystem()` → *Pollen.System*
-Returns the parent Pollen.System that owns this emitter
-
-### `.IsEnabled()` → *bool*
-Returns whether the emitter is enabled
-
-### `.GetEnabled()` → *bool*
-Alias for IsEnabled(); returns whether the emitter is enabled
-
-### `.GetType()` → *struct <span style="color: red;"> *or* </span> string <span style="color: red;"> *or* </span> undefined*
-Returns the particle type set on this emitter (struct or tag), or undefined
-
-### `.GetNumber()` → *real*
-Returns the number of particles emitted per burst/tick
-
-### `.GetShape()` → *ps_shape <span style="color: red;"> *or* </span> undefined*
-Returns the emitter region shape constant
-
-### `.GetDistr()` → *bool*
-Returns the emitter distribution
-
-### `.GetRelative()` → *bool*
-Returns whether the emitter is emitting exact number of particles (true) or a relative percentage (false)
-
-### `.GetDelay()` → *struct*
-Returns the initial delay settings for streaming {min, max, unit}
-
-### `.GetInterval()` → *struct*
-Returns the interval settings for streaming {min, max, unit}
-
-### `.GetSize()` → *struct*
-Returns the emitter region size as a struct {w, h}
-
-### `.GetWidth()` → *real*
-Returns the emitter region width
-
-### `.GetHeight()` → *real*
-Returns the emitter region height
-
-### `.GetOffset()` → *struct*
-Returns the emitter offset as a struct {x, y}
-
-### `.GetOffsetX()` → *real*
-Returns the horizontal emitter offset
-
-### `.GetOffsetY()` → *real*
-Returns the vertical emitter offset
-
----
-
-## Additional Util Methods
+## Additional Util Functions
 
 ### `EmitterDestroy(emitter)` → `undefined`
-Destroys a single Pollen.Emitter and clears all of its data (including its underlying GM part_emitter data)
+Destroys a single `Pollen.Emitter` and clears all of its data (including its underlying GM `part_emitter` data).
 
-| Parameter | Datatype  | Purpose |
-|-----------|-----------|---------|
-|`emitter` |Pollen.Emitter |The Pollen.Emitter data to destroy |
+| Parameter | Datatype | Purpose |
+|-----------|----------|---------|
+| `emitter` | Pollen.Emitter | The `Pollen.Emitter` data to destroy |

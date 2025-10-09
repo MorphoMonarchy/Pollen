@@ -1,4 +1,7 @@
--    [Home](README)
+-    [Home](Home)
+-    [Alternatives](Alternatives)
+-    [FAQ](FAQ)
+-    [Getting Started](<Getting Started.md>)
 
 ---
 
