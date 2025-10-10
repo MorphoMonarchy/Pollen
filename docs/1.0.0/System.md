@@ -86,41 +86,93 @@ Binds the system to a room layer (overrides depth).
 ### `.GetTag()` → `string`
 Returns the unique system tag.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetGmlData()` → `Id.ParticleSystem`
 Returns the underlying GM particle system handle.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetTemplate()` → `string or Id.ParticleSystem or undefined`
 Returns the particle system template the `Pollen.System` copies from.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetDepth()` → `real`
 Returns the system's draw depth (ignored when layer is set).
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetLayer()` → `string or real or undefined`
 Returns the bound room layer name or ID, or undefined if unbound.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetPosition()` → `struct`
 Returns the system position as a struct `{x, y}`.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetGlobalSpace()` → `bool`
 Returns whether the system uses global space.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetDrawOrder()` → `bool`
 Returns whether oldest particles are drawn first.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetAngle()` → `real`
 Returns the render rotation angle in degrees.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetColor()` → `color`
 Returns the color multiplier applied to particles.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetAlpha()` → `real`
 Returns the alpha multiplier applied to particles.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetEmitterList()` → `array`
 Returns the array of emitters owned by this system.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.RefreshStream()` → `undefined`
 Rebuilds and restarts the system's streaming emitters if streaming is active.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.Copy(pfx, [ignore_emitter_list])` → `undefined`
 Copies configuration from another `Pollen.System` into this system.
@@ -155,3 +207,7 @@ Destroys a single `Pollen.System` instance and clears all of its data (including
 
 ### `SystemDestroyAll()` → `undefined`
 Destroys all instances of `Pollen.System` and clears all of their data.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |

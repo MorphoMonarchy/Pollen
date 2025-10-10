@@ -73,7 +73,7 @@
               for specific levels/modes in your game (however, having an immense amount of emitters on one system will
               effect how much memory that system will take up, but even then, I don't think it's a huge concern).
               
-                ~ NOTE: After stress testing, I found that over 10000 unique particle systems takes up <100.0 MB which
+                ~ NOTE: After stress testing, I found that over 1000 unique particle systems takes up <100.0 MB which
                         is far more particles than any game should ever need and is still not a huge memory sink
              
             
@@ -967,6 +967,7 @@ function Pollen() constructor {
     
     ///@func    TypeDestroy(type)
     ///@desc    Destroys a Pollen.Type and clears all of its data (including the GM part_type it holds)
+    ///@param   {Pollen.Type} The Pollen.Type data that you want to destroy
     ///@return  {undefined}
     static TypeDestroy = function(_type){
         if(!is_instanceof(_type, Type)){Error("Cannot destroy type that is not a valid Pollen.Type struct!");}
@@ -1700,10 +1701,11 @@ function Pollen() constructor {
     ///@return {undefined}
     static Stream = function(_system_or_tag, _x_offset = 0, _y_offset = 0, _amount = undefined){
         
-        var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag);
+        var _isTag = is_string(_system_or_tag), _isSystem = is_struct(_system_or_tag) && is_instanceof(_system_or_tag, Pollen.System);
         if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
             
         var _data = (_isTag) ? __systemMap[? _system_or_tag] : _system_or_tag;
+        if(_data == undefined){Error($"Unable to find data for {_system_or_tag}. Check for spelling errors and make sure data has been imported properly!"); return;}
         var _gmlData = _data.GetGmlData();
         var _emitterList = _data.GetEmitterList();
         
@@ -1751,6 +1753,7 @@ function Pollen() constructor {
         if(!_isTag && !_isSystem){Error($"Could not recognize '{_system_or_tag}' as a valid Pollen system (Pollen.Pfx) or a string tag!"); return;}
         
         var _data = (_isTag) ? __systemMap[? _system_or_tag] : _system_or_tag;
+        if(_data == undefined){Error($"Unable to find data for {_system_or_tag}. Check for spelling errors and make sure data has been imported properly!"); return;}
         var _gmlData = _data.GetGmlData();
         var _emitterList = _data.GetEmitterList();
         
@@ -2355,8 +2358,8 @@ function Pollen() constructor {
     ///@return  {undefined}
     static DestroyAll = function(){TypeDestroyAll(); SystemDestroyAll();}
     
-    static Log = function(_message){show_debug_message("Pollen -> " + _message);}
-    static Warn = function(_message){show_debug_message("Pollen -> Warning! " + _message);}
+    static Log = function(_message){if(POLLEN_LOG_LEVEL < 2){return;} show_debug_message("Pollen -> " + _message);}
+    static Warn = function(_message){if(POLLEN_LOG_LEVEL < 1){return;} show_debug_message("Pollen -> Warning! " + _message);}
     static Error = function(_message){show_error("Pollen -> Error! " + _message, true);}
     
     
@@ -2373,7 +2376,7 @@ function Pollen() constructor {
 //We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
 var _initPollen = new Pollen(); 
 delete _initPollen;
-Pollen.ImportPfx(global.pollen_config_pfx); //<---Do not rename any files or this might not work since it requires the other scripts to be initialized first!!!
+if(POLLEN_AUTO_IMPORT_CONFIG_PFX){Pollen.ImportPfx(global.pollen_config_pfx);} //<---Do not rename any files or this might not work since it requires the other scripts to be initialized first!!!
 Pollen.Log("Ready!");
 
 

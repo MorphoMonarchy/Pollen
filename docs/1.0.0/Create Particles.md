@@ -1,6 +1,6 @@
 # Create Particles
 
-Use these methods to create particles in game.
+Use these methods to render particles in game.
 
 ### `Stream(system_or_tag, [x_offset], [y_offset], [amount])` → `undefined`
 Starts continuous streaming from all enabled emitters in a system. If `amount` is provided, it overrides each emitter's particle count.

@@ -18,8 +18,8 @@
   ],
   "name":"rm_pollen_example",
   "parent":{
-    "name":"Rooms",
-    "path":"folders/Rooms.yy",
+    "name":"Pollen Example",
+    "path":"folders/Pollen Example.yy",
   },
   "parentRoom":null,
   "physicsSettings":{

@@ -33,7 +33,7 @@ global.pollen_config_pfx = [
     {
         type : "type_example_full",
         // shape: pt_shape_line,
-        sprite : {id: spr_pollen_test, subImg: 0, animate: false, stretch: false, randomImg: false},
+        sprite : {id: spr_pollen_test, subImg: 0, animate: false, stretch: false, randomImg: false}, //<--- 'id' is required!!!
         size: {min: 0.5, max: 2, wiggle: 0.1, incr: -0.01},
         scale: {x: 0.1, y: 0.1},
         speed: {min: 2, max: 10, incr: -0.05, wiggle: 0.1},

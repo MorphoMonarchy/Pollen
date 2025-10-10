@@ -15,11 +15,23 @@ A Pollen object that represents GM's part types with additional util functions t
 ### `.GetTag()` → `string`
 Returns the unique tag used to identify the type.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetGmlData()` → `Id.ParticleType`
 Returns the GML part type data that the Pollen type uses in the backend.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetShape()` → `pt_shape or undefined`
 Returns the part type shape that is being used or undefined if in sprite mode.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetShape(shape)` → `self`
 Sets the shape to a GM part type shape (i.e. `pt_shape_snow`, etc.) instead of a sprite.
@@ -29,7 +41,11 @@ Sets the shape to a GM part type shape (i.e. `pt_shape_snow`, etc.) instead of a
 | `shape` | pt_shape | The `pt_shape` to set the type to |
 
 ### `.GetSpriteData()` → `struct or undefined`
-Returns the current sprite configuration for the type or undefined if using a primitive shape.
+Returns the current sprite configuration for the type or undefined if using a primitive shape instead.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetSprite(sprite, [sub_img], [animate], [stretch], [random_img])` → `self`
 Sets the particle to use a sprite instead of a `pt_shape`.
@@ -45,6 +61,10 @@ Sets the particle to use a sprite instead of a `pt_shape`.
 ### `.GetSize()` → `struct or undefined`
 Returns the uniform size configuration or undefined if using axis-specific sizes.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetSize([min], [max], [incr], [wiggle])` → `self`
 Sets uniform particle size parameters for both axes and clears axis-specific settings.
 
@@ -57,6 +77,10 @@ Sets uniform particle size parameters for both axes and clears axis-specific set
 
 ### `.GetSizeX()` → `struct or undefined`
 Returns the X-axis size configuration or undefined if using uniform size.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetSizeX(min, max, incr, wiggle)` → `self`
 Sets size parameters for the X-axis and clears uniform size.
@@ -71,6 +95,10 @@ Sets size parameters for the X-axis and clears uniform size.
 ### `.GetSizeY()` → `struct or undefined`
 Returns the Y-axis size configuration or undefined if using uniform size.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetSizeY([min], [max], [incr], [wiggle])` → `self`
 Sets size parameters for the Y-axis and clears uniform size.
 
@@ -84,6 +112,10 @@ Sets size parameters for the Y-axis and clears uniform size.
 ### `.GetScale()` → `struct`
 Returns the current particle render scale (x & y).
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetScale(x, y)` → `self`
 Sets the particle render scale on each axis.
 
@@ -95,8 +127,12 @@ Sets the particle render scale on each axis.
 ### `.GetSpeed()` → `struct`
 Returns the speed configuration for particles.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetSpeed([min], [max], [incr], [wiggle])` → `self`
-Sets the particle speed range and dynamics.
+Sets the particle speed configuration.
 
 | Parameter | Datatype | Purpose |
 |------------|-----------|----------|
@@ -107,6 +143,10 @@ Sets the particle speed range and dynamics.
 
 ### `.GetDirection()` → `struct`
 Returns the emission direction parameters.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetDirection([min], [max], [incr], [wiggle])` → `self`
 Sets the emission direction range and dynamics.
@@ -121,6 +161,10 @@ Sets the emission direction range and dynamics.
 ### `.GetGravity()` → `struct`
 Returns the gravity settings (amount and direction).
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetGravity([amount], [direction])` → `self`
 Sets the gravity amount and direction applied to particles.
 
@@ -131,6 +175,10 @@ Sets the gravity amount and direction applied to particles.
 
 ### `.GetOrientation()` → `struct`
 Returns the image orientation parameters.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetOrientation([min], [max], [incr], [wiggle], [relative])` → `self`
 Sets the image orientation range and whether it tracks particle direction.
@@ -146,6 +194,10 @@ Sets the image orientation range and whether it tracks particle direction.
 ### `.GetColorMix()` → `array<color> or undefined`
 Returns the two-color mix array if set, otherwise undefined.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetColorMix(colors_or_array)` → `self`
 Sets a two-color gradient mix for particles (accepts two arguments or an array of colors).
 
@@ -155,6 +207,10 @@ Sets a two-color gradient mix for particles (accepts two arguments or an array o
 
 ### `.GetColorRgb()` → `struct or undefined`
 Returns the RGB range configuration or undefined if not set.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetColorRgb(rmin, rmax, gmin, gmax, bmin, bmax)` → `self`
 Sets randomized RGB color channel ranges for particles.
@@ -171,6 +227,10 @@ Sets randomized RGB color channel ranges for particles.
 ### `.GetColorHsv()` → `struct or undefined`
 Returns the HSV range configuration or undefined if not set.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetColorHsv(hmin, hmax, smin, smax, vmin, vmax)` → `self`
 Sets randomized HSV color ranges for particles.
 
@@ -186,6 +246,10 @@ Sets randomized HSV color ranges for particles.
 ### `.GetColor()` → `color or array<color>`
 Returns the standard color configuration (single, two, or three colors) if set.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetColor(color_or_array)` → `self`
 Sets standard color using one, two, or three colors; accepts a single color or an array of up to three colors.
 
@@ -195,6 +259,10 @@ Sets standard color using one, two, or three colors; accepts a single color or a
 
 ### `.GetAlpha()` → `real or array<real>`
 Returns the alpha (opacity) configuration (single, two, or three values).
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetAlpha(alpha_or_array)` → `self`
 Sets alpha (opacity) using one, two, or three values; accepts a single number or an array.
@@ -206,6 +274,10 @@ Sets alpha (opacity) using one, two, or three values; accepts a single number or
 ### `.GetBlend()` → `bool`
 Returns whether additive blending is enabled for this particle type.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetBlend(enable)` → `self`
 Enables or disables additive blending for particles.
 
@@ -215,6 +287,10 @@ Enables or disables additive blending for particles.
 
 ### `.GetLife()` → `struct`
 Returns the particle lifetime range in steps.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetLife([min], [max])` → `self`
 Sets the particle lifetime range in steps.
@@ -227,6 +303,10 @@ Sets the particle lifetime range in steps.
 ### `.GetStep()` → `struct`
 Returns the sub-particle step emission settings.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.SetStep([number], [type])` → `self`
 Emits sub-particles every given number of steps using the specified type.
 
@@ -237,6 +317,10 @@ Emits sub-particles every given number of steps using the specified type.
 
 ### `.GetDeath()` → `struct`
 Returns the sub-particle death emission settings.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.SetDeath([number], [type])` → `self`
 Emits sub-particles upon death using the specified type and particle count.
@@ -265,5 +349,13 @@ Gets the data associated with a `Pollen.Type` tag (or undefined if data does not
 ### `TypeDestroy(type)` → `undefined`
 Destroys a `Pollen.Type` and clears all of its data (including the GM part_type it holds).
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| `type` | Pollen.Type | The `Pollen.Type` that you want to destroy |
+
 ### `TypeDestroyAll()` → `undefined`
 Destroys all `Pollen.Types` that exist and clears all their data.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |

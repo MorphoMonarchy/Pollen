@@ -115,53 +115,121 @@ Sets only the vertical emitter offset.
 ### `.GetGmlData()` → `Id.Emitter`
 Returns the underlying GM emitter handle used by the system.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetSystem()` → `Pollen.System`
 Returns the parent Pollen.System that owns this emitter.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.IsEnabled()` → `bool`
 Returns whether the emitter is enabled.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetEnabled()` → `bool`
 Alias for `IsEnabled()`; returns whether the emitter is enabled.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetType()` → `struct or string or undefined`
 Returns the particle type set on this emitter (struct or tag), or `undefined`.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetNumber()` → `real`
 Returns the number of particles emitted per burst/tick.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetShape()` → `ps_shape or undefined`
 Returns the emitter region shape constant.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetDistr()` → `bool`
 Returns the emitter distribution.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetRelative()` → `bool`
 Returns whether the emitter is emitting exact number of particles (true) or a relative percentage (false).
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetDelay()` → `struct`
 Returns the initial delay settings for streaming `{min, max, unit}`.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetInterval()` → `struct`
 Returns the interval settings for streaming `{min, max, unit}`.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetSize()` → `struct`
 Returns the emitter region size as a struct `{w, h}`.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetWidth()` → `real`
 Returns the emitter region width.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetHeight()` → `real`
 Returns the emitter region height.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ### `.GetOffset()` → `struct`
 Returns the emitter offset as a struct `{x, y}`.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetOffsetX()` → `real`
 Returns the horizontal emitter offset.
 
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
 ### `.GetOffsetY()` → `real`
 Returns the vertical emitter offset.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
 
 ## Additional Util Functions
 
