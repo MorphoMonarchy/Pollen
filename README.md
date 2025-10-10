@@ -11,7 +11,7 @@ A live updating particle effects builder library for GameMaker 2024.13.<br>
 
 - ### Download the .yymps
   
-- ### Read the documentation
+- ### Read the [documentation](https://morphomonarchy.github.io/Pollen/#/1.0.0/)
 
 - ### Based on JujuAdam's [Vinyl](https://www.jujuadams.com/Vinyl/#/6.2/README)
   
