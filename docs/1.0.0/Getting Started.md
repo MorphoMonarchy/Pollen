@@ -24,7 +24,7 @@ This guide will take you through installing and using Pollen for the first time,
 ~~~
 
 3. Copy and paste the following code into a create event of an object or a global script: `Pollen.Stream("mySystem")`
-4. Use examples commented in `scr_pollen_config_pfx` or read the "Config JSON" docs for info on how to configure your particle types/systems more.
+4. Use examples commented in `scr_pollen_config_pfx` or read the [Config JSON](<Import Particles.mod/>) docs for info on how to configure your particle types/systems more.
 5. Click "Run" or press f5 to compile and run your project.
 6. If live-reload is enabled, you can see changes in real time by simply saving the `scr_pollen_config_pfx` script after making your changes.
 7. Check logs often for warnings and/or errors especially if you aren't seeing live updates!
