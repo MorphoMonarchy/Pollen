@@ -5,7 +5,7 @@
 
 <p align="center">
 A live updating particle effects builder library for GameMaker based on JujuAdams' <a href="https://www.jujuadams.com/Vinyl/#">Vinyl</a>.<br>
-<a href="https://github.com/MorphoMonarchy/Pollen">Download the latest version here!</a>
+<a href="https://morpho-monarchy.itch.io/pollen">Download the latest version here!</a>
 </p>
 
 <p class="warn">Pollen was built and tested on GameMaker v2024.13 but may work with some older versions as well.</p>
