@@ -11,8 +11,8 @@ A live updating particle effects builder library for GameMaker 2024.13.<br>
 
 - ### Download the .yymps
   
-- ### Read the [documentation](https://morphomonarchy.github.io/Pollen/#/1.0.0/)
+- ### Read the [documentation](https://morphomonarchy.github.io/Pollen/#)
 
-- ### Based on JujuAdams' [Vinyl](https://www.jujuadams.com/Vinyl/#/6.2/README)
+- ### Based on JujuAdams' [Vinyl](https://www.jujuadams.com/Vinyl/#)
   
 - ### You may also like [Pulse](https://delfos1.itch.io/pulse), [Geon FX](<https://nod.itch.io/geon-fx>), or [Particle Editor](<https://gamemakercasts.itch.io/particle-editor>)

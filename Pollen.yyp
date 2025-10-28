@@ -33,6 +33,7 @@
   "resources":[
     {"id":{"name":"doc_welcome","path":"notes/doc_welcome/doc_welcome.yy",},},
     {"id":{"name":"obj_pollen_example","path":"objects/obj_pollen_example/obj_pollen_example.yy",},},
+    {"id":{"name":"obj_test","path":"objects/obj_test/obj_test.yy",},},
     {"id":{"name":"ps_example","path":"particles/ps_example/ps_example.yy",},},
     {"id":{"name":"rm_pollen_example","path":"rooms/rm_pollen_example/rm_pollen_example.yy",},},
     {"id":{"name":"scr_pollen_config_macros","path":"scripts/scr_pollen_config_macros/scr_pollen_config_macros.yy",},},

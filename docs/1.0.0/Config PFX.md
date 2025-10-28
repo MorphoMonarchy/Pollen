@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Pollen can import GML 'JSON' that represents the **particle effects setup** for your game. You can define the JSON that Pollen should load automatically on startup by editing the script **`scr_pollen_config_pfx()`**. You can also manually import JSON at runtime using helper functions such as `Pollen.ImportPFX()` and `Pollen.ImportType()`. 
+Pollen can import GML 'JSON' that represents the **particle effects setup** for your game. This works similarly to the 'JSON' setup in JuJuAdams' [Vinyl](https://www.jujuadams.com/Vinyl/#). You can define the JSON that Pollen should load automatically on startup by editing the script **`scr_pollen_config_pfx()`**. You can also manually import JSON at runtime using helper functions such as `Pollen.ImportPFX()` and `Pollen.ImportType()`. 
 
 Using JSON configuration is **optional**. All JSON imports are simply shorthand for calling the same setup functions that Pollen executes internally. If you prefer, you can manually configure particle systems, emitters, and types through code using `Pollen.Type`, `Pollen.Emitter`, and `Pollen.System` constructors without any loss of functionality.
 
@@ -100,10 +100,10 @@ Please see 'Notes' section of each of the tables for info on which members are r
 |---|---|---|---|
 | `enabled` | bool | `true` | Determines if the emitter is active and emitting particles. |
 | `type` | struct or string or undefined | `undefined` | Particle type to emit (reference or inline definition). |
+| `relative` | bool | `false` | When true, emission is relative to emitter area instead of fixed count. NOTE: this must be defined BEFORE defining 'number' below or live changes won't be reflected properly! |
 | `number` | real | `1` | Number of particles emitted per burst or tick. |
 | `shape` | ps_shape | `ps_shape_ellipse` | Emitter region shape constant. |
 | `distr` | ps_distr | `ps_distr_linear` | Distribution pattern for emitted particles. |
-| `relative` | bool | `false` | When true, emission is relative to emitter area instead of fixed count. |
 | `delay` | struct | <code>{<br>  &nbsp;&nbsp;min: 0,<br>  &nbsp;&nbsp;max: 0,<br>  &nbsp;&nbsp;unit: time_source_units_frames,<br> &nbsp}</code> | Initial delay before emission starts. |
 | `interval` | struct | <code>{<br>  &nbsp;&nbsp;min: 0,<br>  &nbsp;&nbsp;max: 0,<br>  &nbsp;&nbsp;unit: time_source_units_frames,<br> &nbsp}</code> | Interval between emissions when streaming. |
 | `width` | real | `32` | Emitter region width. |

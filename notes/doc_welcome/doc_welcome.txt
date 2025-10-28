@@ -1,3 +1,21 @@
-# Pollen #
+# Pollen
 
-Pollen is a live-reload library for particle effects in GameMaker!
+Pollen is a live updating particle effects builder library for GameMaker based on JujuAdams' Vinyl!
+
+READ THE REST OF THE DOCS HERE!! -> https://morphomonarchy.github.io/Pollen/#/
+
+## Features
+- A simpler & more flexible interface for creating GM particles in runtime
+- Can use particles & GM particle assets as templates for new particles to reduce boilerplate
+- Getter methods to directly get specific data from a particle instead of using the particle-info struct every time
+- Setter methods with default args that can be chained together to “build” particles without redundant properties
+- A simple JSON format for defining particles that can be live-reloaded
+- Supports all of GameMaker’s built-in properties for Types, Emitters, & Systems, + more!
+
+## Special Thanks
+Huge shout out to JujuAdams for all the work done on Vinyl and for the GameMaker community in general. 
+This library would not exist without your work, so thank you!
+
+Also major thanks to CataclysmicStudios for the “Tome” library which helped generate the documentation site!
+
+Pollen © 2025

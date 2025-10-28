@@ -12,91 +12,20 @@
 */
 //======================================================================================================================
 
-/*                                                                                                          Completed?
+/*                                                                                                          
 
-    DOCUMENTATION URL: https://morphomonarchy.github.io/Pollen/#/
+    READ THE DOCS!!! -> https://morphomonarchy.github.io/Pollen/#/
   
-    USEFUL TOOLS:
-        ~ Tome (Auto generate doc site via docsify): https://github.com/CataclysmicStudios/Tome
-
-    TODO:                                                                                                       [ ]                                                                                                            
-        
-        ~ Feature list (v1.0):                                                                                  [X]
-            ~ Setup hot-reload script                                                                           [X]
-            ~ Create default GM-editor particle system                                                          [X]
-            ~ Particle builder API                                                                              [X]
-            ~ Util functions for bursting and streaming particles                                               [X]
-            ~ Generate particle types from hot-reload script                                                    [X]
-            ~ Ability to adjust any part type property from hot-reload script                                   [X]
-            ~ Generate particle systems from hot-reload script                                                  [X]
-            ~ Ability to adjust any part system/emitter property from hot-reload script                         [X]
-            ~ Generate particle types from templates                                                            [X]
-            ~ Generate particle systems from templates (GM part assets, pollen systems, more?)                  [X]
-            ~ Ensure easy cleanup of data (add .Destroy methods and check for mem-leaks)                        [X]
-            ~ Add error checks and basic debug tools                                                            [X]
-                ~ Error check burst/stream functions for tags that do not exist                                 [X]
-            ~ Add additional util functions                                                                     [X]
-            
-        ~ Testing & polish:                                                                                     [ ]
-            ~ Check builder functions to make sure all of them return self                                      [X]
-            ~ Ensure new types can be defined in emitter JSON (i.e. you can set "type" property as a struct)    [X]
-            ~ Test all the sprite animation settings in part types                                              [X]
-            ~ Add tests to ensure JSON data is valid                                                            [X]
-                ~ Refactor import functions to use struct_get_games to test for invalid JSON members            [X]
-            ~ Test YYC version                                                                                  [X]
-            ~ Code cleanup and documentation                                                                    [ ]
-            
-    DOCUMENTATION:
+    INDEX (use ctrl+f to jump to section or search for #region):
     
-        ~ Alternate libraries:
-            ~ https://github.com/GamemakerCasts/particles - A lightweight particle wrapper for GM
-            ~ https://delfos1.itch.io/pulse - A custom particle emitter library that extends GM's capabilities
-            
-        ~ Known bugs:
-            ~ Adding and deleting emitters repeatedly may cause game to crash when POLLEN_FALLBACK_TO_PRIOR_VALUES is true
-            
-        ~ FAQ:
+        ~ UPDATE ~
+        ~ TYPES ~
+        ~ EMITTERS ~
+        ~ SYSTEMS ~
+        ~ CREATE PARTICLES ~
+        ~ IMPORT ~
+        ~ DEBUG/UTIL ~
         
-            ~ When compiling in YYC, users have to uncheck "automatically remove unused assets" when using 
-              particle asset templates
-              
-            ~ When deleting a property from JSON, the types/systems/emitters will fallback to constant default values
-              rather than their previous defined properties. This can be configured in scr_pollen_config_global
-              
-            ~ When POLLEN_FALLBACK_TO_PRIOR_VALUES is true, deleting emitters that are higher up the list may result
-              in the rest of the emitters defaulting to the deleted emitters values. For example, if you delete 
-              the first emitter on the emitterList, then the second emitter will default to the first emitter's values
-              rather than it's own.
-              
-            ~ Each particle type & system struct takes up roughly 0.1 - 0.3[+] mb, so it may be easiest to simply keep
-              them in the global JSON rather than trying to manually create/destroy them, even if you only need them
-              for specific levels/modes in your game (however, having an immense amount of emitters on one system will
-              effect how much memory that system will take up, but even then, I don't think it's a huge concern).
-              
-                ~ NOTE: After stress testing, I found that over 1000 unique particle systems takes up <100.0 MB which
-                        is far more particles than any game should ever need and is still not a huge memory sink
-             
-            
-        
-    POTENTIAL FUTURE FEATURES:    
-    
-        ~ A GM dbg_view for Pollen that can be toggled with a config macro
-            ~ Can view and change all the properties of a particle type, emitter, or system
-            ~ Buttons to burst or stream particles
-            ~ Ability to save/copy data? (maybe turn it into the particle editor tool below)
-        ~ A particle editor tool that copies data as either gml or pollen-struct?                         
-        ~ Ability to use paths/curves to modify properties                                                  
-        ~ Custom emitters:                                                                             
-            ~ Utilize GPU for optimization and so shaders can be applied                
-            ~ Customize shape of emitter using stencils
-            ~ Emit particles along a path or using animation curves
-            ~ Displacement maps to effect particle properties
-            ~ Ability to cache emitter states for improved performance
-            ~ Apply collision & forces to particles for more in-game interactions
-            ~ Custom blendmodes for particles (metaball rendering for splatter fx)                                                          
-            ~ Custom particle properties (blend shapes so a star can morph into a square for example?)                                  
-            
-            
 */
 
 function Pollen() constructor {
@@ -199,7 +128,7 @@ function Pollen() constructor {
         Pollen.__typeMap[? _tag] = self; 
         
         
-        //--- GML TYPE ---//
+        //--- TAG & GML-DATA ---//
         __tag = _tag;
         __gmlData = _gml_type ?? part_type_create();
         
@@ -1892,9 +1821,13 @@ function Pollen() constructor {
                                     var _emName = _emNameList[_iEm];
                                     switch(_emName){
                                         case "type": 
+                                        case "tag":
                                             var _type = _props.type; 
                                             if(is_struct(_type) && ! is_instanceof(_type, Pollen.Type)){
-                                                var _tag = struct_get(_props.type, "tag") ?? struct_get(_props.type, "type"); 
+                                                var _tag = struct_get(_props.type, "tag") 
+                                                var _type = struct_get(_props.type, "type"); 
+                                                if(_tag != undefined && _type != undefined){Error("Can define 'tag' OR 'type' properties but not both when defining types inside of emitters!");}
+                                                _tag ??= _type;
                                                 if(_tag == undefined){Error("Type structs defined in emitterLists must have a 'type' or 'tag' property defined with a valid string!");}
                                                 _type = TypeTagGetData(_tag) ?? new Type(_tag); 
                                                 if(_type == undefined){Error($"Unable to get type data or create a new type for tag: '{_tag}'.");}
