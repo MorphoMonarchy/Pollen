@@ -1,4 +1,4 @@
-// 2025-10-06 15:05:25
+// 2025-10-31 12:09:42
 // Feather ignore all
 
 function __PollenBufferReadGML(_buffer, _offset, _size)
@@ -219,7 +219,7 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
                             }
                             else if (string_starts_with(token, "#") && string_length(token) == 7)
                             {
-                                var _hexValue = hex_string_to_number(token);
+                                var _hexValue = real("0x" + string_delete(token, 1, 1)); //<--- Easier way to convert string to hex value. Thanks to JuJuAdams for this suggestion!
                                 if(_hexValue == undefined){show_error("SNAP:\n\nLine " + string(line) + ", invalid hex value " + string(token) + "\n ", true);}
                                 token = _hexValue;
                             }
@@ -372,7 +372,7 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
                             }
                             else if (string_starts_with(token, "#") && string_length(token) == 7)
                             {
-                                var _hexValue = hex_string_to_number(token);
+                                var _hexValue = real("0x" + string_delete(token, 1, 1)); //<--- Easier way to convert string to hex value. Thanks to JuJuAdams for this suggestion!
                                 if(_hexValue == undefined){show_error("SNAP:\n\nLine " + string(line) + ", invalid hex value " + string(token) + "\n ", true);}
                                 token = _hexValue;
                             }
@@ -568,40 +568,6 @@ function ____PollenBufferReadGMLParser(_buffer, _buffer_size) constructor
         
         if (!variable_struct_exists(_constantStruct, _asset)) return -1;
         return _constantStruct[$ _asset];
-    }
-    
-    static hex_string_to_number = function(hex_string) 
-    {
-        var _hex_string = string_lower(string_lettersdigits(hex_string));
-        var _value = 0;
-        var _len = string_length(_hex_string); 
-        for (var i = 1; i <= _len; i++) 
-        {
-            var _char = string_char_at(_hex_string, i);
-            var _digit_val = 0;
-            switch (_char) 
-            {
-                case "0": _digit_val = 0; break;
-                case "1": _digit_val = 1; break;
-                case "2": _digit_val = 2; break;
-                case "3": _digit_val = 3; break;
-                case "4": _digit_val = 4; break;
-                case "5": _digit_val = 5; break;
-                case "6": _digit_val = 6; break;
-                case "7": _digit_val = 7; break;
-                case "8": _digit_val = 8; break;
-                case "9": _digit_val = 9; break;
-                case "a": _digit_val = 10; break;
-                case "b": _digit_val = 11; break;
-                case "c": _digit_val = 12; break;
-                case "d": _digit_val = 13; break;
-                case "e": _digit_val = 14; break;
-                case "f": _digit_val = 15; break;
-                default: return undefined; // Invalid hex character
-            } 
-            _value = _value * 16 + _digit_val;
-        }
-        return bgr_to_rgb(_value);
     }
 
     static bgr_to_rgb = function(_c) {
