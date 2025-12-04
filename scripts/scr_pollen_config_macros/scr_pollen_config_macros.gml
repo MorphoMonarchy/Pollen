@@ -14,6 +14,9 @@
 // Whether live/hot-reloading is enabled. Set this to 'false' when making a ship build of your project.
 #macro POLLEN_LIVE_EDIT true
 
+// Whether to enable debug tools for Pollen
+#macro POLLEN_ENABLE_DEBUG true
+
 
 // Whether Pollen should automatically import global.pollen_config_pfx after initialization
 #macro POLLEN_AUTO_IMPORT_CONFIG_PFX true

@@ -12,4 +12,7 @@ system.SetPosition(mouse_x, mouse_y);
 //         new Pollen.Type($"type_{__id}", part_type_create());
 //     }
 // }
-// if(keyboard_check_pressed(vk_delete)){Pollen.DestroyAll();}
+// if(keyboard_check_pressed(vk_delete)){
+    // __enable = !__enable;
+    // system.SetEnabled(__enable);
+// }

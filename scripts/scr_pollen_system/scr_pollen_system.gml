@@ -24,7 +24,8 @@
         ~ SYSTEMS ~
         ~ CREATE PARTICLES ~
         ~ IMPORT ~
-        ~ DEBUG/UTIL ~
+        ~ UTIL ~
+        ~ DEBUG ~
         
 */
 
@@ -156,7 +157,7 @@ function Pollen() constructor {
         ///@param {pt_shape} shape The pt_shape to set the type to
         ///@return {self}
         static SetShape = function(_shape){
-            __AssertReal(_shape, "SetShape", "_shape");
+            Pollen.__AssertReal(_shape, "SetShape", "_shape");
             __sprite.id = undefined;
             __shape = _shape;
             part_type_shape(__gmlData, _shape);
@@ -182,10 +183,10 @@ function Pollen() constructor {
         ///@return {self}
         static SetSprite = function(_sprite, _sub_img = 0, _animate = false, _stretch = false, _random_img = false){
             if(asset_get_type(_sprite) != asset_sprite){Pollen.Error($"Attempting to set sprite of type: {__tag} but '{_sprite}' is not a valid GM sprite!");};
-            __AssertReal(_sub_img, "SetSprite", "_sub_img");
-            __AssertBool(_animate, "SetSprite", "_animate");
-            __AssertBool(_stretch, "SetSprite", "_stretch");
-            __AssertBool(_random_img, "SetSprite", "_random_img");
+            Pollen.__AssertReal(_sub_img, "SetSprite", "_sub_img");
+            Pollen.__AssertBool(_animate, "SetSprite", "_animate");
+            Pollen.__AssertBool(_stretch, "SetSprite", "_stretch");
+            Pollen.__AssertBool(_random_img, "SetSprite", "_random_img");
             __shape = undefined;
             __sprite = {id: _sprite, subImg: _sub_img, animate: _animate, stretch: _stretch, randomImg: _random_img};
             part_type_sprite(__gmlData, _sprite, _animate, _stretch, _random_img);
@@ -214,10 +215,10 @@ function Pollen() constructor {
         static SetSize = function(_min = undefined, _max = undefined, _incr = undefined, _wiggle = undefined){
             if(__size != undefined){_min ??= __size.min; _max ??= __size.max; _incr ??= __size.incr; _wiggle ??= __size.wiggle;}
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
-            __AssertReal(_min, "SetSize", "_min");
-            __AssertReal(_max, "SetSize", "_max");
-            __AssertReal(_incr, "SetSize", "_incr");
-            __AssertReal(_wiggle, "SetSize", "_wiggle");
+            Pollen.__AssertReal(_min, "SetSize", "_min");
+            Pollen.__AssertReal(_max, "SetSize", "_max");
+            Pollen.__AssertReal(_incr, "SetSize", "_incr");
+            Pollen.__AssertReal(_wiggle, "SetSize", "_wiggle");
             __size = {min: _min, max: _max, incr: _incr, wiggle: _wiggle}
             __sizeX = undefined;
             __sizeY = undefined;
@@ -241,10 +242,10 @@ function Pollen() constructor {
             if(__sizeX != undefined){_min ??= __sizeX.min; _max ??= __sizeX.max; _incr ??= __sizeX.incr; _wiggle ??= __sizeX.wiggle;}
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
             __size = undefined;
-            __AssertReal(_min, "SetSizeX", "_min");
-            __AssertReal(_max, "SetSizeX", "_max");
-            __AssertReal(_incr, "SetSizeX", "_incr");
-            __AssertReal(_wiggle, "SetSizeX", "_wiggle");
+            Pollen.__AssertReal(_min, "SetSizeX", "_min");
+            Pollen.__AssertReal(_max, "SetSizeX", "_max");
+            Pollen.__AssertReal(_incr, "SetSizeX", "_incr");
+            Pollen.__AssertReal(_wiggle, "SetSizeX", "_wiggle");
             __sizeX = {min: _min, max: _max, incr: _incr, wiggle: _wiggle};
             part_type_size_offsetX(__gmlData, _min, _max, _incr, _wiggle);
             return self;
@@ -266,10 +267,10 @@ function Pollen() constructor {
             if(__sizeY != undefined){_min ??= __sizeY.min; _max ??= __sizeY.max; _incr ??= __sizeY.incr; _wiggle ??= __sizeY.wiggle;}
             else {_min ??= 0; _max ??= 0; _incr ??= 0; _wiggle ??= 0;}
             __size = undefined;
-            __AssertReal(_min, "SetSizeY", "_min");
-            __AssertReal(_max, "SetSizeY", "_max");
-            __AssertReal(_incr, "SetSizeY", "_incr");
-            __AssertReal(_wiggle, "SetSizeY", "_wiggle");
+            Pollen.__AssertReal(_min, "SetSizeY", "_min");
+            Pollen.__AssertReal(_max, "SetSizeY", "_max");
+            Pollen.__AssertReal(_incr, "SetSizeY", "_incr");
+            Pollen.__AssertReal(_wiggle, "SetSizeY", "_wiggle");
             __sizeY = {min: _min, max: _max, incr: _incr, wiggle: _wiggle};
             part_type_size_y(__gmlData, _min, _max, _incr, _wiggle);
             return self;
@@ -290,8 +291,8 @@ function Pollen() constructor {
         ///@param  {real} [y] The vertical scale factor
         ///@return {self}
         static SetScale = function(_x = __scale.x, _y = __scale.y){
-            __AssertReal(_x, "SetScale", "_x");
-            __AssertReal(_y, "SetScale", "_y");
+            Pollen.__AssertReal(_x, "SetScale", "_x");
+            Pollen.__AssertReal(_y, "SetScale", "_y");
             __scale = {x: _x, y: _y};
             part_type_scale(__gmlData, _x, _y);
             return self;
@@ -319,10 +320,10 @@ function Pollen() constructor {
             _incr   = __speed.incr,
             _wiggle = __speed.wiggle
         ){
-            __AssertReal(_min, "SetSpeed", "_min");
-            __AssertReal(_max, "SetSpeed", "_max");
-            __AssertReal(_incr, "SetSpeed", "_incr");
-            __AssertReal(_wiggle, "SetSpeed", "_wiggle");
+            Pollen.__AssertReal(_min, "SetSpeed", "_min");
+            Pollen.__AssertReal(_max, "SetSpeed", "_max");
+            Pollen.__AssertReal(_incr, "SetSpeed", "_incr");
+            Pollen.__AssertReal(_wiggle, "SetSpeed", "_wiggle");
             __speed = { min: _min, max: _max, incr: _incr, wiggle: _wiggle };
             part_type_speed(__gmlData, _min, _max, _incr, _wiggle);
             return self;
@@ -350,10 +351,10 @@ function Pollen() constructor {
             _incr   = __direction.incr,
             _wiggle = __direction.wiggle
         ){
-            __AssertReal(_min, "SetDirection", "_min");
-            __AssertReal(_max, "SetDirection", "_max");
-            __AssertReal(_incr, "SetDirection", "_incr");
-            __AssertReal(_wiggle, "SetDirection", "_wiggle");
+            Pollen.__AssertReal(_min, "SetDirection", "_min");
+            Pollen.__AssertReal(_max, "SetDirection", "_max");
+            Pollen.__AssertReal(_incr, "SetDirection", "_incr");
+            Pollen.__AssertReal(_wiggle, "SetDirection", "_wiggle");
             __direction = { min: _min, max: _max, incr: _incr, wiggle: _wiggle };
             part_type_direction(__gmlData, _min, _max, _incr, _wiggle);
             return self;
@@ -377,8 +378,8 @@ function Pollen() constructor {
             _amount    = __gravity.amount,
             _direction = __gravity.direction
         ){
-            __AssertReal(_amount, "SetGravity", "_amount");
-            __AssertReal(_direction, "SetGravity", "_direction");
+            Pollen.__AssertReal(_amount, "SetGravity", "_amount");
+            Pollen.__AssertReal(_direction, "SetGravity", "_direction");
             __gravity = { amount: _amount, direction: _direction };
             part_type_gravity(__gmlData, _amount, _direction);
             return self;
@@ -408,11 +409,11 @@ function Pollen() constructor {
             _wiggle   = __orientation.wiggle,
             _relative = __orientation.relative
         ){
-            __AssertReal(_min, "SetOrientation", "_min");
-            __AssertReal(_max, "SetOrientation", "_max");
-            __AssertReal(_incr, "SetOrientation", "_incr");
-            __AssertReal(_wiggle, "SetOrientation", "_wiggle");
-            __AssertBool(_relative, "SetOrientation", "_relative");
+            Pollen.__AssertReal(_min, "SetOrientation", "_min");
+            Pollen.__AssertReal(_max, "SetOrientation", "_max");
+            Pollen.__AssertReal(_incr, "SetOrientation", "_incr");
+            Pollen.__AssertReal(_wiggle, "SetOrientation", "_wiggle");
+            Pollen.__AssertBool(_relative, "SetOrientation", "_relative");
             __orientation = { min: _min, max: _max, incr: _incr, wiggle: _wiggle, relative: _relative };
             part_type_orientation(__gmlData, _min, _max, _incr, _wiggle, _relative);
             return self;
@@ -434,19 +435,19 @@ function Pollen() constructor {
         static SetColorMix = function(_colors_or_array){
             var _array = _colors_or_array;
             if(argument_count > 1){
-                __AssertReal(argument0, "SetColorMix", "argument0");
-                __AssertReal(argument1, "SetColorMix", "argument1");
+                Pollen.__AssertReal(argument0, "SetColorMix", "argument0");
+                Pollen.__AssertReal(argument1, "SetColorMix", "argument1");
                 _array = [argument0, argument1];
             }
             else {
-                __AssertArray(_array, "SetColorMix", "_colors_or_array");
+                Pollen.__AssertArray(_array, "SetColorMix", "_colors_or_array");
             }
             var _length = array_length(_array);
             if(_length < 2){
                 Pollen.Error($"PfxType.SetColorMix() expects at least 2 colors but received {_length}!");
             }
-            __AssertReal(_array[0], "SetColorMix", "_colors_or_array[0]");
-            __AssertReal(_array[1], "SetColorMix", "_colors_or_array[1]");
+            Pollen.__AssertReal(_array[0], "SetColorMix", "_colors_or_array[0]");
+            Pollen.__AssertReal(_array[1], "SetColorMix", "_colors_or_array[1]");
             __colorMix = _array;
             __colorRgb = undefined;
             __colorHsv = undefined;
@@ -474,12 +475,12 @@ function Pollen() constructor {
         ///@param  {real} bmax Maximum blue channel (0–255)
         ///@return {self}
         static SetColorRgb = function(_rmin, _rmax, _gmin, _gmax, _bmin, _bmax){
-            __AssertReal(_rmin, "SetColorRgb", "_rmin");
-            __AssertReal(_rmax, "SetColorRgb", "_rmax");
-            __AssertReal(_gmin, "SetColorRgb", "_gmin");
-            __AssertReal(_gmax, "SetColorRgb", "_gmax");
-            __AssertReal(_bmin, "SetColorRgb", "_bmin");
-            __AssertReal(_bmax, "SetColorRgb", "_bmax");
+            Pollen.__AssertReal(_rmin, "SetColorRgb", "_rmin");
+            Pollen.__AssertReal(_rmax, "SetColorRgb", "_rmax");
+            Pollen.__AssertReal(_gmin, "SetColorRgb", "_gmin");
+            Pollen.__AssertReal(_gmax, "SetColorRgb", "_gmax");
+            Pollen.__AssertReal(_bmin, "SetColorRgb", "_bmin");
+            Pollen.__AssertReal(_bmax, "SetColorRgb", "_bmax");
             __colorMix = undefined;
             __colorRgb = {rmin: _rmin, rmax: _rmax, gmin: _gmin, gmax: _gmax, bmin: _bmin, bmax: _bmax};
             __colorHsv = undefined;
@@ -507,12 +508,12 @@ function Pollen() constructor {
         ///@param  {real} vmax Maximum value/brightness (0–255)
         ///@return {self}
         static SetColorHsv = function(_hmin, _hmax, _smin, _smax, _vmin, _vmax){
-            __AssertReal(_hmin, "SetColorHsv", "_hmin");
-            __AssertReal(_hmax, "SetColorHsv", "_hmax");
-            __AssertReal(_smin, "SetColorHsv", "_smin");
-            __AssertReal(_smax, "SetColorHsv", "_smax");
-            __AssertReal(_vmin, "SetColorHsv", "_vmin");
-            __AssertReal(_vmax, "SetColorHsv", "_vmax");
+            Pollen.__AssertReal(_hmin, "SetColorHsv", "_hmin");
+            Pollen.__AssertReal(_hmax, "SetColorHsv", "_hmax");
+            Pollen.__AssertReal(_smin, "SetColorHsv", "_smin");
+            Pollen.__AssertReal(_smax, "SetColorHsv", "_smax");
+            Pollen.__AssertReal(_vmin, "SetColorHsv", "_vmin");
+            Pollen.__AssertReal(_vmax, "SetColorHsv", "_vmax");
             __colorMix = undefined;
             __colorRgb = undefined;
             __colorHsv = {hmin: _hmin, hmax: _hmax, smin: _smin, smax: _smax, vmin: _vmin, vmax: _vmax};
@@ -536,7 +537,7 @@ function Pollen() constructor {
         ///@return {self}
         static SetColor = function(_color_or_array){
             if(!is_array(_color_or_array)){
-                __AssertReal(_color_or_array, "SetColor", "_color_or_array");
+                Pollen.__AssertReal(_color_or_array, "SetColor", "_color_or_array");
                 __color = _color_or_array;
                 part_type_color1(__gmlData, _color_or_array);
                 __colorMix = undefined;
@@ -544,7 +545,7 @@ function Pollen() constructor {
                 __colorHsv = undefined;
                 return self;
             }
-            __AssertArrayOfReals(_color_or_array, "SetColor", "_color_or_array");
+            Pollen.__AssertArrayOfReals(_color_or_array, "SetColor", "_color_or_array");
             var _numColors = array_length(_color_or_array);
             if(_numColors == 0){
                 Pollen.Warn($"Attempting to set color of type: '{__tag}' using an empty array! Bailing!");
@@ -588,12 +589,12 @@ function Pollen() constructor {
         ///@return {self}
         static SetAlpha = function(_alpha_or_array){
             if(!is_array(_alpha_or_array)){
-                __AssertReal(_alpha_or_array, "SetAlpha", "_alpha_or_array");
+                Pollen.__AssertReal(_alpha_or_array, "SetAlpha", "_alpha_or_array");
                 __alpha = _alpha_or_array;
                 part_type_alpha1(__gmlData, _alpha_or_array);
                 return self;
             }
-            __AssertArrayOfReals(_alpha_or_array, "SetAlpha", "_alpha_or_array");
+            Pollen.__AssertArrayOfReals(_alpha_or_array, "SetAlpha", "_alpha_or_array");
             var _numalphas = array_length(_alpha_or_array);
             if(_numalphas == 0){
                 Pollen.Warn($"Attempting to set alpha of type: '{__tag}' using an empty array! Bailing!");
@@ -633,7 +634,7 @@ function Pollen() constructor {
         ///@param  {bool} enable True to enable additive blending, false for normal blending
         ///@return {self}
         static SetBlend = function(_enable){
-            __AssertBool(_enable, "SetBlend", "_enable");
+            Pollen.__AssertBool(_enable, "SetBlend", "_enable");
             __blend = _enable;
             part_type_blend(__gmlData, _enable);
             return self;
@@ -654,8 +655,8 @@ function Pollen() constructor {
         ///@param  {real} [max] The maximum lifetime (steps)
         ///@return {self}
         static SetLife = function(_min = __life.min, _max = __life.max){
-            __AssertReal(_min, "SetLife", "_min");
-            __AssertReal(_max, "SetLife", "_max");
+            Pollen.__AssertReal(_min, "SetLife", "_min");
+            Pollen.__AssertReal(_max, "SetLife", "_max");
             __life = { min: _min, max: _max };
             part_type_life(__gmlData, _min, _max);
             return self;
@@ -676,7 +677,7 @@ function Pollen() constructor {
         ///@param  {struct|string|undefined} [type] The sub-particle type (Pollen.Type instance, tag, or undefined)
         ///@return {self}
         static SetStep = function(_number = __step.number, _type = __step.type){
-            __AssertReal(_number, "SetStep", "_number");
+            Pollen.__AssertReal(_number, "SetStep", "_number");
             if((_type != undefined) && !is_struct(_type) && !is_string(_type)){
                 Pollen.Error($"PfxType.SetStep() expects argument '_type' to be a struct, string, or undefined but received {typeof(_type)}!");
             }
@@ -705,7 +706,7 @@ function Pollen() constructor {
         ///@param  {struct|string|undefined} [type] The sub-particle type (Pollen.Type instance, tag, or undefined)
         ///@return {self}
         static SetDeath = function(_number = __death.number, _type = __death.type){
-            __AssertReal(_number, "SetDeath", "_number");
+            Pollen.__AssertReal(_number, "SetDeath", "_number");
             if((_type != undefined) && !is_struct(_type) && !is_string(_type)){
                 Pollen.Error($"PfxType.SetDeath() expects argument '_type' to be a struct, string, or undefined but received {typeof(_type)}!");
             }
@@ -854,36 +855,6 @@ function Pollen() constructor {
             }
         }
         
-        //--- DEBUG ---//
-        
-        //No need for JSDOC functions since these are not meant to be called by users
-        static __AssertBool = function(_value, _method, _arg){
-            if(!is_bool(_value)){
-                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
-            }
-        };
-        static __AssertReal = function(_value, _method, _arg){
-            if(!is_real(_value) && !is_int64(_value)){
-                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a real number but received {typeof(_value)}!");
-            }
-        };
-        static __AssertArray = function(_value, _method, _arg){
-            if(!is_array(_value)){
-                Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be an array but received {typeof(_value)}!");
-            }
-        };
-        static __AssertArrayOfReals = function(_value, _method, _arg){
-            __AssertArray(_value, _method, _arg);
-            var _length = array_length(_value);
-            var _i = -1;
-            repeat(_length){
-                _i++;
-                if(!is_real(_value[_i]) && !is_int64(_value[_i])){
-                    Pollen.Error($"PfxType.{_method}() expects all entries of '{_arg}' to be real numbers but received {typeof(_value[_i])} at index {_i}!");
-                }
-            }
-        };
-        
     }
     
     //--- TYPE CONTROL ---/
@@ -896,7 +867,7 @@ function Pollen() constructor {
     
     ///@func    TypeDestroy(type)
     ///@desc    Destroys a Pollen.Type and clears all of its data (including the GM part_type it holds)
-    ///@param   {Pollen.Type} The Pollen.Type data that you want to destroy
+    ///@param   {Pollen.Type} type The Pollen.Type data that you want to destroy
     ///@return  {undefined}
     static TypeDestroy = function(_type){
         if(!is_instanceof(_type, Type)){Error("Cannot destroy type that is not a valid Pollen.Type struct!");}
@@ -921,8 +892,17 @@ function Pollen() constructor {
         }
         ds_map_destroy(__typeMap); //<---Gamemaker does not automatically reallocate an empty map, therefore it's best to destroy the map and make a new one so there isn't a bunch of empty data floating around
         __typeMap = ds_map_create();
+        __defaultType = new Pollen.Type("__pollen_type_default");
     }
 
+    ///@func    TypeReset(type)
+    ///@desc    Resets all the underlying data of a part type to default settings similar to GM's 'part_type_clear' function. Does not clear the visual representation of particles!
+    ///@param   {Pollen.Type} type The Pollen.Type data that you want to reset
+    ///@return  {undefined}
+    static TypeReset = function(_type){
+        part_type_clear(_type.GetGmlData());
+        _type.Copy(__defaultType);
+    }
 
 #endregion 
 //======================================================================================================================
@@ -967,8 +947,9 @@ function Pollen() constructor {
         ///@param  {bool} enabled True to enable, false to disable
         ///@return {self}
         static SetEnabled = function(_enabled){
-            __AssertBool(_enabled, "SetEnabled", "_enabled");
+            Pollen.__AssertBool(_enabled, "SetEnabled", "_enabled");
             __enabled = _enabled;
+            part_emitter_enable(__system.GetGmlData(), __gmlData, _enabled);
             return self;
         }
 
@@ -990,7 +971,7 @@ function Pollen() constructor {
         ///@param  {real} number The number of particles
         ///@return {self}
         static SetNumber = function(_number){
-            __AssertReal(_number, "SetNumber", "_number");
+            Pollen.__AssertReal(_number, "SetNumber", "_number");
             __number = _number;
             __system.RefreshStream();
             return self;
@@ -1001,7 +982,7 @@ function Pollen() constructor {
         ///@param  {ps_shape} shape The emitter shape constant
         ///@return {self}
         static SetShape = function(_shape){
-            __AssertReal(_shape, "SetShape", "_shape");
+            Pollen.__AssertReal(_shape, "SetShape", "_shape");
             __shape = _shape;
             __system.RefreshStream();
             return self;
@@ -1012,7 +993,7 @@ function Pollen() constructor {
         ///@param  {ps_distr} distr The distribution constant
         ///@return {self}
         static SetDistr = function(_distr){
-            __AssertReal(_distr, "SetDistr", "_distr");
+            Pollen.__AssertReal(_distr, "SetDistr", "_distr");
             __distr = _distr;
             __system.RefreshStream();
             return self;
@@ -1024,7 +1005,7 @@ function Pollen() constructor {
         ///@param  {bool} enabled True for relative, false for absolute
         ///@return {self}
         static SetRelative = function(_enabled){
-            __AssertBool(_enabled, "SetRelative", "_enabled");
+            Pollen.__AssertBool(_enabled, "SetRelative", "_enabled");
             __relative = _enabled;
             part_emitter_relative(__system.GetGmlData(), __gmlData, _enabled);
             __system.RefreshStream();
@@ -1036,7 +1017,7 @@ function Pollen() constructor {
         ///@param  {struct} delay A struct containing the following properties {min, max, unit}
         ///@return {self}
         static SetDelay = function(_delay){
-            __AssertRangeStruct(_delay, "SetDelay", "_delay");
+            Pollen.__AssertRangeStruct(_delay, "SetDelay", "_delay");
             __delay = _delay;
             part_emitter_delay(__system.GetGmlData(), __gmlData, _delay.min, _delay.max, _delay.unit);
             __system.RefreshStream();
@@ -1048,7 +1029,7 @@ function Pollen() constructor {
         ///@param  {struct} interval A struct containing the following properties {min, max, unit}
         ///@return {self}
         static SetInterval = function(_interval){
-            __AssertRangeStruct(_interval, "SetInterval", "_interval");
+            Pollen.__AssertRangeStruct(_interval, "SetInterval", "_interval");
             __interval = _interval;
             part_emitter_interval(__system.GetGmlData(), __gmlData, _interval.min, _interval.max, _interval.unit);
             __system.RefreshStream();
@@ -1061,8 +1042,8 @@ function Pollen() constructor {
         ///@param  {real} height The emitter height
         ///@return {self}
         static SetSize = function(_width, _height){
-            __AssertReal(_width, "SetSize", "_width");
-            __AssertReal(_height, "SetSize", "_height");
+            Pollen.__AssertReal(_width, "SetSize", "_width");
+            Pollen.__AssertReal(_height, "SetSize", "_height");
             __width = _width;
             __height = _height;
             __system.RefreshStream();
@@ -1074,7 +1055,7 @@ function Pollen() constructor {
         ///@param  {real} width The emitter width
         ///@return {self}
         static SetWidth = function(_width){
-            __AssertReal(_width, "SetWidth", "_width");
+            Pollen.__AssertReal(_width, "SetWidth", "_width");
             SetSize(_width, __height);
             return self;
         }
@@ -1084,7 +1065,7 @@ function Pollen() constructor {
         ///@param  {real} height The emitter height
         ///@return {self}
         static SetHeight = function(_height){
-            __AssertReal(_height, "SetHeight", "_height");
+            Pollen.__AssertReal(_height, "SetHeight", "_height");
             SetSize(__width, _height);
             return self;
         }
@@ -1095,8 +1076,8 @@ function Pollen() constructor {
         ///@param  {real} offsetY Vertical offset
         ///@return {self}
         static SetOffset = function(_offsetX, _offsetY){
-            __AssertReal(_offsetX, "SetOffset", "_offsetX");
-            __AssertReal(_offsetY, "SetOffset", "_offsetY");
+            Pollen.__AssertReal(_offsetX, "SetOffset", "_offsetX");
+            Pollen.__AssertReal(_offsetY, "SetOffset", "_offsetY");
             __offsetX = _offsetX;
             __offsetY = _offsetY;
             __system.RefreshStream();
@@ -1108,7 +1089,7 @@ function Pollen() constructor {
         ///@param  {real} offsetX Horizontal offset
         ///@return {self}
         static SetOffsetX = function(_offsetX){
-            __AssertReal(_offsetX, "SetOffsetX", "_offsetX");
+            Pollen.__AssertReal(_offsetX, "SetOffsetX", "_offsetX");
             SetOffset(_offsetX, __offsetY);
             return self;
         }
@@ -1118,7 +1099,7 @@ function Pollen() constructor {
         ///@param  {real} offsetY Vertical offset
         ///@return {self}
         static SetOffsetY = function(_offsetY){
-            __AssertReal(_offsetY, "SetOffsetY", "_offsetY");
+            Pollen.__AssertReal(_offsetY, "SetOffsetY", "_offsetY");
             SetOffset(__offsetX, _offsetY);
             return self;
         }
@@ -1211,33 +1192,22 @@ function Pollen() constructor {
         ///@return {real}
         static GetOffsetY = function(){return __offsetY;}
         
-        
-        //--- DEBUG ---//
-        
-        //NOTE: No need for JSDOC since users shouldn't use these functions
-        static __AssertBool = function(_value, _method, _arg){
-            if(!is_bool(_value)){
-                Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
-            }
-        }
-        static __AssertReal = function(_value, _method, _arg){
-            if(!is_real(_value)){
-                Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a real number but received {typeof(_value)}!");
-            }
-        }
-        static __AssertRangeStruct = function(_value, _method, _arg){
-            if(!is_struct(_value)){
-                Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a struct but received {typeof(_value)}!");
-            }
-            if(!struct_exists(_value, "min") || !is_real(_value.min)){
-                Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.min' to be a real number!");
-            }
-            if(!struct_exists(_value, "max") || !is_real(_value.max)){
-                Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.max' to be a real number!");
-            }
-            if(!struct_exists(_value, "unit") || !is_real(_value.unit)){
-                Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.unit' to be a real number!");
-            }
+        //--- UTIL ---//
+        ///@method Copy(target)
+        ///@desc   Copies configuration from another Pollen.Emitter into this emitter
+        ///@param  {Pollen.Emitter} target The source emitter to copy from
+        ///@return {undefined}
+        static Copy = function(_target){
+            SetEnabled(_target.GetEnabled());
+            SetType(_target.GetType());
+            SetNumber(_target.GetNumber());
+            SetShape(_target.GetShape());
+            SetDistr(_target.GetDistr());
+            SetRelative(_target.GetRelative());
+            SetDelay(_target.GetDelay());
+            SetInterval(_target.GetInterval());
+            SetSize(_target.GetWidth(), _target.GetHeight());
+            SetOffset(_target.GetOffsetX(), _target.GetOffsetY());
         }
     }
     
@@ -1252,8 +1222,16 @@ function Pollen() constructor {
         delete _emitter;
         Log($"Destroyed emitter from {_system.GetTag()}");
     }
+    
+    ///@func    EmitterReset(emitter)
+    ///@desc    Resets the underlying data of a particle emitter similar to GM's 'part_emitter_clear' function. NOTE: if an emitter is streaming particles, it will stop and have to be restarted using Pollen.Stream
+    ///@param   {Pollen.Emitter} system The Pollen.System data that you want to reset
+    ///@return  {undefined}
+    static EmitterReset = function(_emitter){
+        part_emitter_clear(_emitter.__system.GetGmlData(), _emitter.GetGmlData());
+        _emitter.Copy(__defaultEmitter);
+    }
    
-  
 #endregion 
 //======================================================================================================================
 #region ~ SYSTEMS ~
@@ -1287,6 +1265,7 @@ function Pollen() constructor {
         //--- SETUP PROPERTIES ---//
         __tag = _tag;
         __gmlData = _gml_system ?? part_system_create();
+        __enabled = true;
         __template = undefined;
         __position = {x: 0, y: 0}
         __globalSpace = false;
@@ -1302,6 +1281,24 @@ function Pollen() constructor {
         
         
         //--- SETTERS ---//
+        ///@method SetEnabled(enabled)
+        ///@desc   Enables/disables all the system's emitters
+        ///@param  {bool} enabled True to enable, false to disable
+        ///@return {self}
+        static SetEnabled = function(_enabled){
+            Pollen.__AssertBool(_enabled, "SetEnabled", "_enabled");
+            __enabled = _enabled;
+            var _numEmitters = array_length(__emitterList);
+            var _i = -1;
+            repeat(_numEmitters){
+                _i++;
+                var _emitter = __emitterList[_i];
+                _emitter.SetEnabled(_enabled);
+            }
+            return self;
+        }
+        
+        
         ///@method  SetTemplate(template, [copy_on_set])
         ///@desc    Sets the template that the system will default to
         ///@param   {string|Pollen.System|undefined} template The tag or Pollen.Instance to set the template as, or set as 'undefined' clear the template
@@ -1570,6 +1567,7 @@ function Pollen() constructor {
     ///@param   {Pollen.System} system The system to clear the emitters from
     ///@returns {undefined}
     static EmitterListDestroyAll = function(_system){
+        if(!is_instanceof(_system, System)){Error("Cannot destroy system that is not a valid Pollen.System struct!");}
         var _numEmitters = array_length(_system.__emitterList);
         var _i = -1;
         repeat(_numEmitters){
@@ -1609,6 +1607,27 @@ function Pollen() constructor {
         }
         ds_map_destroy(__systemMap); //<---Gamemaker does not automatically reallocate an empty map, therefore it's best to destroy the map and make a new one so there isn't a bunch of empty data floating around
         __systemMap = ds_map_create();
+        __defaultSystem = new Pollen.System("__pollen_system_default");
+    }
+    
+    ///@func    SystemClear(system)
+    ///@desc    Clears the visual representation of a particle system without resetting it's underlying data similar to GM's 'part_particle_clear' function. NOTE: streaming particles will only be cleared for 1 frame and will resume streaming afterwards!
+    ///@param   {Pollen.System} system The Pollen.System data that you want to reset
+    ///@return  {undefined}
+    static SystemClear = function(_system){
+        if(!is_instanceof(_system, System)){Error("Cannot destroy system that is not a valid Pollen.System struct!");}
+        part_particles_clear(_system.GetGmlData());
+    }
+    
+    ///@func    SystemReset(system)
+    ///@desc    Clears the visual representation of a particle system AND resets it's underlying data similar to GM's 'part_system_clear' function. NOTE: this will destroy all the system's emitters as well so any references to them will result in a crash!
+    ///@param   {Pollen.System} system The Pollen.System data that you want to reset
+    ///@return  {undefined}
+    static SystemReset = function(_system){
+        if(!is_instanceof(_system, System)){Error("Cannot destroy system that is not a valid Pollen.System struct!");}
+        EmitterListDestroyAll(_system); //<---preemptively destroy emitters so Pollen data is set properly before calling part_system_clear
+        part_system_clear(_system.GetGmlData());
+        _system.Copy(__defaultSystem); //<---Set pollen data back to default to reflect gml data
     }
     
 
@@ -2073,6 +2092,8 @@ function Pollen() constructor {
             }
         }
         
+        //Initialize or init debug after import so Pollen data is up to date
+        if(POLLEN_ENABLE_DEBUG){Pollen.DebugInit();}
     }
     
     ///@func    ConvertGmlPartAssetToPollenStruct(asset, pollen_system, [ignore_emitter_list])
@@ -2097,7 +2118,7 @@ function Pollen() constructor {
             .SetPosition(_originX, _originY)
             .SetGlobalSpace(_globalSpace)
             .SetDrawOrder(_drawOrder);
-        
+        if(POLLEN_ENABLE_DEBUG){Pollen.DebugInit();}
         //--- EMITTERS ---//
         var _typeList = [];
         var _emitterList = [];
@@ -2279,30 +2300,137 @@ function Pollen() constructor {
 
 #endregion    
 //======================================================================================================================
-#region ~ DEBUG/UTIL ~
+#region ~ UTIL ~
 //======================================================================================================================
     
-    /// @title      Misc
+    /// @title      Util
     /// @category   API
     /// @text       Additional util methods.
     
     ///@func    DestroyAll()
     ///@desc    Destroys all Pollen Types, Emitters, & Systems and clears all their data.
     ///@return  {undefined}
-    static DestroyAll = function(){TypeDestroyAll(); SystemDestroyAll();}
+    static DestroyAll = function(){
+        TypeDestroyAll(); 
+        SystemDestroyAll();
+        __defaultType = new Pollen.Type("__pollen_type_default");
+        __defaultSystem = new Pollen.System("__pollen_system_default");
+    }
+    
+    //No need for JSDOC functions since these are generallty not meant to be called by users
     
     static Log = function(_message){if(POLLEN_LOG_LEVEL < 2){return;} show_debug_message("Pollen -> " + _message);}
     static Warn = function(_message){if(POLLEN_LOG_LEVEL < 1){return;} show_debug_message("Pollen -> Warning! " + _message);}
     static Error = function(_message){show_error("Pollen -> Error! " + _message, true);}
+
+    static __AssertBool = function(_value, _method, _arg){
+        if(!is_bool(_value)){
+            Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a bool but received {typeof(_value)}!");
+        }
+    };
+    static __AssertReal = function(_value, _method, _arg){
+        if(!is_real(_value) && !is_int64(_value)){
+            Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be a real number but received {typeof(_value)}!");
+        }
+    };
+    static __AssertArray = function(_value, _method, _arg){
+        if(!is_array(_value)){
+            Pollen.Error($"PfxType.{_method}() expects argument '{_arg}' to be an array but received {typeof(_value)}!");
+        }
+    };
+    static __AssertArrayOfReals = function(_value, _method, _arg){
+        __AssertArray(_value, _method, _arg);
+        var _length = array_length(_value);
+        var _i = -1;
+        repeat(_length){
+            _i++;
+            if(!is_real(_value[_i]) && !is_int64(_value[_i])){
+                Pollen.Error($"PfxType.{_method}() expects all entries of '{_arg}' to be real numbers but received {typeof(_value[_i])} at index {_i}!");
+            }
+        }
+    };
+    static __AssertRangeStruct = function(_value, _method, _arg){
+        if(!is_struct(_value)){
+            Pollen.Error($"PfxEmitter.{_method}() expects argument '{_arg}' to be a struct but received {typeof(_value)}!");
+        }
+        if(!struct_exists(_value, "min") || !is_real(_value.min)){
+            Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.min' to be a real number!");
+        }
+        if(!struct_exists(_value, "max") || !is_real(_value.max)){
+            Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.max' to be a real number!");
+        }
+        if(!struct_exists(_value, "unit") || !is_real(_value.unit)){
+            Pollen.Error($"PfxEmitter.{_method}() expects '{_arg}.unit' to be a real number!");
+        }
+    }
     
+ 
+#endregion    
+//======================================================================================================================
+#region ~ DEBUG ~
+//======================================================================================================================
+  
+    /// @title      Debug
+    /// @category   API
+    /// @text       Setup debug tools.
+    
+    static __dbgData = {
+        view: undefined,
+        selectedSystem: undefined,
+        showGmlData: false,
+        systemDataString: "",
+    }
+    
+    static DebugInit = function(){
+        
+        //View
+        dbg_view_delete(__dbgData.view);
+        __dbgData.view = dbg_view("Pollen", true);
+        
+        dbg_section("Options");
+        
+        //System selector
+        __dbgData.selectedSystem ??= "__pollen_system_default";
+        var _systemTagList = ds_map_keys_to_array(__systemMap);
+        array_sort(_systemTagList, true);
+        var _selectorRef = ref_create(__dbgData, "selectedSystem");
+        dbg_drop_down(_selectorRef, _systemTagList, "System:");
+        
+        //Show Gml Toggle
+        var _toggleRef = ref_create(__dbgData, "showGmlData");
+        dbg_checkbox(_toggleRef, "Show Gml Data:");
+        
+        dbg_section("Data");
+        
+        //Show data (can expand this later to allow more useful debug tools)
+        DebugUpdateDisplayData();
+        var _dataRef = ref_create(__dbgData, "systemDataString");
+        dbg_text(_dataRef);
+    }
+  
+    static DebugUpdateDisplayData = function(){
+        var _data = SystemTagGetData(__dbgData.selectedSystem);
+        var _names = struct_get_names(_data);
+        var _numNames = array_length(_names);
+        var _iName = -1;
+        repeat(_numNames){
+            _iName++;
+            var _name = _names[_iName];
+            var _value = struct_get(_data, _name);
+            _name = string_delete(_name, 1, 2); //<---Remove '__' prefix from struct members
+            var _string = $"{_name}: {_value}\n";
+            __dbgData.systemDataString += _string;
+        }
+    }
     
 #endregion    
 //======================================================================================================================
 #region ~ SETUP ~
 //======================================================================================================================
 
-    static __defaultType = new Pollen.Type("__pollen_type_default");
-    static __defaultSystem = new Pollen.System("__pollen_system_default");
+    static __defaultType = new Type("__pollen_type_default");
+    static __defaultSystem = new System("__pollen_system_default");
+    static __defaultEmitter = new Emitter(__defaultSystem);
 
 } //<---DON'T DELETE THIS!!!
 
