@@ -93,10 +93,10 @@ global.pollen_config_pfx = [
         drawOrder: false,
         // angle: 45, //<--- Uncomment this to rotate the particle system
         // color: c_purple, //<--- Uncomment this to adjust global color blend for the particle system
-        // alpha: 1,
+        // alpha: 0.5, //<--- Uncomment this to adjust global alpha for the particle system
         emitterList : [
             {
-                type: "type_example_full", //<---set this to 'type_example_template' to see how templates work with part types
+                type: "type_example_template", //<---set this to 'type_example_template' to see how templates work with part types
                 width: 64,
                 height: 64,
                 number: 10,

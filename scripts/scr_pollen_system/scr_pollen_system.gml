@@ -14,9 +14,9 @@
 
 /*                                                                                                          
 
-    READ THE DOCS!!! -> https://morphomonarchy.github.io/Pollen/#/
+    - READ THE DOCS! -> https://morphomonarchy.github.io/Pollen/#/
   
-    INDEX (use ctrl+f to jump to section or search for #region):
+    - INDEX: (use ctrl+f to jump to section or search for #region):
     
         ~ UPDATE ~
         ~ TYPES ~
@@ -26,6 +26,18 @@
         ~ IMPORT ~
         ~ UTIL ~
         ~ DEBUG ~
+        
+    - CHANGELOG:
+    
+        ~ v1.1.0 ~
+        
+            Features:
+            - Added reset/clear methods that wrap GM's part_x_clear functions
+            - Added optional debug view to watch and edit part variables
+            
+            Bug fixes:
+            - Optimized hex conversion in pollen importer thanks to JuJuAdams
+            - Fixed "alpha" property updating the part system's depth instead of alpha when using pollen_config_pfx
         
 */
 
@@ -50,6 +62,8 @@ function Pollen() constructor {
     
     time_source_start(time_source_create(time_source_global, 1, time_source_units_frames, function()
     {
+        
+        if(POLLEN_ENABLE_DEBUG){DebugUpdate();}
         
         if (POLLEN_LIVE_EDIT && ((os_type == os_windows) || (os_type == os_macosx) || (os_type == os_linux))){
             Pollen.__bootSetupTimer--;
@@ -1799,7 +1813,7 @@ function Pollen() constructor {
                         case "globalSpace": var _globalSpace = _struct.globalSpace; _tagData.SetGlobalSpace(_globalSpace); break;
                         case "drawOrder": var _drawOrder = _struct.drawOrder; _tagData.SetDrawOrder(_drawOrder); break;
                         case "color": var _color = _struct.color; _tagData.SetColor(_color); break;
-                        case "alpha": var _alpha = _struct.alpha; _tagData.SetDepth(_alpha); break;
+                        case "alpha": var _alpha = _struct.alpha; _tagData.SetAlpha(_alpha); break;
                         case "emitterList":
                             var _emitterList = _struct.emitterList;
                             var _numOldList = array_length(_tagData.GetEmitterList());
@@ -1883,6 +1897,9 @@ function Pollen() constructor {
                 Error($"Struct at global.pollen_config_pfx[{_i}] could not be parsed. Struct should contain one of the following properties: {__expectedList}");
             }
         }
+        
+        //Make sure data in debug view is up to date
+        if(POLLEN_ENABLE_DEBUG){Pollen.DebugViewRefresh();}
     }
     
     ///@func    ImportType(import_data, type_data)
@@ -2091,9 +2108,6 @@ function Pollen() constructor {
                 default: Log($"Part type property: {_name} is not supported!");
             }
         }
-        
-        //Initialize or init debug after import so Pollen data is up to date
-        if(POLLEN_ENABLE_DEBUG){Pollen.DebugInit();}
     }
     
     ///@func    ConvertGmlPartAssetToPollenStruct(asset, pollen_system, [ignore_emitter_list])
@@ -2118,7 +2132,8 @@ function Pollen() constructor {
             .SetPosition(_originX, _originY)
             .SetGlobalSpace(_globalSpace)
             .SetDrawOrder(_drawOrder);
-        if(POLLEN_ENABLE_DEBUG){Pollen.DebugInit();}
+        if(POLLEN_ENABLE_DEBUG){Pollen.DebugViewRefresh();}
+        
         //--- EMITTERS ---//
         var _typeList = [];
         var _emitterList = [];
@@ -2377,49 +2392,129 @@ function Pollen() constructor {
     static __dbgData = {
         view: undefined,
         selectedSystem: undefined,
+        selectedSystemLast: undefined,
         showGmlData: false,
-        systemDataString: "",
+        sectionOpt: undefined,
+        sectionSys: undefined,
+        sectionEmit: undefined,
+        sectionType: undefined,
+        typeDataString: "",
     }
     
-    static DebugInit = function(){
+    static __DebugInit = function(){
         
         //View
         dbg_view_delete(__dbgData.view);
         __dbgData.view = dbg_view("Pollen", true);
         
-        dbg_section("Options");
+        //Show data (can expand this later to allow more useful debug tools)
+        DebugViewRefresh();
+    }
+    
+    static DebugUpdate = function(){
+        if(__dbgData.selectedSystem != __dbgData.selectedSystemLast){
+            DebugViewRefresh();
+            __dbgData.selectedSystemLast = __dbgData.selectedSystem;
+        }
+    }
+    
+    static DebugViewRefresh = function(){
+        dbg_section_delete(__dbgData.sectionOpt);
+        dbg_section_delete(__dbgData.sectionSys);
+        dbg_section_delete(__dbgData.sectionEmit);
+        dbg_section_delete(__dbgData.sectionType);
+        
+        __dbgData.sectionOpt = dbg_section("Options");
         
         //System selector
         __dbgData.selectedSystem ??= "__pollen_system_default";
+        __dbgData.selectedSystemLast ??= "__pollen_system_default";
         var _systemTagList = ds_map_keys_to_array(__systemMap);
         array_sort(_systemTagList, true);
-        var _selectorRef = ref_create(__dbgData, "selectedSystem");
-        dbg_drop_down(_selectorRef, _systemTagList, "System:");
+        dbg_drop_down(ref_create(__dbgData, "selectedSystem"), _systemTagList, "System:");
         
         //Show Gml Toggle
-        var _toggleRef = ref_create(__dbgData, "showGmlData");
-        dbg_checkbox(_toggleRef, "Show Gml Data:");
+        dbg_checkbox(ref_create(__dbgData, "showGmlData"), "Show Gml Data:");
         
-        dbg_section("Data");
+        dbg_text("\n");
         
-        //Show data (can expand this later to allow more useful debug tools)
-        DebugUpdateDisplayData();
-        var _dataRef = ref_create(__dbgData, "systemDataString");
-        dbg_text(_dataRef);
+        DebugRefreshSystemData();
     }
   
-    static DebugUpdateDisplayData = function(){
+    static DebugRefreshSystemData = function(){
+        
+        __dbgData.sectionSys = dbg_section("System");
+        
         var _data = SystemTagGetData(__dbgData.selectedSystem);
         var _names = struct_get_names(_data);
+        array_sort(_names, true);
         var _numNames = array_length(_names);
         var _iName = -1;
         repeat(_numNames){
             _iName++;
             var _name = _names[_iName];
-            var _value = struct_get(_data, _name);
-            _name = string_delete(_name, 1, 2); //<---Remove '__' prefix from struct members
-            var _string = $"{_name}: {_value}\n";
-            __dbgData.systemDataString += _string;
+            if(_name == "__emitterList"){continue;}
+            var _cleanName = string_delete(_name, 1, 2); //<---Remove '__' prefix from struct members
+            dbg_watch(ref_create(_data, _name), _cleanName);
+        }
+        dbg_text("\n"); //<---Space at end makes things look cleaner
+        
+        if(array_length(_data.__emitterList) != 0){
+            __dbgData.sectionEmit = dbg_section("Emitters");
+            __DebugRefreshEmitterData(_data.__emitterList); 
+        }
+    }
+    
+    static __DebugRefreshEmitterData = function(_emitter_list){
+        var _numEmitters = array_length(_emitter_list);
+        var _iEmitter = -1;
+        repeat(_numEmitters){
+            _iEmitter++;
+            var _data = _emitter_list[_iEmitter];
+            var _names = struct_get_names(_data);
+            array_sort(_names, true);
+            var _numNames = array_length(_names);
+            var _iName = -1;
+            
+            dbg_text_separator($"~ Emitter {_iEmitter} ~");
+            repeat(_numNames){
+                _iName++;
+                var _name = _names[_iName];
+                if(_name == "__system"){continue;}
+                if(_name == "__type"){continue;}
+                var _cleanName = string_delete(_name, 1, 2); //<---Remove '__' prefix from struct members
+                dbg_watch(ref_create(_data, _name), _cleanName);
+            }
+        dbg_text("\n"); //<---Space at end makes things look cleaner
+        }
+        
+        if(_numEmitters != 0){
+            __dbgData.sectionType = dbg_section("Types");
+            __DebugRefreshTypeData(_emitter_list);
+        }
+    }
+    
+    static __DebugRefreshTypeData = function(_emitter_list){
+        var _numEmitters = array_length(_emitter_list);
+        var _iEmitter = -1;
+        repeat(_numEmitters){
+            _iEmitter++;
+            var _data = _emitter_list[_iEmitter].__type;
+            if(_data == undefined){continue;}
+            var _names = struct_get_names(_data);
+            array_sort(_names, true);
+            var _numNames = array_length(_names);
+            var _iName = -1;
+            
+            dbg_text_separator($"~ {_data.__tag} ~");
+            repeat(_numNames){
+                _iName++;
+                var _name = _names[_iName];
+                if(_name == "__tag"){continue;}
+                var _cleanName = string_delete(_name, 1, 2); //<---Remove '__' prefix from struct members
+                dbg_watch(ref_create(_data, _name), _cleanName);
+            }
+        dbg_text("\n"); //<---Space at end makes things look cleaner
         }
     }
     
@@ -2437,6 +2532,7 @@ function Pollen() constructor {
 //We only need the static vars in Pollen so we instantiate Pollen to set them up, then delete the actual instance since we don't need it.
 var _initPollen = new Pollen(); 
 delete _initPollen;
+if(POLLEN_ENABLE_DEBUG){Pollen.__DebugInit();}
 if(POLLEN_AUTO_IMPORT_CONFIG_PFX){Pollen.ImportPfx(global.pollen_config_pfx);} //<---Do not rename any files or this might not work since it requires the other scripts to be initialized first!!!
 Pollen.Log("Ready!");
 
