@@ -33,7 +33,7 @@
         
             Features:
             - Added reset/clear methods that wrap GM's part_x_clear functions
-            - Added optional debug view to watch and edit part variables
+            - Added optional debug view to watch particle variables
             
             Bug fixes:
             - Optimized hex conversion in pollen importer thanks to JuJuAdams
@@ -63,7 +63,7 @@ function Pollen() constructor {
     time_source_start(time_source_create(time_source_global, 1, time_source_units_frames, function()
     {
         
-        if(POLLEN_ENABLE_DEBUG){DebugUpdate();}
+        if(POLLEN_ENABLE_DEBUG){__DebugUpdate();}
         
         if (POLLEN_LIVE_EDIT && ((os_type == os_windows) || (os_type == os_macosx) || (os_type == os_linux))){
             Pollen.__bootSetupTimer--;
@@ -914,6 +914,7 @@ function Pollen() constructor {
     ///@param   {Pollen.Type} type The Pollen.Type data that you want to reset
     ///@return  {undefined}
     static TypeReset = function(_type){
+        if(!is_instanceof(_type, Type)){Error("Cannot reset type that is not a valid Pollen.Type struct!");}
         part_type_clear(_type.GetGmlData());
         _type.Copy(__defaultType);
     }
@@ -1239,9 +1240,10 @@ function Pollen() constructor {
     
     ///@func    EmitterReset(emitter)
     ///@desc    Resets the underlying data of a particle emitter similar to GM's 'part_emitter_clear' function. NOTE: if an emitter is streaming particles, it will stop and have to be restarted using Pollen.Stream
-    ///@param   {Pollen.Emitter} system The Pollen.System data that you want to reset
+    ///@param   {Pollen.Emitter} emitter The Pollen.Emitter data that you want to reset
     ///@return  {undefined}
     static EmitterReset = function(_emitter){
+        if(!is_instanceof(_emitter, Emitter)){Error("Cannot reset emitter that is not a valid Pollen.Emitter struct!");}
         part_emitter_clear(_emitter.__system.GetGmlData(), _emitter.GetGmlData());
         _emitter.Copy(__defaultEmitter);
     }
@@ -1629,7 +1631,7 @@ function Pollen() constructor {
     ///@param   {Pollen.System} system The Pollen.System data that you want to reset
     ///@return  {undefined}
     static SystemClear = function(_system){
-        if(!is_instanceof(_system, System)){Error("Cannot destroy system that is not a valid Pollen.System struct!");}
+        if(!is_instanceof(_system, System)){Error("Cannot clear system that is not a valid Pollen.System struct!");}
         part_particles_clear(_system.GetGmlData());
     }
     
@@ -1638,7 +1640,7 @@ function Pollen() constructor {
     ///@param   {Pollen.System} system The Pollen.System data that you want to reset
     ///@return  {undefined}
     static SystemReset = function(_system){
-        if(!is_instanceof(_system, System)){Error("Cannot destroy system that is not a valid Pollen.System struct!");}
+        if(!is_instanceof(_system, System)){Error("Cannot reset system that is not a valid Pollen.System struct!");}
         EmitterListDestroyAll(_system); //<---preemptively destroy emitters so Pollen data is set properly before calling part_system_clear
         part_system_clear(_system.GetGmlData());
         _system.Copy(__defaultSystem); //<---Set pollen data back to default to reflect gml data
@@ -2332,7 +2334,7 @@ function Pollen() constructor {
         __defaultSystem = new Pollen.System("__pollen_system_default");
     }
     
-    //No need for JSDOC functions since these are generallty not meant to be called by users
+    //No need for JSDOC since these are generallty not meant to be called by users
     
     static Log = function(_message){if(POLLEN_LOG_LEVEL < 2){return;} show_debug_message("Pollen -> " + _message);}
     static Warn = function(_message){if(POLLEN_LOG_LEVEL < 1){return;} show_debug_message("Pollen -> Warning! " + _message);}
@@ -2389,11 +2391,12 @@ function Pollen() constructor {
     /// @category   API
     /// @text       Setup debug tools.
     
+     //No need for JSDOC since these are generallty not meant to be called by users
+     
     static __dbgData = {
         view: undefined,
         selectedSystem: undefined,
         selectedSystemLast: undefined,
-        showGmlData: false,
         sectionOpt: undefined,
         sectionSys: undefined,
         sectionEmit: undefined,
@@ -2402,22 +2405,21 @@ function Pollen() constructor {
     }
     
     static __DebugInit = function(){
-        
-        //View
         dbg_view_delete(__dbgData.view);
-        __dbgData.view = dbg_view("Pollen", true);
-        
-        //Show data (can expand this later to allow more useful debug tools)
+        __dbgData.view = dbg_view("Pollen", false);
         DebugViewRefresh();
     }
     
-    static DebugUpdate = function(){
+    static __DebugUpdate = function(){
         if(__dbgData.selectedSystem != __dbgData.selectedSystemLast){
             DebugViewRefresh();
             __dbgData.selectedSystemLast = __dbgData.selectedSystem;
         }
     }
     
+    ///@func    DebugRefresh()
+    ///@desc    Clears and repopulates the dbg view with dbg sections and controls that watch the currently selected system.
+    ///@return  {undefined}
     static DebugViewRefresh = function(){
         dbg_section_delete(__dbgData.sectionOpt);
         dbg_section_delete(__dbgData.sectionSys);
@@ -2433,15 +2435,20 @@ function Pollen() constructor {
         array_sort(_systemTagList, true);
         dbg_drop_down(ref_create(__dbgData, "selectedSystem"), _systemTagList, "System:");
         
-        //Show Gml Toggle
-        dbg_checkbox(ref_create(__dbgData, "showGmlData"), "Show Gml Data:");
+        //Show GML data
+        dbg_text_separator($"~ GML Data ~");
+        dbg_button("Dump Gml Data", DebugDumpGmlData);
+        dbg_same_line();
+        dbg_button("Copy Gml Data", DebugCopyGmlData);
+        // dbg_checkbox(ref_create(__dbgData, "showGmlData"), "Show Gml Data:");
         
         dbg_text("\n");
         
-        DebugRefreshSystemData();
+        __DebugRefreshSystemData();
     }
   
-    static DebugRefreshSystemData = function(){
+   //This gets called automatically with DebugViewRefresh and there shouldn't be any need to call this outside of that function.
+    static __DebugRefreshSystemData = function(){
         
         __dbgData.sectionSys = dbg_section("System");
         
@@ -2465,6 +2472,7 @@ function Pollen() constructor {
         }
     }
     
+    //This gets called automatically with __DebugRefreshSystemData and there shouldn't be any need to call this outside of that function.
     static __DebugRefreshEmitterData = function(_emitter_list){
         var _numEmitters = array_length(_emitter_list);
         var _iEmitter = -1;
@@ -2494,6 +2502,7 @@ function Pollen() constructor {
         }
     }
     
+    //This gets called automatically with __DebugRefreshEmitterData and there shouldn't be any need to call this outside of that function.
     static __DebugRefreshTypeData = function(_emitter_list){
         var _numEmitters = array_length(_emitter_list);
         var _iEmitter = -1;
@@ -2516,6 +2525,86 @@ function Pollen() constructor {
             }
         dbg_text("\n"); //<---Space at end makes things look cleaner
         }
+    }
+    
+    ///@func    DebugFormatGmlData(gml_system)
+    ///@desc    Gets the particle info struct for a gml part system and formats the data into a "pretty print" string
+    ///@param   {Id.ParticleSystem} The gml part system to get particle info from
+    ///@return  {string}
+    static DebugFormatGmlData = function(_gml_system){
+        var _data = particle_get_info(_gml_system);
+        var _names = struct_get_names(_data);
+        array_sort(_names, true);
+        var _numNames = array_length(_names);
+        var _iName = -1;
+        var _log = $"\n--- System: '{Pollen.__dbgData.selectedSystem}' Gml Data ---\n\n";
+        repeat(_numNames){
+            _iName++;
+            var _name = _names[_iName];
+            if(_name == "emitters"){continue;}
+            _log += $"{_name}: {struct_get(_data, _name)},\n";
+        }
+        
+        if(_data.emitters != 0){
+            var _numEmitters = array_length(_data.emitters);
+            var _iEm = -1;
+            repeat(_numEmitters){
+                _iEm++;
+                _log += $"\nemitters[{_iEm}]: \{\n";
+                var _em = _data.emitters[_iEm];
+                var _emNames = struct_get_names(_em);
+                array_sort(_emNames, true);
+                var _numEmNames = array_length(_emNames);
+                var _iEmName = -1;
+                repeat(_numEmNames){
+                    _iEmName++;
+                    var _name = _emNames[_iEmName];
+                    if(_name == "parttype"){continue;}
+                    _log += $"\t{_name}: {struct_get(_em, _name)},\n";
+                }
+                
+                if(_em.parttype == undefined){_log += "\n\tparttype: undefined,\n";}
+                else {
+                    _log += "\n\tparttype: {\n";
+                    var _typeNames = struct_get_names(_em.parttype);
+                    array_sort(_typeNames, true);
+                    var _numTypeNames = array_length(_typeNames);
+                    var _iTypeName = -1;
+                    repeat(_numTypeNames){
+                        _iTypeName++;
+                        var _name = _typeNames[_iTypeName];
+                        _log += $"\t\t{_name}: {struct_get(_em.parttype, _name)},\n";
+                    }
+                    _log += "\t";
+                }
+                
+                _log += "},\n";
+            }
+        }
+        
+        return _log;
+    }
+    
+    ///@func    DebugDumpGmlData(_system_tag)
+    ///@desc    Shows a debug message (log) of a "pretty print" formatted gml part system
+    ///@param   {string} The pollen system tag to dump particle info data from
+    ///@return  {undefined}
+    static DebugDumpGmlData = function(_system_tag = Pollen.__dbgData.selectedSystem){
+        var _sys = Pollen.SystemTagGetData(_system_tag);
+        if(_sys == undefined){Pollen.Warn("Trying to call DebugDumpGmlData() but unable to find a pollen system named '{_system_tag}'. Bailing."); return;}
+        var _log = Pollen.DebugFormatGmlData(_sys.GetGmlData());
+        show_debug_message(_log);
+    }
+    
+    ///@func    DebugCopyGmlData(_system_tag)
+    ///@desc    Copies "pretty print" formatted gml part system data into clipboard
+    ///@param   {string} The pollen system tag to copy particle info data from
+    ///@return  {undefined}
+    static DebugCopyGmlData = function(_system_tag = Pollen.__dbgData.selectedSystem){
+        var _sys = Pollen.SystemTagGetData(_system_tag);
+        if(_sys == undefined){Pollen.Warn("Trying to call DebugCopyGmlData() but unable to find a pollen system named '{_system_tag}'. Bailing."); return;}
+        var _log = Pollen.DebugFormatGmlData(_sys.GetGmlData());
+        clipboard_set_text(_log);
     }
     
 #endregion    
