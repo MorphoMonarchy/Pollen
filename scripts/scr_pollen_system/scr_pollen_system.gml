@@ -2401,7 +2401,6 @@ function Pollen() constructor {
         sectionSys: undefined,
         sectionEmit: undefined,
         sectionType: undefined,
-        typeDataString: "",
     }
     
     static __DebugInit = function(){
@@ -2527,12 +2526,17 @@ function Pollen() constructor {
         }
     }
     
-    ///@func    DebugFormatGmlData(gml_system)
+    ///@func    DebugFormatGmlData(system_or_tag)
     ///@desc    Gets the particle info struct for a gml part system and formats the data into a "pretty print" string
-    ///@param   {Id.ParticleSystem} The gml part system to get particle info from
+    ///@param   {Pollen.System|string|undefined} The pollen system or tag to get particle info data from. Pass 'undefined' to default to the currently selected part system in the Pollen dbg view.
     ///@return  {string}
-    static DebugFormatGmlData = function(_gml_system){
-        var _data = particle_get_info(_gml_system);
+    static DebugFormatGmlData = function(_system = undefined){
+        _system ??= Pollen.__dbgData.selectedSystem;
+        var _sysData = _system;
+        if(is_string(_sysData)){_sysData = SystemTagGetData(_system);}
+        if(_sysData == undefined){Pollen.Warn($"Attempting to format GML data but '{_system}' is not a recognized system tag. Bailing!"); return "Error!";}
+        if(!is_instanceof(_sysData, Pollen.System)){Pollen.Warn("Attempting to format GML data but the system passed is not a valid Pollen.System struct or tag. Bailing!"); return "Error!";}
+        var _data = particle_get_info(_sysData.GetGmlData());
         var _names = struct_get_names(_data);
         array_sort(_names, true);
         var _numNames = array_length(_names);
@@ -2585,25 +2589,35 @@ function Pollen() constructor {
         return _log;
     }
     
-    ///@func    DebugDumpGmlData(_system_tag)
-    ///@desc    Shows a debug message (log) of a "pretty print" formatted gml part system
-    ///@param   {string} The pollen system tag to dump particle info data from
+    ///@func    DebugDumpGmlData(system_or_tag)
+    ///@desc    Shows a debug message (log) of a "pretty print" formatted gml part system. NOTE: the POLLEN_LOG_LEVEL macro must be set to 2 in order to see the log.
+    ///@param   {string|Pollen.System|undefined} The pollen system or tag to dump particle info data from. Pass 'undefined' to default to the currently selected part system in the Pollen dbg view.
     ///@return  {undefined}
-    static DebugDumpGmlData = function(_system_tag = Pollen.__dbgData.selectedSystem){
-        var _sys = Pollen.SystemTagGetData(_system_tag);
-        if(_sys == undefined){Pollen.Warn("Trying to call DebugDumpGmlData() but unable to find a pollen system named '{_system_tag}'. Bailing."); return;}
-        var _log = Pollen.DebugFormatGmlData(_sys.GetGmlData());
+    static DebugDumpGmlData = function(_system = undefined){ //<---Default to 'undefined' instead of selectedSystem because default args are constants evaluated at compile time
+        if(POLLEN_LOG_LEVEL < 2){Pollen.Warn("Attempting to dump gml data, but POLLEN_LOG_LEVEL must be set to 2! Bailing."); return;}
+        _system ??= Pollen.__dbgData.selectedSystem;  
+        if(_system == 0){_system = Pollen.__dbgData.selectedSystem;} //<---For some reason dbg_buttons pass '0' as an arg by default even though they're not supposed to pass any args?
+        var _sysData = _system;
+        Pollen.Log($"{_system}");
+        if(is_string(_system)){_sysData = Pollen.SystemTagGetData(_system);}
+        if(_sysData == undefined){Pollen.Warn($"Trying to call DebugDumpGmlData() but unable to find a pollen system named '{_system}'. Bailing."); return;}
+        if(!is_instanceof(_sysData, Pollen.System)){Pollen.Warn($"Trying to call DebugDumpGmlData() but the system arg is not a valid Pollen.System struct. Bailing."); return;}
+        var _log = Pollen.DebugFormatGmlData(_sysData);
         show_debug_message(_log);
     }
     
-    ///@func    DebugCopyGmlData(_system_tag)
-    ///@desc    Copies "pretty print" formatted gml part system data into clipboard
-    ///@param   {string} The pollen system tag to copy particle info data from
+    ///@func    DebugCopyGmlData(system_or_tag)
+    ///@desc    Copies "pretty print" formatted gml part system data into clipboard.
+    ///@param   {string|Pollen.System|undefined} The pollen system or tag to copy particle info data from. Pass 'undefined' to default to the currently selected part system in the Pollen dbg view.
     ///@return  {undefined}
-    static DebugCopyGmlData = function(_system_tag = Pollen.__dbgData.selectedSystem){
-        var _sys = Pollen.SystemTagGetData(_system_tag);
-        if(_sys == undefined){Pollen.Warn("Trying to call DebugCopyGmlData() but unable to find a pollen system named '{_system_tag}'. Bailing."); return;}
-        var _log = Pollen.DebugFormatGmlData(_sys.GetGmlData());
+    static DebugCopyGmlData = function(_system = undefined){
+        _system ??= Pollen.__dbgData.selectedSystem; 
+        if(_system == 0){_system = Pollen.__dbgData.selectedSystem;} //<---For some reason dbg_buttons pass '0' as an arg by default even though they're not supposed to pass any args?
+        var _sysData = _system;
+        if(is_string(_system)){_sysData = Pollen.SystemTagGetData(_system);} 
+        if(_sysData == undefined){Pollen.Warn($"Trying to call DebugCopyGmlData() but unable to find a pollen system named '{_system}'. Bailing."); return;}
+        if(!is_instanceof(_sysData, Pollen.System)){Pollen.Warn($"Trying to call DebugCopyGmlData() but the system arg is not a valid Pollen.System struct. Bailing."); return;}
+        var _log = Pollen.DebugFormatGmlData(_sysData);
         clipboard_set_text(_log);
     }
     

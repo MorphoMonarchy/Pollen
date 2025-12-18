@@ -87,7 +87,7 @@ global.pollen_config_pfx = [
     {
         system : "system_example",
         depth: 100,
-        //layer: "Asset", //<--- Uncomment this to set the system to a specific room layer instead
+        // layer: "Asset", //<--- Uncomment this to set the system to a specific room layer instead
         // position: {x: 600, y: 300}, //<--- Uncomment this to initialize the system at a specific position
         globalSpace: true,
         drawOrder: false,
@@ -96,7 +96,7 @@ global.pollen_config_pfx = [
         // alpha: 0.5, //<--- Uncomment this to adjust global alpha for the particle system
         emitterList : [
             {
-                type: "type_example_template", //<---set this to 'type_example_template' to see how templates work with part types
+                type: "type_example_full", //<---set this to 'type_example_template' to see how templates work with part types
                 width: 64,
                 height: 64,
                 number: 10,

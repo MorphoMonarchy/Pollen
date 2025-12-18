@@ -14,7 +14,7 @@
 // Whether live/hot-reloading is enabled. Set this to 'false' when making a ship build of your project.
 #macro POLLEN_LIVE_EDIT true
 
-// Whether to enable debug tools for Pollen
+// Whether to enable debug tools for Pollen such as the dbg_view.
 #macro POLLEN_ENABLE_DEBUG true
 
 
