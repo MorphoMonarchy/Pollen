@@ -43,6 +43,23 @@ This guide will take you through installing and using Pollen for the first time,
 - If you notice that Pollen is not working in Mac or Ubuntu builds, but works in Windows, please [submit a bug report](https://github.com/MorphoMonarchy/Pollen/issues).
 
 
+## Workflow Tips
+
+### Design:
+
+Games often utilize "copy and pasted" particle fx for both the sake of productivity as well as visual consistency for the player (it's nice when there's a win-win between devs and players). 
+
+So what I recommend is designing a generic or 'base' design of a particle effect in either Pollen or GM's particle designer (though you could also work with other 3rd party editors if you want, but it might take a bit more work setting up). Then make variations by simply setting the 'template' property to the tag of the 'base' effect and make changes from there. 
+
+For example, you could design a 'base' version of a fireball that looks like a normal fireball, then simply use it as a template in a new type and change the color property to get a blue fireball (see template examples in 'scr_pollen_config_pfx'). This could even be expanded to create an ice/electro-ball or more!
+
+### Organization:
+
+First and foremost, I recommend always defining your generic or 'base' types/system first (i.e. ones that will be used as templates), and also always declare your types before your systems/emitters. This will prevent errors from trying to read a type/system before it's defined.
+
+It also might be useful to group together effects in ways that are relevant for your project. For example, you could group all your fireball type/system definitions with the rest of the'"magic' fx (think of them like GM's audio groups but for particle fx). 
+
+This will make it easier if you need to load/destroy particle effects on the fly (for example if there are particle fx that only exist in one level and are never used for the rest of the game. See 'Optimization Tips' below for more info). It will also make it easier to find the effects you're looking for (especially if you utilize `#region` code folding). 
 
 ## Optimization Tips
 
