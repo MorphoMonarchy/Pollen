@@ -5,7 +5,7 @@
 <h1 align="center">Pollen</h1>
 
 <p align="center">
-A live updating particle effects builder library for GameMaker 2024.13.<br>
+A live updating particle effects builder library for GameMaker 2024.14.2.<br>
 </p>
 
 

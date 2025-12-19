@@ -32,12 +32,16 @@
         ~ v1.1.0 ~
         
             Features:
-            - Added reset/clear methods that wrap GM's part_x_clear functions
+            - Added reset/clear methods that wrap GM's part_X_clear functions
             - Added optional debug view to watch particle variables
             
             Bug fixes:
             - Optimized hex conversion in pollen importer thanks to JuJuAdams
             - Fixed "alpha" property updating the part system's depth instead of alpha when using pollen_config_pfx
+            
+            Docs:
+            - Added "Troubleshooting" and "Workflow Tips" sections to "Getting Started" page in the docs
+            - Update to reflect current API and other minor changes.
         
 */
 
