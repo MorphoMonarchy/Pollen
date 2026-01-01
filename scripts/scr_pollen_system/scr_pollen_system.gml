@@ -33,6 +33,7 @@
             
             Bug fixes:
             - Removed unnecessary Vinyl script from scripts folder 
+            - Removed 'pollen_type_property' enum as it
     
         ~ v1.1.0 ~
         
@@ -133,7 +134,6 @@ function Pollen() constructor {
     
     //--- PROPERTIES ---/
     
-    enum pollen_type_property {shape, sprite, size, scale, speed, direction, gravity, orientation, color, blend, life, step, death}
     static __typeMap = ds_map_create();
     
     
