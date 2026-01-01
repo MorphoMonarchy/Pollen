@@ -29,6 +29,11 @@
         
     - CHANGELOG:
     
+        ~ Patch v1.1.1
+            
+            Bug fixes:
+            - Removed unnecessary Vinyl script from scripts folder 
+    
         ~ v1.1.0 ~
         
             Features:
