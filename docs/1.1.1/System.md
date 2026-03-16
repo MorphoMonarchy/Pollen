@@ -1,0 +1,227 @@
+# System
+
+A particle system constructor that uses similar properties found in GM's `part_system` family of functions.
+
+### `System(tag, [gml_system])` (*constructor*)
+A Pollen object that represents GM's particle systems with additional util functions to simplify building systems and getting their data.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `tag` | string | A unique tag used to identify the system |
+| `[gml_system]` | Id.ParticleType | An optional reference to a GML particle system you can pass in to initialize the system with (i.e. with `part_system_create()`. Defaults to `undefined`) |
+
+## Methods
+
+### `.SetTemplate(template, [copy_on_set])` → `self`
+Sets the template that the system will default to.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `template` | string or Pollen.System or undefined | The tag or `Pollen.System` to set as the template, or `undefined` to clear the template |
+
+### `.SetEmitterList(list)` → `self`
+Replaces the system's emitter list with the provided array; destroys existing emitters first.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `list` | array | The new list of `Pollen.Emitter` instances |
+
+### `.SetColor(color)` → `self`
+Sets a color multiplier applied to all particles rendered by this system.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `color` | color | The color (e.g., `c_white`) |
+
+### `.SetAlpha(alpha)` → `self`
+Sets the alpha multiplier applied to all particles rendered by this system.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `alpha` | real | The alpha value (0..1) |
+
+### `.SetPosition([x], [y])` → `self`
+Sets the system's origin position.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `[x]` | real or undefined | X position (or undefined to keep current) |
+| `[y]` | real or undefined | Y position (or undefined to keep current) |
+
+### `.SetGlobalSpace(enabled)` → `self`
+Toggles whether particle positions maintain their global/room position or are set local/relative to the system's position.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `enabled` | bool | True for global space, false for local |
+
+### `.SetDrawOrder(enabled)` → `self`
+Sets draw order to old-to-new (`true`) or new-to-old (`false`).
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `enabled` | bool | Draw oldest first when true |
+
+### `.SetAngle(angle)` → `self`
+Sets a rotation applied to all particles during rendering.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `angle` | real | Angle in degrees |
+
+### `.SetDepth(depth)` → `self`
+Sets the draw depth for the system and clears any layer binding.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `depth` | real or undefined | The new depth (smaller = in front) |
+
+### `.SetLayer(layer)` → `self`
+Binds the system to a room layer (overrides depth).
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `layer` | string or real or undefined | The room layer name or ID |
+
+### `.GetTag()` → `string`
+Returns the unique system tag.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetGmlData()` → `Id.ParticleSystem`
+Returns the underlying GM particle system handle.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetTemplate()` → `string or Id.ParticleSystem or undefined`
+Returns the particle system template the `Pollen.System` copies from.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetDepth()` → `real`
+Returns the system's draw depth (ignored when layer is set).
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetLayer()` → `string or real or undefined`
+Returns the bound room layer name or ID, or undefined if unbound.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetPosition()` → `struct`
+Returns the system position as a struct `{x, y}`.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetGlobalSpace()` → `bool`
+Returns whether the system uses global space.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetDrawOrder()` → `bool`
+Returns whether oldest particles are drawn first.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetAngle()` → `real`
+Returns the render rotation angle in degrees.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetColor()` → `color`
+Returns the color multiplier applied to particles.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetAlpha()` → `real`
+Returns the alpha multiplier applied to particles.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.GetEmitterList()` → `array`
+Returns the array of emitters owned by this system.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.RefreshStream()` → `undefined`
+Rebuilds and restarts the system's streaming emitters if streaming is active.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `.Copy(pfx, [ignore_emitter_list])` → `undefined`
+Copies configuration from another `Pollen.System` into this system.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `pfx` | Pollen.System | The source system to copy from |
+| `[ignore_emitter_list]` | bool | If true, skips copying the emitter list |
+
+## Additional Util Functions
+
+### `SystemTagGetData(tag)` → `Pollen.System or undefined`
+Gets the data associated with a `Pollen.System` tag (or undefined if data does not exist for the tag).
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `tag` | string | The tag of the `Pollen.System` that you want to get the data for |
+
+### `EmitterListDestroyAll(system)` → `undefined`
+Destroys all the emitters tied to a `Pollen.System`.
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `system` | Pollen.System | The system to clear the emitters from |
+
+### `SystemDestroy(system)` → `undefined`
+Destroys a single `Pollen.System` instance and clears all of its data (including its underlying GM `part_system` data).
+
+| Parameter | Datatype | Purpose |
+|-----------|-----------|---------|
+| `system` | Pollen.System | The `Pollen.System` instance to destroy |
+
+### `SystemDestroyAll()` → `undefined`
+Destroys all instances of `Pollen.System` and clears all of their data.
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| None |  |  |
+
+### `SystemClear(system)` → `undefined`
+Clears the visual representation of a particle system without resetting it's underlying data similar to GM's 'part_particle_clear' function. **NOTE: streaming particles will only be cleared for 1 frame and will resume streaming afterwards!**
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| `system` | Pollen.System | The `Pollen.System` data that you want to clear |
+
+### `SystemReset(system)` → `undefined`
+Clears the visual representation of a particle system **AND** resets it's underlying data similar to GM's 'part_system_clear' function. **NOTE: this will destroy all the system's emitters as well so any references to them will result in a crash!**
+
+| Parameter | Datatype | Purpose |
+|------------|-----------|----------|
+| `system` | Pollen.System | The `Pollen.System` data that you want to reset |

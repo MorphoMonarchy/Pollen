@@ -15,6 +15,7 @@
 /*                                                                                                          
 
     - READ THE DOCS! -> https://morphomonarchy.github.io/Pollen/#/
+	
   
     - INDEX: (use ctrl+f to jump to section or search for #region):
     
@@ -26,6 +27,7 @@
         ~ IMPORT ~
         ~ UTIL ~
         ~ DEBUG ~
+		
         
     - CHANGELOG:
     
@@ -33,7 +35,11 @@
             
             Bug fixes:
             - Removed unnecessary Vinyl script from scripts folder 
-            - Removed 'pollen_type_property' enum as it
+            - Removed the unused 'pollen_type_property' enum
+			
+			Minor changes:
+			- Renamed scripts to use naming conventions that are more consistent with other popular libraries
+			- Add example system to show how to use the builder pattern with the .Set methods
     
         ~ v1.1.0 ~
         
@@ -67,7 +73,7 @@ function Pollen() constructor {
     //Set up an update function that executes one every frame forever.
     
     static __bootSetupTimer = 0;
-    static __bootSetupPath = (POLLEN_LIVE_EDIT) ? filename_dir(GM_project_filename) + "/scripts/scr_pollen_config_pfx/scr_pollen_config_pfx.gml" : undefined;
+    static __bootSetupPath = (POLLEN_LIVE_EDIT) ? filename_dir(GM_project_filename) + "/scripts/__scr_pollen_config_pfx/__scr_pollen_config_pfx.gml" : undefined;
     static __bootSetupHash = undefined;
     
     time_source_start(time_source_create(time_source_global, 1, time_source_units_frames, function()

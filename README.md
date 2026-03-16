@@ -2,10 +2,10 @@
   <img src=https://i.imgur.com/DnBMqSZ.png style="display:block; margin:auto; width:300px">
 </p>
 
-<h1 align="center">Pollen</h1>
+<h1 align="center">Pollen 1.1.1</h1>
 
 <p align="center">
-A live updating particle effects builder library for GameMaker 2024.14.2.<br>
+A live updating particle effects builder library for GameMaker 2024.14.<br>
 </p>
 
 

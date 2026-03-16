@@ -17,7 +17,7 @@
     You can configure the entirety of your game particle effects from this one script in most cases.
     
     If POLLEN_LIVE_EDIT is set to <true> then editing this file will quickly be reflected in
-    particle effects currently playing in your game. The live update feature does have limitations, however.
+    particle effects currently playing in your game. The live update feature does have limitations however.
     This feature is only available when running on Windows, Mac, or Linux. Furthermore, the GML
     parser used to power live updating is very simple. You should treat the JSON written in this
     file as "pure JSON" and you should not use conditionals or if-statements or any logic at all.
@@ -26,7 +26,7 @@
         
         ~ DO NOT RENAME THIS FILE!!!
         
-        ~ READ THE DOCS!!! -> https://morphomonarchy.github.io/Pollen/#/1.0.0/Config%20PFX
+        ~ READ THE DOCS!!! -> https://morphomonarchy.github.io/Pollen/#/1.1.1/Config%20PFX
         
         ~ The particle effects defined below are examples of how you can configure particle FX using this script
           feel free to change, delete, or add to them as you need!
