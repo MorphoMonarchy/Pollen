@@ -81,7 +81,8 @@ function Pollen() constructor {
         
         if(POLLEN_ENABLE_DEBUG){__DebugUpdate();}
         
-        if (POLLEN_LIVE_EDIT && ((os_type == os_windows) || (os_type == os_macosx) || (os_type == os_linux))){
+        if (POLLEN_LIVE_EDIT){
+        	if(os_type != os_windows && os_type != os_macosx && os_type != os_linux){Pollen.Error("Live edit is not supported on this build target! Pollen only supports Windows, Mac, or Linux builds. Either disable the sandbox or POLLEN_LIVE_EDIT to continue.");}
         	if(GM_is_sandboxed){Pollen.Error("GM sandbox is not disabled so live edit will not work! Either disable the sandbox or POLLEN_LIVE_EDIT to continue.");}
         	
             Pollen.__bootSetupTimer--;
