@@ -82,6 +82,8 @@ function Pollen() constructor {
         if(POLLEN_ENABLE_DEBUG){__DebugUpdate();}
         
         if (POLLEN_LIVE_EDIT && ((os_type == os_windows) || (os_type == os_macosx) || (os_type == os_linux))){
+        	if(GM_is_sandboxed){Pollen.Error("GM sandbox is not disabled so live edit will not work! Either disable the sandbox or POLLEN_LIVE_EDIT to continue.");}
+        	
             Pollen.__bootSetupTimer--;
             if (Pollen.__bootSetupTimer <= 0){
                 Pollen.__bootSetupTimer = 60;
